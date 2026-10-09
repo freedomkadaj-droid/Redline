@@ -399,7 +399,31 @@ async function loadResult(){
 async function loadControl(){
  const t=tok;
  try{const m=(await get(`/race_control?session_key=${cur.session_key}`)).sort((a,b)=>new Date(b.date)-new Date(a.date));if(!ok(t))return;
-  $("control").innerHTML=m.slice(0,80).map(x=>`<div class="msg"><time>${x.lap_number?"Lap "+x.function drawRadio(){
+  $("control").innerHTML=m.slice(0,80).map(x=>`<div class="msg"><time>${x.lap_number?"Lap "+x.lap_number:new Date(x.date).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</time><div>${x.flag?`<span class="flag ${esc(String(x.flag).split(" ")[0])}">${esc(x.flag)}</span>`:""}${esc(x.message)}</div></div>`).join("")||'<div class="state">No messages.</div>'}catch(e){ok(t)&&fail("control",e)}
+}
+
+// Team radio: any session of the selected race weekend
+let rclips=[],rby={};
+async function loadSessions(race){const t0=tok;
+ try{const ss=(await get(`/sessions?meeting_key=${race.meeting_key}`)).filter(s=>new Date(s.date_start)<Date.now()).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
+  if(!ok(t0))return;$("rsess").innerHTML=ss.map(s=>`<option value="${s.session_key}">${esc(race.country_name)} · ${esc(s.session_name)}</option>`).join("");
+  $("rsess").value=race.session_key;$("lsess").innerHTML=$("rsess").innerHTML;$("lsess").value=race.session_key;$("wsess").innerHTML=$("rsess").innerHTML;$("wsess").value=race.session_key;lapsFor=null;await loadRadio();await loadLaps();await loadWeather()}catch(e){fail("radioList",e)}
+}
+let radioFor=null,radioContext={key:null,control:[],positions:[],intervals:[],stints:[]};
+async function loadRadio(){
+ const k=$("rsess").value;if(!k)return;radioFor=k;$("radioList").innerHTML='<div class="state">Loading team radio and session context…</div>';
+ try{
+  const [c,d,control,positions,intervals,stints]=await Promise.all([
+   get(`/team_radio?session_key=${k}`),get(`/drivers?session_key=${k}`),
+   get(`/race_control?session_key=${k}`).catch(()=>[]),get(`/position?session_key=${k}`).catch(()=>[]),
+   get(`/intervals?session_key=${k}`).catch(()=>[]),get(`/stints?session_key=${k}`).catch(()=>[])
+  ]);
+  if(radioFor!==k)return;
+  rby=Object.fromEntries(d.map(x=>[x.driver_number,x]));rclips=c.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  radioContext={key:k,control,positions,intervals,stints};drawRadio()
+ }catch(e){fail("radioList",e)}
+}
+function drawRadio(){
  const l=rclips.slice(0,40);
  $("radioList").innerHTML=l.map((c,i)=>{
   const d=who(rby,c.driver_number),dt=new Date(c.date),time=dt.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"});
@@ -424,7 +448,7 @@ async function loadControl(){
   if(gapValue!=null&&gapValue!=="")summary.push("recorded gap "+gapText);
   if(prevLap&&typeof prevLap.lap_duration==="number")summary.push("previous completed lap "+lapText);
   if(stint&&stint.compound)summary.push(tyre+" tyres"+(tyreAge?" ("+tyreAge+")":""));
-  const what=summary.length?"At "+time+", "+(d.full_name||"this driver")+" was "+summary.join("; ")+".": "There isn't enough nearby timing data to describe this moment reliably.";
+  const what=summary.length?"At "+time+", "+(d.full_name||"this driver")+" was "+summary.join("; ")+".":"There isn't enough nearby timing data to describe this moment reliably.";
   return `<article class="radio${isFavD(d)?" hot":""}">
    <div class="radio-head"><div class="av" style="background:var(--hover);border:1px solid color-mix(in srgb,#${esc(d.team_colour||"8B8B98")} 65%,white)"><img src="${esc(d.headshot_url||"")}" alt="" loading="lazy" onerror="this.remove()"></div><div class="radio-id"><div class="radio-kicker">Original team radio</div><b>${esc(d.full_name||"Driver #"+c.driver_number)}</b><small>${esc(d.team_name||"")} · Driver #${esc(c.driver_number)}</small></div><div class="radio-time">${esc(time)}<br><span>${esc(dt.toLocaleDateString([],{day:"numeric",month:"short"}))}</span></div></div>
    <div class="radio-audio"><div class="radio-wave" aria-hidden="true">${[5,10,7,15,9,18,11,6,14,20,8,12,17,7,10,15,5,13,8,18,11,6,14,9,16,7,12,5,10,15,8,13].map((h,j)=>`<i style="height:${h}px;opacity:${.45+(j%4)*.15}"></i>`).join("")}</div><audio controls preload="none" src="${esc(c.recording_url)}">Your browser does not support audio playback.</audio></div>
@@ -437,20 +461,6 @@ async function loadControl(){
     </div><div class="context-summary"><b>What was happening?</b><p>${esc(what)} ${nearby?"Race control: "+String(nearby.message||"message recorded")+".":""}</p></div><small class="context-foot">Original audio from the session. Context is based on recorded timing and race-control data near this timestamp; no AI transcript or invented quotes.</small>
    </section></article>`
  }).join("")||'<div class="state">No radio clips for this session.</div>';
-}
-let radioContext={key:null,control:[],positions:[],intervals:[],stints:[]};
-async function loadRadio(){
- const k=$("rsess").value;if(!k)return;radioFor=k;$("radioList").innerHTML='<div class="state">Loading team radio and session context…</div>';
- try{
-  const [c,d,control,positions,intervals,stints]=await Promise.all([
-   get(`/team_radio?session_key=${k}`),get(`/drivers?session_key=${k}`),
-   get(`/race_control?session_key=${k}`).catch(()=>[]),get(`/position?session_key=${k}`).catch(()=>[]),
-   get(`/intervals?session_key=${k}`).catch(()=>[]),get(`/stints?session_key=${k}`).catch(()=>[])
-  ]);
-  if(radioFor!==k)return;
-  rby=Object.fromEntries(d.map(x=>[x.driver_number,x]));rclips=c.sort((a,b)=>new Date(b.date)-new Date(a.date));
-  radioContext={key:k,control,positions,intervals,stints};drawRadio()
- }catch(e){fail("radioList",e)}
 }
 $("rsess").onchange=loadRadio;
 
