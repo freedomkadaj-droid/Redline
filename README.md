@@ -96,6 +96,16 @@ In other words:
 
 If I think of something cool, I'll probably build it. 🏎️💨
 
+🏁 Update
+
+REDLINE v0.013 — UI & Design Improvements
+
+✨ What's New
+
+📰 News Tab: Fixed the awkward expansion behaviour when opening news articles.
+🎨 Branding Refresh: Introduced a new logo and updated the title and subtitle typography.
+📊 Standings UI: Reduced the size of the standings section in the upper-right corner for a cleaner layout.
+
 ⚠️ Disclaimer
 
 Redline is an independent fan-made project.
