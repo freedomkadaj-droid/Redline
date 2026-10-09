@@ -288,18 +288,18 @@ footer{color:var(--mute);font-size:14px}
  </header>
  <button class="pickbtn" id="pick" aria-haspopup="dialog">Choose Grand Prix</button>
   <nav id="tabs" role="tablist">
-  <button role="tab" aria-selected="true" data-v="standings">Standings</button>
-  <button role="tab" aria-selected="false" data-v="live">Live</button>
-  <button role="tab" aria-selected="false" data-v="race">Race</button>
-  <button role="tab" aria-selected="false" data-v="tele">Telemetry</button>
+  <button role="tab" aria-selected="true" data-v="news">News</button>
   <button role="tab" aria-selected="false" data-v="cal">Calendar</button>
-  <button role="tab" aria-selected="false" data-v="news">News</button>
+  <button role="tab" aria-selected="false" data-v="standings">Standings</button>
+  <button role="tab" aria-selected="false" data-v="race">Race</button>
+  <button role="tab" aria-selected="false" data-v="live">Live</button>
+  <button role="tab" aria-selected="false" data-v="tele">Telemetry</button>
  </nav>
  <div id="sub" hidden></div>
  <div class="layout">
  <aside class="panel" id="gps" aria-label="Grand Prix list"><h2>Season</h2><div class="yr"><select id="year" aria-label="Season"></select></div><div class="gplist" id="rounds"></div></aside>
  <main>
- <div class="pane grid" id="v-standings">
+ <div class="pane grid" id="v-standings" hidden>
   <section class="panel"><h2>Drivers</h2><div id="drivers"><div class="state">Loading…</div></div></section>
   <section class="panel"><h2>Constructors</h2><div id="teams"><div class="state">Loading…</div></div></section>
  </div>
@@ -311,7 +311,7 @@ footer{color:var(--mute);font-size:14px}
  <section class="panel pane" id="v-tele" hidden><h2>Telemetry</h2>
   <div class="tools"><select id="lsess" aria-label="Session"></select><select id="ldrv" aria-label="Driver"></select><select id="clap" aria-label="Lap" hidden></select></div>
   <div class="scroll" id="lapList"><div class="state">Loading…</div></div><div id="carView" hidden></div></section>
- <section class="panel pane" id="v-news" hidden><h2>Latest F1 news</h2>
+ <section class="panel pane" id="v-news"><h2>Latest F1 news</h2>
   <div class="tools"><div class="seg" role="group" aria-label="News layout">
    <button type="button" data-view="cards" aria-pressed="true"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>Cards</button>
    <button type="button" data-view="rows" aria-pressed="false"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="2" width="14" height="3" rx="1.2"/><rect x="1" y="6.5" width="14" height="3" rx="1.2"/><rect x="1" y="11" width="14" height="3" rx="1.2"/></svg>List</button></div>
@@ -393,7 +393,7 @@ const nowY=new Date().getFullYear();
 for(let y=nowY;y>=2023;y--)$("year").insertAdjacentHTML("beforeend",`<option>${y}</option>`);
 $("year").onchange=()=>loadYear(+$("year").value);
 const SUBS={race:[["result","Result"],["control","Race control"],["radio","Team radio"],["weather","Weather"]],tele:[["laps","Lap times"],["car","Car data"]]};
-const memo={};let curSub="standings";
+const memo={};let curSub="news";
 function show(top,sub){
  sub=sub||memo[top]||(SUBS[top]?SUBS[top][0][0]:top);memo[top]=sub;curSub=sub;
  document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x.dataset.v===top));
