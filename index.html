@@ -213,11 +213,7 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 .mi b{text-decoration:underline;text-decoration-color:transparent;text-decoration-thickness:2px;text-underline-offset:4px;transition:color .15s ease,text-decoration-color .15s ease}
 .mth:focus-visible .mi b{color:var(--red);text-decoration-color:var(--red)}
 @media(hover:hover){.mth:hover{background:var(--hover)}.mth:hover .mi b{color:var(--red);text-decoration-color:var(--red)}.mth:hover .chev{color:var(--red)}}
-.rtools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}.tnote{color:var(--mute);font-size:12px}
-.tbtn{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:99px;padding:6px 14px;min-height:36px;font:500 13px Inter,system-ui,sans-serif;cursor:pointer}
-.tbtn:hover{border-color:var(--red)}.tbtn:focus-visible{outline:2px solid var(--red);outline-offset:2px}.tbtn[disabled]{opacity:.55;cursor:default}
-.tx{margin-top:8px;padding:10px 12px;border-left:3px solid var(--red);background:var(--soft);border-radius:0 8px 8px 0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
-.tx .ai{display:block;color:var(--mute);font:600 11px 'Space Grotesk';letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}.tx.err{border-left-color:#f5c400}
+.radio{padding:18px;border-bottom:1px solid var(--line)}.radio:last-child{border-bottom:0}.radio-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}.radio-head .av{flex:0 0 40px}.radio-id{min-width:0;flex:1}.radio-id b{display:block;font:600 16px 'Space Grotesk';line-height:1.2}.radio-id small{display:block;color:var(--mute);font-size:12px;margin-top:4px}.radio-time{text-align:right;color:var(--mute);font:600 12px 'Space Grotesk';white-space:nowrap}.radio-kicker{font:700 10px 'Space Grotesk';letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:5px}.radio-audio{padding:10px 12px;background:var(--soft);border:1px solid var(--line);border-radius:12px}.radio-audio audio{display:block}.radio-wave{display:flex;align-items:center;gap:3px;height:22px;margin:0 0 7px;opacity:.8}.radio-wave i{display:block;width:3px;max-width:3px;flex:1;border-radius:4px;background:var(--red)}.radio-context{margin-top:14px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--soft)}.context-head{padding:12px 14px;border-bottom:1px solid var(--line)}.context-head b{display:block;font:700 12px 'Space Grotesk';letter-spacing:.1em}.context-head small{display:block;color:var(--mute);font-size:12px;margin-top:4px}.context-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line)}.context-card{min-width:0;padding:11px 13px;background:var(--card)}.context-card small{display:block;color:var(--mute);font:600 10px 'Space Grotesk';letter-spacing:.09em;text-transform:uppercase;margin-bottom:6px}.context-card b{display:block;font:600 15px 'Space Grotesk';overflow-wrap:anywhere}.context-card p{font-size:12px;color:var(--mute);line-height:1.45;margin:4px 0 0;overflow-wrap:anywhere}.context-summary{padding:12px 14px;border-top:1px solid var(--line)}.context-summary b{display:block;font:700 11px 'Space Grotesk';letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}.context-summary p{font-size:13px;line-height:1.5;margin:0;color:var(--txt)}.context-foot{display:block;padding:8px 14px;color:var(--mute);font-size:11px;border-top:1px solid var(--line)}@media(max-width:520px){.context-grid{grid-template-columns:1fr}.radio{padding:14px}.radio-time{font-size:11px}}
 [hidden]{display:none!important}
 footer{color:var(--mute);font-size:14px}
 </style>
@@ -403,46 +399,61 @@ async function loadResult(){
 async function loadControl(){
  const t=tok;
  try{const m=(await get(`/race_control?session_key=${cur.session_key}`)).sort((a,b)=>new Date(b.date)-new Date(a.date));if(!ok(t))return;
-  $("control").innerHTML=m.slice(0,80).map(x=>`<div class="msg"><time>${x.lap_number?"Lap "+x.lap_number:new Date(x.date).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</time><div>${x.flag?`<span class="flag ${esc(String(x.flag).split(" ")[0])}">${esc(x.flag)}</span>`:""}${esc(x.message)}</div></div>`).join("")||'<div class="state">No messages.</div>'}catch(e){ok(t)&&fail("control",e)}
-}
-
-// Team radio: any session of the selected race weekend
-let rclips=[],rby={};
-async function loadSessions(race){const t0=tok;
- try{const ss=(await get(`/sessions?meeting_key=${race.meeting_key}`)).filter(s=>new Date(s.date_start)<Date.now()).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
-  if(!ok(t0))return;$("rsess").innerHTML=ss.map(s=>`<option value="${s.session_key}">${esc(race.country_name)} · ${esc(s.session_name)}</option>`).join("");
-  $("rsess").value=race.session_key;$("lsess").innerHTML=$("rsess").innerHTML;$("lsess").value=race.session_key;$("wsess").innerHTML=$("rsess").innerHTML;$("wsess").value=race.session_key;lapsFor=null;await loadRadio();await loadLaps();await loadWeather()}catch(e){fail("radioList",e)}
-}
-let radioFor=null;
-async function loadRadio(){
- const k=$("rsess").value;radioFor=k;$("radioList").innerHTML='<div class="state">Loading…</div>';
- try{const [c,d]=await Promise.all([get(`/team_radio?session_key=${k}`),get(`/drivers?session_key=${k}`)]);
-  rby=Object.fromEntries(d.map(x=>[x.driver_number,x]));rclips=c.sort((a,b)=>new Date(b.date)-new Date(a.date));drawRadio()}catch(e){fail("radioList",e)}
-}
-function drawRadio(){
+  $("control").innerHTML=m.slice(0,80).map(x=>`<div class="msg"><time>${x.lap_number?"Lap "+x.function drawRadio(){
  const l=rclips.slice(0,40);
- $("radioList").innerHTML=l.map((c,i)=>{const d=who(rby,c.driver_number),done=txCache.get(c.recording_url);
-  return `<div class="radio${isFavD(d)?" hot":""}"><div class="top">${av(d.headshot_url,d.full_name,d.team_colour)}<b>${esc(d.full_name||"Driver #"+c.driver_number)}</b><small>${new Date(c.date).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</small></div><audio controls preload="none" src="${esc(c.recording_url)}"></audio>
-  <div class="rtools"><button type="button" class="tbtn" data-i="${i}">${done!=null?"Hide transcript":"✦ AI transcript"}</button><small class="tnote">Generated in your browser</small></div>
-  <div class="tx" id="tx${i}" role="status" aria-live="polite" ${done!=null?`data-ok="1"><span class="ai">AI transcript · may contain errors</span>${esc(done||"(No speech detected)")}`:"hidden>"}</div></div>`}).join("")||'<div class="state">No radio clips for this session.</div>';
+ $("radioList").innerHTML=l.map((c,i)=>{
+  const d=who(rby,c.driver_number),dt=new Date(c.date),time=dt.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  const ctx=radioContext.key===radioFor?radioContext:{control:[],positions:[],intervals:[],stints:[]};
+  const at=dt.getTime(),driver=String(c.driver_number);
+  const nearest=(arr,field,maxMs=180000)=>{const list=(arr||[]).filter(x=>String(x.driver_number)===driver&&x[field]&&Math.abs(new Date(x[field]).getTime()-at)<=maxMs);return list.sort((a,b)=>Math.abs(new Date(a[field])-at)-Math.abs(new Date(b[field])-at))[0]||null};
+  const pos=nearest(ctx.positions,"date"),gap=nearest(ctx.intervals,"date");
+  const nearby=(ctx.control||[]).filter(x=>Math.abs(new Date(x.date).getTime()-at)<=120000).sort((a,b)=>Math.abs(new Date(a.date)-at)-Math.abs(new Date(b.date)-at))[0];
+  const driverLaps=(lapData.g&&lapData.g[driver]||[]).filter(x=>x.date_start&&new Date(x.date_start).getTime()<=at).sort((a,b)=>new Date(b.date_start)-new Date(a.date_start));
+  const prevLap=driverLaps[0]||null,lapNo=prevLap&&prevLap.lap_number;
+  const stint=(ctx.stints||[]).filter(x=>String(x.driver_number)===driver&&lapNo!=null&&Number(x.lap_start)<=lapNo&&Number(x.lap_end)>=lapNo).sort((a,b)=>Number(b.stint_number)-Number(a.stint_number))[0]||null;
+  const gapValue=gap&&(gap.interval!=null?gap.interval:gap.gap_to_leader);
+  const gapText=gapValue==null||gapValue===""?"Not recorded":(String(gapValue).toLowerCase().includes("lap")?gapValue:(Number.isFinite(Number(gapValue))?Number(gapValue).toFixed(3)+"s":gapValue));
+  const posText=pos&&pos.position!=null?"P"+pos.position:"Not recorded";
+  const lapText=prevLap&&typeof prevLap.lap_duration==="number"?fmtTime(prevLap.lap_duration):"Not recorded";
+  const tyre=stint&&stint.compound?String(stint.compound).replace(/_/g," "):"Not recorded";
+  const tyreAge=stint&&lapNo!=null&&stint.lap_start!=null?(Number(stint.tyre_age_at_start||0)+Math.max(0,lapNo-Number(stint.lap_start)))+" laps into stint":"";
+  const raceText=nearby?(nearby.flag?nearby.flag+" · ":"")+String(nearby.message||"Race-control message recorded"):"No nearby message recorded";
+  const summary=[];
+  if(pos&&pos.position!=null)summary.push("running P"+pos.position);
+  if(gapValue!=null&&gapValue!=="")summary.push("recorded gap "+gapText);
+  if(prevLap&&typeof prevLap.lap_duration==="number")summary.push("previous completed lap "+lapText);
+  if(stint&&stint.compound)summary.push(tyre+" tyres"+(tyreAge?" ("+tyreAge+")":""));
+  const what=summary.length?"At "+time+", "+(d.full_name||"this driver")+" was "+summary.join("; ")+".": "There isn't enough nearby timing data to describe this moment reliably.";
+  return `<article class="radio${isFavD(d)?" hot":""}">
+   <div class="radio-head"><div class="av" style="background:var(--hover);border:1px solid color-mix(in srgb,#${esc(d.team_colour||"8B8B98")} 65%,white)"><img src="${esc(d.headshot_url||"")}" alt="" loading="lazy" onerror="this.remove()"></div><div class="radio-id"><div class="radio-kicker">Original team radio</div><b>${esc(d.full_name||"Driver #"+c.driver_number)}</b><small>${esc(d.team_name||"")} · Driver #${esc(c.driver_number)}</small></div><div class="radio-time">${esc(time)}<br><span>${esc(dt.toLocaleDateString([],{day:"numeric",month:"short"}))}</span></div></div>
+   <div class="radio-audio"><div class="radio-wave" aria-hidden="true">${[5,10,7,15,9,18,11,6,14,20,8,12,17,7,10,15,5,13,8,18,11,6,14,9,16,7,12,5,10,15,8,13].map((h,j)=>`<i style="height:${h}px;opacity:${.45+(j%4)*.15}"></i>`).join("")}</div><audio controls preload="none" src="${esc(c.recording_url)}">Your browser does not support audio playback.</audio></div>
+   <section class="radio-context"><div class="context-head"><b>REDLINE TEAM RADIO CONTEXT</b><small>${esc(cur&&cur.country_name?cur.country_name+" Grand Prix":"Race weekend")} · ${esc(($("rsess").selectedOptions[0]||{}).textContent||"Selected session")} · ${lapNo!=null?"Lap "+lapNo:"Lap not available"}</small></div>
+    <div class="context-grid">
+     <div class="context-card"><small>Race Control</small><b>${esc(nearby&&nearby.flag||"Session notes")}</b><p>${esc(raceText)}</p></div>
+     <div class="context-card"><small>Driver Performance</small><b>${esc(posText)}</b><p>${esc(gap&&gap.interval!=null?"Interval to car ahead: "+gapText:gap&&gap.gap_to_leader!=null?"Gap to leader: "+gapText:"Position gap not recorded nearby")}</p></div>
+     <div class="context-card"><small>Previous Lap</small><b>${esc(lapText)}</b><p>${prevLap&&lapNo!=null?"Lap "+lapNo+(prevLap.is_pit_out_lap?" · pit-out lap":""):"No completed lap time found before this clip"}</p></div>
+     <div class="context-card"><small>Tyre Stint</small><b>${esc(tyre)}</b><p>${esc(tyreAge||"Stint detail not recorded for this lap")}</p></div>
+    </div><div class="context-summary"><b>What was happening?</b><p>${esc(what)} ${nearby?"Race control: "+String(nearby.message||"message recorded")+".":""}</p></div><small class="context-foot">Original audio from the session. Context is based on recorded timing and race-control data near this timestamp; no AI transcript or invented quotes.</small>
+   </section></article>`
+ }).join("")||'<div class="state">No radio clips for this session.</div>';
 }
+let radioContext={key:null,control:[],positions:[],intervals:[],stints:[]};
+async function loadRadio(){
+ const k=$("rsess").value;if(!k)return;radioFor=k;$("radioList").innerHTML='<div class="state">Loading team radio and session context…</div>';
+ try{
+  const [c,d,control,positions,intervals,stints]=await Promise.all([
+   get(`/team_radio?session_key=${k}`),get(`/drivers?session_key=${k}`),
+   get(`/race_control?session_key=${k}`).catch(()=>[]),get(`/position?session_key=${k}`).catch(()=>[]),
+   get(`/intervals?session_key=${k}`).catch(()=>[]),get(`/stints?session_key=${k}`).catch(()=>[])
+  ]);
+  if(radioFor!==k)return;
+  rby=Object.fromEntries(d.map(x=>[x.driver_number,x]));rclips=c.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  radioContext={key:k,control,positions,intervals,stints};drawRadio()
+ }catch(e){fail("radioList",e)}
+}
+$("rsess").onchange=loadRadio;
 
-// ---- AI transcript: Whisper speech-to-text running inside the browser (no server, no API key) ----
-// First use downloads a small speech model (about 40 MB, then cached by the browser). Radio audio is noisy, so results can contain mistakes.
-// If the radio audio server refuses cross-origin reads (CORS), set audioProxy to your own proxy, e.g. "https://your-worker.workers.dev/?url=".
-const RADIO_AI={lib:"https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2",model:"Xenova/whisper-tiny.en",audioProxy:"",loader:u=>import(u)};
-const txCache=new Map();let asrP=null,txBusy=false;
-try{Object.entries(JSON.parse(localStorage.getItem("redline-radio-tx")||"{}")).forEach(([k,v])=>txCache.set(k,v))}catch(e){}
-function saveTx(){try{localStorage.setItem("redline-radio-tx",JSON.stringify(Object.fromEntries([...txCache].slice(-60))))}catch(e){}}
-function getAsr(onProgress){
- if(!asrP)asrP=(async()=>{const m=await RADIO_AI.loader(RADIO_AI.lib);m.env.allowLocalModels=false;
-  return m.pipeline("automatic-speech-recognition",RADIO_AI.model,{progress_callback:onProgress})})().catch(e=>{asrP=null;e.stage="model";throw e});
- return asrP}
-async function transcribe(url,onProgress,onStage){
- if(txCache.has(url))return txCache.get(url);
- const asr=await getAsr(onProgress);onStage&&onStage();
- let out;try{out=await asr(RADIO_AI.audioProxy?RADIO_AI.audioProxy+encodeURIComponent(url):url,{chunk_length_s:30})}catch(e){e.stage="audio";throw e}
- const text=String(out&&out.text||"").replace(/\s+/g," ").trim();txCache.set(url,text);saveTx();return text}
+t}
 function txError(e){
  if(e&&e.stage==="model")return"Couldn't download the speech model. Check your connection and try again.";
  if(e&&e.stage==="audio")return"Couldn't read this clip. The radio audio server may not allow other websites to use its files, so an audio proxy is needed (RADIO_AI.audioProxy). You can still play the clip above.";
@@ -473,7 +484,7 @@ async function loadLaps(){
   laps.forEach(l=>(g[l.driver_number]??=[]).push(l));
   const best={};Object.keys(g).forEach(n=>{const t=g[n].map(l=>l.lap_duration).filter(x=>typeof x==="number");best[n]=t.length?Math.min(...t):null});
   const order=Object.keys(g).filter(n=>best[n]).sort((a,b)=>best[a]-best[b]);
-  lapData={g,by,best,order};
+  lapData={g,by,best,order};if(radioFor===k)drawRadio();
   $("ldrv").innerHTML='<option value="">Fastest laps, all drivers</option>'+order.map(n=>`<option value="${n}">${esc(who(by,n).full_name||"Driver #"+n)}</option>`).join("");
   drawTele()}catch(e){fail("lapList",e)}
 }
