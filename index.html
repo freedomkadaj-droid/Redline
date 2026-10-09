@@ -884,13 +884,17 @@ function circuitGuideHTML(x){
   "buddh":{slug:"buddh",layout:1}, "greater noida":{slug:"buddh",layout:1},
   "madring":{slug:"madring",layout:1}, "madrid":{slug:"madring",layout:1}
  };
- const alias=Object.keys(known).sort((a,b)=>b.length-a.length).find(k=>source.includes(k));
- const meta=alias?known[alias]:null;
+ // The 2026 Bahrain GP in Malaysia is hosted at Sepang, not Bahrain International Circuit.
+ const isBahrainInMalaysia=/bahrain.*(in malaysia|malaysia)|malaysia.*bahrain/.test(source);
+ const alias=isBahrainInMalaysia?null:Object.keys(known).sort((a,b)=>b.length-a.length).find(k=>source.includes(k));
+ const meta=isBahrainInMalaysia
+  ?{slug:"sepang",layout:1,length:"5.543 km",corners:"15",laps:"56",distance:"310.398 km",displayName:"Sepang International Circuit"}
+  :(alias?known[alias]:null);
  const fallbackId=String(x?.Circuit?.circuitId||"").toLowerCase().replace(/_/g,"-").replace(/[^a-z0-9-]/g,"").replace(/-+/g,"-");
  const slug=meta?.slug||fallbackId;
  if(!slug)return "";
  const layout=meta?.layout||1;
- const title=slug==="suzuka"?"Suzuka International Racing Course":name||slug.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+ const title=meta?.displayName||(slug==="suzuka"?"Suzuka International Racing Course":name||slug.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase()));
  const stats=meta?.length?[[meta.length,"Lap length"],[meta.corners,"Corners"],[meta.laps,"Race laps"],[meta.distance,"Race distance"]]:[["—","Lap length"],["—","Corners"],["—","Race laps"],["—","Race distance"]];
  const sectorMeta=meta?.sectors||null;
  const sectorDetails=sectorMeta?sectorMeta.map((q,i)=>`<div class="circuit-sector"><b><i style="background:${["#ff453a","#3b82f6","#facc15"][i]}"></i>Sector ${i+1}</b>${q[0]} · ${q[1]}</div>`).join(""):["Sector 1","Sector 2","Sector 3"].map((q,i)=>`<div class="circuit-sector"><b><i style="background:${["#ff453a","#3b82f6","#facc15"][i]}"></i>${q}</b>Refer to official circuit map</div>`).join("");
