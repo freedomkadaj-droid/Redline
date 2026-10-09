@@ -4,7 +4,7 @@ Redline is a personal Formula 1 data dashboard built to make F1 statistics, race
 
 The project uses the OpenF1 API as its primary data source and presents the information through a clean, fan-friendly web interface.
 
-🌐 Live-Demo: https://freedomkadaj-droid.github.io/Redline/
+🌐 Live-Demo: https://redlinef1.github.io
 
 ✨ Features
 🏁 Formula 1 race and session data
