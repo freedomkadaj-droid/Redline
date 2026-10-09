@@ -387,7 +387,7 @@ const ok=t=>t===tok,drvOf=async key=>{try{return await get(`/drivers?session_key
 async function loadStandings(){
  const t=tok,key=cur.session_key,drv=await drvOf(key),by=Object.fromEntries(drv.map(d=>[d.driver_number,d]));
  try{const st=(await get(`/championship_drivers?session_key=${key}`)).sort((a,b)=>a.position_current-b.position_current);if(!ok(t))return;
-  $("drivers").innerHTML=st.map(s=>{const d=who(by,s.driver_number);return row(s.position_current,driverNoBadge(s.driver_number,d.team_colour),d.full_name||"Driver #"+s.driver_number,d.team_name||"",s.points_current,isFavD(d))}).join("")||'<div class="state">No standings yet.</div>'}catch(e){ok(t)&&fail("drivers",e)}
+  $("drivers").innerHTML=st.map(s=>{const d=who(by,s.driver_number);return row(s.position_current,driverNoBadge(s.driver_number,d.team_colour),d.full_name||"Driver #"+s.driver_number,d.team_name||(Number(s.driver_number)===22?"Racing Bulls":""),s.points_current,isFavD(d))}).join("")||'<div class="state">No standings yet.</div>'}catch(e){ok(t)&&fail("drivers",e)}
  try{const st=(await get(`/championship_teams?session_key=${key}`)).sort((a,b)=>a.position_current-b.position_current);if(!ok(t))return;
   const col=Object.fromEntries(drv.map(d=>[d.team_name,d.team_colour]));
   $("teams").innerHTML=st.map(s=>row(s.position_current,av(logoUrl(s.team_name,year),s.team_name,col[s.team_name],true),s.team_name,"",s.points_current,isFavT(s.team_name))).join("")||'<div class="state">No standings yet.</div>'}catch(e){ok(t)&&fail("teams",e)}
