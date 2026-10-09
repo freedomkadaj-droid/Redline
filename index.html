@@ -73,6 +73,7 @@ select{background:var(--card2);color:var(--txt);border:1px solid var(--line);bor
 .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:6px}
 .av.logo{background:#1b1b24}.av.logo::before{content:"";width:14px;height:14px;border-radius:4px;background:var(--tc)}.av.logo img{background:#1b1b24}
 .who b{font:600 17px 'Space Grotesk';display:block;line-height:1.2}.who small{color:var(--mute)}
+.driver-no{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:22px;margin-right:7px;padding:0 5px;border:1px solid var(--red);border-radius:5px;background:rgba(255,30,0,.12);color:var(--red);font:700 12px/1 'Space Grotesk',sans-serif;letter-spacing:.02em;vertical-align:2px}
 .pts{font:600 22px 'Space Grotesk';text-align:right;font-variant-numeric:tabular-nums}.pts small{font:400 12px Inter;color:var(--mute);margin-left:3px}
 .hot{background:linear-gradient(90deg,rgba(255,30,0,.14),transparent)}
 .msg{padding:10px 16px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:62px 1fr;gap:10px;font-size:15px}.msg time{color:var(--mute);font-size:13px}
@@ -307,7 +308,7 @@ function logoUrl(team,year){const n=(team||"").toLowerCase();
  return m?`https://media.formula1.com/image/upload/c_lfill,w_96/q_auto/v1740000001/common/f1/${year}/${m[1]}/${year}${m[1]}logowhite.webp`:""}
 
 function row(pos,pic,name,sub,val,hot,unit="pts"){return `<div class="row${hot?" hot":""}"><div class="pos">${pos}</div>${pic}
- <div class="who"><b>${esc(name)}</b><small>${esc(sub)}</small></div><div class="pts">${esc(val)}<small>${unit}</small></div></div>`}
+ <div class="who"><b>${driverNumber!=null?`<span class="driver-no" aria-label="Car number ${esc(driverNumber)}">${esc(driverNumber)}</span>`:""}${esc(name)}</b><small>${esc(sub)}</small></div><div class="pts">${esc(val)}<small>${unit}</small></div></div>`}
 const fmtTime=t=>{if(typeof t!=="number")return"";const m=Math.floor(t/60);return m+":"+(t-m*60).toFixed(3).padStart(6,"0")};
 
 let rounds=[],year,tok=0,current=null,t;
@@ -382,7 +383,7 @@ const ok=t=>t===tok,drvOf=async key=>{try{return await get(`/drivers?session_key
 async function loadStandings(){
  const t=tok,key=cur.session_key,drv=await drvOf(key),by=Object.fromEntries(drv.map(d=>[d.driver_number,d]));
  try{const st=(await get(`/championship_drivers?session_key=${key}`)).sort((a,b)=>a.position_current-b.position_current);if(!ok(t))return;
-  $("drivers").innerHTML=st.map(s=>{const d=who(by,s.driver_number);return row(s.position_current,av(0,d.full_name,d.team_colour),d.full_name||"Driver #"+s.driver_number,d.team_name||"",s.points_current,isFavD(d))}).join("")||'<div class="state">No standings yet.</div>'}catch(e){ok(t)&&fail("drivers",e)}
+  $("drivers").innerHTML=st.map(s=>{const d=who(by,s.driver_number);return row(s.position_current,av(0,d.full_name,d.team_colour),d.full_name||"Driver #"+s.driver_number,d.team_name||"",s.points_current,isFavD(d),"pts",s.driver_number)}).join("")||'<div class="state">No standings yet.</div>'}catch(e){ok(t)&&fail("drivers",e)}
  try{const st=(await get(`/championship_teams?session_key=${key}`)).sort((a,b)=>a.position_current-b.position_current);if(!ok(t))return;
   const col=Object.fromEntries(drv.map(d=>[d.team_name,d.team_colour]));
   $("teams").innerHTML=st.map(s=>row(s.position_current,av(logoUrl(s.team_name,year),s.team_name,col[s.team_name],true),s.team_name,"",s.points_current,isFavT(s.team_name))).join("")||'<div class="state">No standings yet.</div>'}catch(e){ok(t)&&fail("teams",e)}
