@@ -45,6 +45,19 @@ h1.brand-name{font:italic 700 clamp(32px,5.2vw,54px)/.95 'Chakra Petch','Space G
 .last .lr{display:flex;align-items:center;gap:14px;min-width:0}.last .lt{min-width:0}
 .rnd{font:700 15px 'Space Grotesk';letter-spacing:.06em;background:var(--red);color:#fff;border-radius:8px;padding:5px 10px}
 .last b{font:600 18px/1.25 'Space Grotesk';display:block}.last small{color:var(--mute);font-size:13px}
+/* Responsive next-session countdown in the existing header card */
+.last{align-items:stretch;gap:12px 18px}.last .lr{flex:1 1 220px}
+.lnx{flex:0 1 auto;min-width:0;padding-left:18px}
+.session-countdown{flex:1 1 270px;min-width:0;padding-left:18px;border-left:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;gap:7px}
+.sc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.sc-kicker{font:600 10px 'Space Grotesk';letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.sc-status{font:600 9px 'Space Grotesk';letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border:1px solid var(--line);border-radius:99px;color:var(--mute);white-space:nowrap}.sc-status.live{background:var(--red);border-color:var(--red);color:#fff}
+.sc-session{font:600 17px/1.2 'Space Grotesk';color:var(--txt);overflow-wrap:anywhere}.sc-gp{font-size:11px;color:var(--mute);overflow-wrap:anywhere}
+.sc-clock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;max-width:310px}
+.sc-unit{min-width:0;text-align:center;padding:5px 3px;border-radius:7px;background:var(--soft);border:1px solid var(--line)}
+.sc-unit b{font:600 clamp(15px,1.7vw,21px)/1.1 'Space Grotesk';font-variant-numeric:tabular-nums;display:block}.sc-unit small{display:block;margin-top:3px;font-size:8px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.sc-time{font-size:11px;color:var(--mute);overflow-wrap:anywhere}.sc-time strong{font-weight:600;color:var(--txt)}
+@media(max-width:1000px) and (min-width:821px){.last{gap:12px}.last .lr{flex-basis:180px}.session-countdown{flex-basis:245px;padding-left:12px}.lnx{padding-left:12px}.sc-clock{gap:4px}}
+
 .lnx{display:flex;align-items:baseline;gap:8px;padding-left:22px;border-left:1px solid var(--line)}.lnx b{display:inline;font-size:15.5px}
 button,select{font-family:inherit}
 .season{display:flex;gap:10px;align-items:center;margin-bottom:16px}
@@ -172,7 +185,11 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
  body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
  .wrap{padding:16px 14px 20px}
  header{margin-bottom:14px;padding-bottom:14px}.brand{padding-right:54px}.brand-mark{width:44px}h1.brand-name{font-size:30px}.tag{margin-top:5px}
- .last{width:100%}.lnx{padding-left:0;border-left:0}
+ .last{width:100%;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:12px 14px}
+ .last .lr{width:100%;gap:10px}.last .lt b{font-size:16px}.last .lt small{font-size:12px}
+ .lnx{padding:10px 0 0;border-left:0;border-top:1px solid var(--line);width:100%;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.lnx b{font-size:14px}
+ .session-countdown{padding:11px 0 0;border-left:0;border-top:1px solid var(--line);width:100%;gap:8px}
+ .sc-session{font-size:16px}.sc-clock{width:100%;max-width:none;gap:6px}.sc-unit{padding:7px 3px}.sc-unit b{font-size:clamp(17px,5vw,22px)}.sc-unit small{font-size:9px}.sc-time{font-size:12px}
  .pickbtn{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:12px;padding:13px 16px;min-height:48px;border-radius:14px;border:1px solid var(--red);background:rgba(255,30,0,.14);color:var(--txt);font:600 16px 'Space Grotesk';cursor:pointer}
  #gps{position:fixed;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));top:auto;max-height:min(78vh,calc(100vh - 110px));max-height:min(78dvh,calc(100dvh - 110px));z-index:30;border-radius:20px 20px 0 0;background:var(--sheet);transform:translateY(calc(100% + 70px));transition:transform .25s ease;padding-bottom:max(12px,env(safe-area-inset-bottom))}
  body.sheet #gps{transform:none}body.sheet #scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:20}
@@ -408,6 +425,48 @@ function show(top,sub){
 }
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>show(b.dataset.v));
 
+
+/* ---------- Next-session countdown ---------- */
+let countdownSessions=[],countdownTimer=null,countdownRefreshTimer=null;
+const COUNTDOWN_LABELS={"First Practice":"FP1","Second Practice":"FP2","Third Practice":"FP3","Qualifying":"QUALIFYING","Sprint Qualifying":"SPRINT QUALIFYING","Sprint Shootout":"SPRINT SHOOTOUT","Sprint":"SPRINT","Race":"RACE"};
+function sessionLabel(s){return COUNTDOWN_LABELS[String(s.name||s.session_name||"")]||String(s.name||s.session_name||"Session")}
+function normaliseCountdownSession(s,race){
+ const start=new Date(s.date_start||s.date||"");const end=new Date(s.date_end||"");
+ if(!Number.isFinite(+start))return null;
+ return {name:s.session_name||s.name||"Session",start:+start,end:Number.isFinite(+end)&&+end>+start?+end:(+start+2*3600000),race:s.meeting_name||s.raceName||race?.meeting_name||race?.raceName||race?.country_name||"Grand Prix",round:s.round||race?.round||race?.jolpicaRound||"",location:s.circuit_short_name||race?.circuit_short_name||"",source:s._source||race?._source||"openf1"};
+}
+async function loadCountdownSchedule(y){
+ let items=[];
+ try{const all=await get(`/sessions?year=${y}`);items=all.map(x=>normaliseCountdownSession(x,rounds.find(r=>r.meeting_key===x.meeting_key))).filter(Boolean)}catch(e){}
+ if(!items.length){
+  try{const races=rounds.some(r=>r._source==="jolpica")?rounds:await jolpicaRounds(y);
+   items=races.flatMap(r=>(r._source==="jolpica"&&r.jolpicaRace?jolpicaSessionList(r.jolpicaRace).map(q=>normaliseCountdownSession({name:q.name,date_start:q.date.toISOString(),date_end:new Date(+q.date+2*3600000).toISOString(),_source:"jolpica",meeting_name:r.meeting_name,circuit_short_name:r.circuit_short_name,round:r.jolpicaRound},r)):[]));
+  }catch(e){}
+ }
+ countdownSessions=items.filter(Boolean).sort((a,b)=>a.start-b.start);renderLast();
+ if(countdownTimer)clearInterval(countdownTimer);countdownTimer=setInterval(renderCountdown,1000);
+ if(countdownRefreshTimer)clearInterval(countdownRefreshTimer);countdownRefreshTimer=setInterval(()=>loadCountdownSchedule(year).catch(()=>{}),30*60*1000);
+}
+function countdownHTML(){
+ const now=Date.now(),active=countdownSessions.find(x=>x.start<=now&&now<x.end),next=countdownSessions.find(x=>x.start>now),chosen=active||next;
+ if(!chosen)return '<div class="session-countdown" id="sessionCountdown"><div class="sc-top"><span class="sc-kicker">NEXT SESSION</span><span class="sc-status">Schedule unavailable</span></div><div class="sc-session">No verified session time</div><div class="sc-time">Please check the calendar again later.</div></div>';
+ const d=new Date(chosen.start),race=chosen.race||"Grand Prix",label=sessionLabel(chosen);
+ const status=active?'<span class="sc-status live">Session in progress</span>':'<span class="sc-status">Upcoming</span>';
+ let clock="";
+ if(!active){
+  const sec=Math.max(0,Math.floor((chosen.start-now)/1000)),days=Math.floor(sec/86400),hours=Math.floor(sec%86400/3600),mins=Math.floor(sec%3600/60),secs=sec%60;
+  clock=`<div class="sc-clock" aria-label="Time until session starts"><div class="sc-unit"><b>${String(days).padStart(2,"0")}</b><small>Days</small></div><div class="sc-unit"><b>${String(hours).padStart(2,"0")}</b><small>Hours</small></div><div class="sc-unit"><b>${String(mins).padStart(2,"0")}</b><small>Mins</small></div><div class="sc-unit"><b>${String(secs).padStart(2,"0")}</b><small>Secs</small></div></div>`;
+ }else{
+  const upcoming=countdownSessions.find(x=>x.start>=chosen.end&&x.start>now);
+  clock=upcoming?`<div class="sc-time">Next up: <strong>${esc(sessionLabel(upcoming))}</strong> · ${new Date(upcoming.start).toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})}</div>`:'<div class="sc-time">Session is underway.</div>';
+ }
+ return `<div class="session-countdown" id="sessionCountdown"><div class="sc-top"><span class="sc-kicker">NEXT SESSION</span>${status}</div><div class="sc-session">${esc(label)}</div><div class="sc-gp">${esc(race)}${chosen.location?" · "+esc(chosen.location):""}</div>${clock}<div class="sc-time"><strong>${active?"Started":d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</strong> · Your local time</div></div>`;
+}
+function renderCountdown(){const old=$("sessionCountdown");if(!old)return;const box=document.createElement("div");box.innerHTML=countdownHTML();old.replaceWith(box.firstElementChild)}
+function renderLast(raceHTML){
+ const selected=raceHTML!==undefined?raceHTML:(cur?`<div class="lr"><span class="rnd">R${Math.max(1,rounds.indexOf(cur)+1)}</span><div class="lt"><b>${esc(cur.country_name||"Grand Prix")} Grand Prix</b><small>${esc(cur.circuit_short_name||"")} · ${new Date(cur.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}</small></div></div>`:"");
+ $("last").innerHTML=selected+countdownHTML();
+}
 async function loadYear(y){
  year=y;$("year").value=y;$("rounds").innerHTML="";
  try{rounds=(await get(`/sessions?year=${y}&session_name=Race`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start))}catch(e){rounds=[]}
@@ -419,10 +478,9 @@ async function loadYear(y){
  const nxt=rounds.findIndex(r=>new Date(r.date_start)>Date.now());
  $("rounds").innerHTML=rounds.map((r,i)=>`<button class="gp" data-i="${i}" ${new Date(r.date_end)>Date.now()?"disabled":""} aria-pressed="false"><span class="n">${String(i+1).padStart(2,"0")}</span><span><b>${esc(r.location||r.country_name)}</b><small>${esc(r.country_name)} · ${new Date(r.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span>${i===nxt?'<span class="badge">Next</span>':""}</button>`).join("");
  document.querySelectorAll(".gp").forEach(b=>b.onclick=()=>{loadRound(+b.dataset.i);closeSheet()});
- const next=rounds.find(r=>new Date(r.date_start)>Date.now());
- window.nextHtml=next?`<div class="lnx"><small>Next race</small><b>${esc(next.country_name)} GP</b><small>in ${Math.max(0,Math.ceil((new Date(next.date_start)-Date.now())/864e5))} days · ${new Date(next.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></div>`:"";
+ await loadCountdownSchedule(y);
  if(done.length)loadRound(rounds.indexOf(done[done.length-1]));
- else $("last").innerHTML="<small>Season hasn't started yet.</small>"+nextHtml;
+ else {cur=null;renderLast("<small>Season hasn't started yet.</small>");}
 }
 
 let cur=null,loaded={};
@@ -433,7 +491,7 @@ function loadRound(i){
  $("rsess").innerHTML="";$("lsess").innerHTML="";$("ldrv").innerHTML="";$("wsess").innerHTML="";weatherFor=null;
  document.querySelectorAll(".gp").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.i===i));
  $("pick").innerHTML=`<span>R${i+1} · ${esc(race.location||race.country_name)}</span><span>Change ▾</span>`;
- $("last").innerHTML=`<div class="lr"><span class="rnd">R${i+1}</span><div class="lt"><b>${esc(race.country_name)} Grand Prix</b><small>${esc(race.circuit_short_name)} · ${new Date(race.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}</small></div></div>`+(i===rounds.filter(r=>new Date(r.date_end)<Date.now()).length-1?nextHtml:"");$("last").title="Everything on this page is shown as it stood after this race";
+ renderLast();$("last").title="Everything on this page is shown as it stood after this race";
  $("resTitle").textContent=`${race.country_name} Grand Prix result`;
  ["drivers","teams","result","control","radioList","lapList","weatherView"].forEach(id=>$(id).innerHTML='<div class="state">Loading…</div>');
  ensure();prefetchAll();
