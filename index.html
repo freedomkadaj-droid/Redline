@@ -836,91 +836,79 @@ function circuitGuideHTML(x){
  const name=String(x?.Circuit?.circuitName||x?.circuit_short_name||x?.meeting_official_name||x?.raceName||"").trim();
  const country=String(x?.Circuit?.Location?.country||x?.country_name||"").trim();
  const locality=String(x?.Circuit?.Location?.locality||x?.location||"").trim();
- const source=[name,x?.meeting_name,x?.meeting_official_name,x?.raceName].filter(Boolean).join(" ").toLowerCase();
+ const source=[name,x?.meeting_name,x?.meeting_official_name,x?.raceName,x?.Circuit?.circuitId].filter(Boolean).join(" ").toLowerCase();
+ // IDs/layout numbers follow F1DB's circuit catalogue; modern 2026 layouts are used where available.
  const known={
-  "suzuka":{slug:"suzuka",layout:1,length:"5.807 km",corners:"18",laps:"53",distance:"307.471 km",sectors:[["2.184 km","37.6%"],["2.526 km","43.5%"],["1.097 km","18.9%"]],official:"https://www.fia.com/"},
-  "japanese grand prix":{slug:"suzuka",layout:1,length:"5.807 km",corners:"18",laps:"53",distance:"307.471 km",sectors:[["2.184 km","37.6%"],["2.526 km","43.5%"],["1.097 km","18.9%"]],official:"https://www.fia.com/"},
-  "monza":{slug:"monza",layout:1}, "italian grand prix":{slug:"monza",layout:1},
-  "silverstone":{slug:"silverstone",layout:1}, "british grand prix":{slug:"silverstone",layout:1},
+  "suzuka":{slug:"suzuka",layout:2,length:"5.807 km",corners:"18",laps:"53",distance:"307.471 km",sectors:[["2.184 km","37.6%"],["2.526 km","43.5%"],["1.097 km","18.9%"]]},
+  "japanese grand prix":{slug:"suzuka",layout:2,length:"5.807 km",corners:"18",laps:"53",distance:"307.471 km",sectors:[["2.184 km","37.6%"],["2.526 km","43.5%"],["1.097 km","18.9%"]]},
+  "monza":{slug:"monza",layout:7}, "italian grand prix":{slug:"monza",layout:7},
+  "silverstone":{slug:"silverstone",layout:8}, "british grand prix":{slug:"silverstone",layout:8},
   "miami":{slug:"miami",layout:1}, "bahrain":{slug:"bahrain",layout:1},
-  "spa-francorchamps":{slug:"circuit-de-spa-francorchamps",layout:1},
-  "spa francorchamps":{slug:"circuit-de-spa-francorchamps",layout:1},
-  "zandvoort":{slug:"circuit-park-zandvoort",layout:1},
-  "circuit de monaco":{slug:"circuit-de-monaco",layout:1},
-  "monaco":{slug:"circuit-de-monaco",layout:1},
-  "circuit de barcelona-catalunya":{slug:"circuit-de-barcelona-catalunya",layout:1},
-  "catalunya":{slug:"circuit-de-barcelona-catalunya",layout:1},
-  "marina bay":{slug:"marina-bay",layout:1},
-  "singapore":{slug:"marina-bay",layout:1},
+  "spa-francorchamps":{slug:"spa-francorchamps",layout:4}, "spa francorchamps":{slug:"spa-francorchamps",layout:4},
+  "zandvoort":{slug:"zandvoort",layout:5},
+  "monaco":{slug:"monaco",layout:6},
+  "barcelona-catalunya":{slug:"catalunya",layout:6}, "catalunya":{slug:"catalunya",layout:6},
+  "marina bay":{slug:"marina-bay",layout:4}, "singapore":{slug:"marina-bay",layout:4},
   "jeddah":{slug:"jeddah",layout:1},
-  "yas marina":{slug:"yas-marina",layout:1},
-  "abu dhabi":{slug:"yas-marina",layout:1},
-  "red bull ring":{slug:"red-bull-ring",layout:1},
-  "spielberg":{slug:"red-bull-ring",layout:1},
-  "interlagos":{slug:"interlagos",layout:1},
-  "sao paulo":{slug:"interlagos",layout:1},
-  "hermanos rodriguez":{slug:"autodromo-hermanos-rodriguez",layout:1},
-  "mexico city":{slug:"autodromo-hermanos-rodriguez",layout:1},
+  "yas marina":{slug:"yas-marina",layout:2}, "abu dhabi":{slug:"yas-marina",layout:2},
+  "red bull ring":{slug:"spielberg",layout:3}, "spielberg":{slug:"spielberg",layout:3},
+  "interlagos":{slug:"interlagos",layout:2}, "sao paulo":{slug:"interlagos",layout:2},
+  "hermanos rodriguez":{slug:"mexico-city",layout:3}, "mexico city":{slug:"mexico-city",layout:3},
   "las vegas":{slug:"las-vegas",layout:1},
-  "cota":{slug:"circuit-of-the-americas",layout:1},
-  "americas":{slug:"circuit-of-the-americas",layout:1},
-  "imola":{slug:"autodromo-enzo-e-dino-ferrari",layout:1},
-  "hungaroring":{slug:"hungaroring",layout:1},
+  "cota":{slug:"austin",layout:1}, "americas":{slug:"austin",layout:1}, "circuit of the americas":{slug:"austin",layout:1},
+  "imola":{slug:"imola",layout:3},
+  "hungaroring":{slug:"hungaroring",layout:3},
   "baku":{slug:"baku",layout:1},
-  "albert park":{slug:"albert-park",layout:1},
-  "melbourne":{slug:"albert-park",layout:1},
+  "albert park":{slug:"melbourne",layout:2}, "melbourne":{slug:"melbourne",layout:2},
   "shanghai":{slug:"shanghai",layout:1},
-  "circuit gilles-villeneuve":{slug:"circuit-gilles-villeneuve",layout:1},
-  "montreal":{slug:"circuit-gilles-villeneuve",layout:1},
-  "lusail":{slug:"lusail",layout:1},
-  "qatar":{slug:"lusail",layout:1},
-  "circuit paul ricard":{slug:"circuit-paul-ricard",layout:1},
-  "portimao":{slug:"algarve",layout:1},
-  "algarve":{slug:"algarve",layout:1},
+  "gilles-villeneuve":{slug:"montreal",layout:6}, "montreal":{slug:"montreal",layout:6},
+  "lusail":{slug:"lusail",layout:1}, "qatar":{slug:"lusail",layout:1},
+  "paul ricard":{slug:"paul-ricard",layout:3},
+  "portimao":{slug:"portimao",layout:1}, "algarve":{slug:"portimao",layout:1},
   "mugello":{slug:"mugello",layout:1},
-  "istanbul":{slug:"istanbul-park",layout:1},
-  "hockenheim":{slug:"hockenheimring",layout:1},
-  "nurburgring":{slug:"nurburgring",layout:1},
+  "istanbul":{slug:"istanbul",layout:1},
+  "hockenheim":{slug:"hockenheimring",layout:4},
+  "nurburgring":{slug:"nurburgring",layout:4},
   "sepang":{slug:"sepang",layout:1},
-  "kyalami":{slug:"kyalami",layout:1},
+  "kyalami":{slug:"kyalami",layout:2},
   "adelaide":{slug:"adelaide",layout:1},
-  "ain-diab":{slug:"ain-diab",layout:1},
+  "ain-diab":{slug:"ain-diab",layout:1}, "ain diab":{slug:"ain-diab",layout:1},
   "aintree":{slug:"aintree",layout:1},
-  "fuji":{slug:"fuji",layout:1},
-  "okayama":{slug:"okayama",layout:1},
+  "fuji":{slug:"fuji",layout:2},
+  "okayama":{slug:"aida",layout:1}, "aida":{slug:"aida",layout:1},
   "valencia":{slug:"valencia",layout:1},
-  "phoenix":{slug:"phoenix",layout:1},
-  "long beach":{slug:"long-beach",layout:1},
-  "detroit":{slug:"detroit",layout:1},
-  "watkins glen":{slug:"watkins-glen",layout:1},
-  "buddh":{slug:"buddh",layout:1},
-  "greater noida":{slug:"buddh",layout:1}
+  "phoenix":{slug:"phoenix",layout:2},
+  "long beach":{slug:"long-beach",layout:3},
+  "detroit":{slug:"detroit",layout:2},
+  "watkins glen":{slug:"watkins-glen",layout:3},
+  "buddh":{slug:"buddh",layout:1}, "greater noida":{slug:"buddh",layout:1},
+  "madring":{slug:"madring",layout:1}, "madrid":{slug:"madring",layout:1}
  };
  const alias=Object.keys(known).sort((a,b)=>b.length-a.length).find(k=>source.includes(k));
  const meta=alias?known[alias]:null;
- const slug=meta?.slug||String(x?.Circuit?.circuitId||"").toLowerCase().replace(/_/g,"-").replace(/[^a-z0-9-]/g,"").replace(/-+/g,"-");
+ const fallbackId=String(x?.Circuit?.circuitId||"").toLowerCase().replace(/_/g,"-").replace(/[^a-z0-9-]/g,"").replace(/-+/g,"-");
+ const slug=meta?.slug||fallbackId;
  if(!slug)return "";
- const title=meta?.slug==="suzuka"?"Suzuka International Racing Course":name||slug.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase());
- const stats=meta?.length?[
-  [meta.length,"Lap length"],[meta.corners,"Corners"],[meta.laps,"Race laps"],[meta.distance,"Race distance"]
- ]:[["—","Lap length"],["—","Corners"],["—","Race laps"],["—","Race distance"]];
+ const layout=meta?.layout||1;
+ const title=slug==="suzuka"?"Suzuka International Racing Course":name||slug.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+ const stats=meta?.length?[[meta.length,"Lap length"],[meta.corners,"Corners"],[meta.laps,"Race laps"],[meta.distance,"Race distance"]]:[["—","Lap length"],["—","Corners"],["—","Race laps"],["—","Race distance"]];
  const sectorMeta=meta?.sectors||null;
- const sectorDetails=sectorMeta
-  ? sectorMeta.map((q,i)=>`<div class="circuit-sector"><b><i style="background:${["#ff453a","#3b82f6","#facc15"][i]}"></i>Sector ${i+1}</b>${q[0]} · ${q[1]}</div>`).join("")
-  : ["Sector 1","Sector 2","Sector 3"].map((q,i)=>`<div class="circuit-sector"><b><i style="background:${["#ff453a","#3b82f6","#facc15"][i]}"></i>${q}</b>Refer to official circuit map</div>`).join("");
+ const sectorDetails=sectorMeta?sectorMeta.map((q,i)=>`<div class="circuit-sector"><b><i style="background:${["#ff453a","#3b82f6","#facc15"][i]}"></i>Sector ${i+1}</b>${q[0]} · ${q[1]}</div>`).join(""):["Sector 1","Sector 2","Sector 3"].map((q,i)=>`<div class="circuit-sector"><b><i style="background:${["#ff453a","#3b82f6","#facc15"][i]}"></i>${q}</b>Refer to official circuit map</div>`).join("");
  const corners=meta?.corners?Array.from({length:Number(meta.corners)},(_,i)=>`<span aria-label="Corner ${i+1}">${String(i+1).padStart(2,"0")}</span>`).join(""):"";
- const mapUrl=`https://raw.githubusercontent.com/f1db/f1db/main/src/assets/circuits/white-outline/${slug}-1.svg`;
- const mapLink=meta?.slug==="suzuka"?"https://www.fia.com/":"https://github.com/f1db/f1db/tree/main/src/assets/circuits";
+ const assetBase=`https://raw.githubusercontent.com/f1db/f1-circuits-svg/main/circuits`;
+ const mapUrl=`${assetBase}/detailed/white-outline/${slug}-${layout}.svg`;
+ const fallbackUrl=`${assetBase}/minimal/white-outline/${slug}-${layout}.svg`;
+ const mapLink=`https://github.com/f1db/f1-circuits-svg/tree/main/circuits`;
  return `<section class="circuit-guide" aria-label="${esc(title)} circuit guide">
   <div class="circuit-guide-head"><div><div class="circuit-guide-title">${esc(title)}</div><div class="circuit-guide-sub">${esc([locality,country].filter(Boolean).join(" · ")||"Formula 1 circuit")} · Track layout</div></div><span class="badge">Circuit guide</span></div>
-  <div class="circuit-guide-map"><img src="${mapUrl}" alt="${esc(title)} circuit outline" loading="lazy" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span class=&quot;circuit-guide-sub&quot;>Circuit outline unavailable for this layout</span>')"></div>
-  <div class="circuit-guide-sub">🏁 Track outline · corner numbering and sector boundaries should be checked against the official map</div>
+  <div class="circuit-guide-map"><img src="${mapUrl}" alt="${esc(title)} circuit outline" loading="lazy" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${fallbackUrl}'}else{this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span class=&quot;circuit-guide-sub&quot;>Circuit outline unavailable for this layout</span>')}"></div>
+  <div class="circuit-guide-sub">🏁 Track outline · layout source: F1DB / F1 Circuits SVG</div>
   <div class="circuit-guide-stats">${stats.map(q=>`<div class="circuit-stat"><b>${q[0]}</b><span>${q[1]}</span></div>`).join("")}</div>
   <div class="circuit-guide-title" style="font-size:13px">Sector breakdown</div>
   <div class="circuit-sectorbar" role="img" aria-label="Sector 1 red, Sector 2 blue, Sector 3 yellow"><span></span><span></span><span></span></div>
   <div class="circuit-sectors">${sectorDetails}</div>
   ${corners?`<div class="circuit-guide-sub" style="margin-top:13px">Corner index</div><div class="circuit-corners" aria-label="Circuit corner index">${corners}</div>`:""}
-  <div class="circuit-guide-links"><a href="${mapLink}" target="_blank" rel="noopener">Circuit layouts & data ↗</a><a href="https://github.com/f1db/f1db" target="_blank" rel="noopener">Track outline: F1DB (CC BY 4.0) ↗</a></div>
+  <div class="circuit-guide-links"><a href="${mapLink}" target="_blank" rel="noopener">Circuit layouts & data ↗</a><a href="https://github.com/f1db/f1-circuits-svg" target="_blank" rel="noopener">Track outline: F1 Circuits SVG (CC BY 4.0) ↗</a></div>
  </section>`;
 }
 $("calList").onclick=async e=>{
