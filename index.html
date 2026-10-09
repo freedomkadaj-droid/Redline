@@ -460,7 +460,7 @@ function countdownHTML(){
   const upcoming=countdownSessions.find(x=>x.start>=chosen.end&&x.start>now);
   clock=upcoming?`<div class="sc-time">Next up: <strong>${esc(sessionLabel(upcoming))}</strong> · ${new Date(upcoming.start).toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})}</div>`:'<div class="sc-time">Session is underway.</div>';
  }
- return `<div class="session-countdown" id="sessionCountdown"><div class="sc-top"><span class="sc-kicker">NEXT SESSION</span>${status}</div><div class="sc-session">${esc(label)}</div><div class="sc-gp">${esc(race)}${chosen.location?" · "+esc(chosen.location):""}</div>${clock}<div class="sc-time"><strong>${active?"Started":d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</strong> · Your local time</div></div>`;
+ return `<div class="session-countdown" id="sessionCountdown"><div class="sc-top"><span class="sc-kicker">${active?"SESSION IN PROGRESS":"NEXT SESSION"}</span>${status}</div><div class="sc-session">${esc(label)}</div><div class="sc-gp">${esc(race)}${chosen.location?" · "+esc(chosen.location):""}</div>${clock}<div class="sc-time"><strong>${active?"Started":d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</strong> · Your local time</div></div>`;
 }
 function renderCountdown(){const old=$("sessionCountdown");if(!old)return;const box=document.createElement("div");box.innerHTML=countdownHTML();old.replaceWith(box.firstElementChild)}
 function renderLast(raceHTML){
