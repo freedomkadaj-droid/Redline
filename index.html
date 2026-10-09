@@ -114,7 +114,7 @@ audio{width:100%;height:36px}
 main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 #gps{position:sticky;top:16px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;margin:0}
 #gps .yr{padding:10px 14px;border-bottom:1px solid var(--line)}#gps select{width:100%}
-.gplist{overflow-y:auto}
+.gplist{overflow-y:auto;min-height:0;flex:1}
 .gp{all:unset;box-sizing:border-box;display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;width:100%;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer}
 .gp:hover{background:var(--hover)}.gp:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
 .gp .n{font:600 15px 'Space Grotesk';color:var(--mute)}.gp b{font:600 16px 'Space Grotesk';display:block;line-height:1.2}.gp small{color:var(--mute);font-size:12px}
@@ -130,7 +130,7 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
  header{margin-bottom:14px;padding-bottom:14px}.brand{padding-right:54px}.brand-mark{width:44px}h1.brand-name{font-size:30px}.tag{margin-top:5px}
  .last{width:100%}.lnx{padding-left:0;border-left:0}
  .pickbtn{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:12px;padding:13px 16px;min-height:48px;border-radius:14px;border:1px solid var(--red);background:rgba(255,30,0,.14);color:var(--txt);font:600 16px 'Space Grotesk';cursor:pointer}
- #gps{position:fixed;left:0;right:0;bottom:0;top:auto;max-height:78vh;z-index:30;border-radius:20px 20px 0 0;background:var(--sheet);transform:translateY(105%);transition:transform .25s ease;padding-bottom:env(safe-area-inset-bottom)}
+ #gps{position:fixed;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));top:auto;max-height:min(78vh,calc(100vh - 110px));max-height:min(78dvh,calc(100dvh - 110px));z-index:30;border-radius:20px 20px 0 0;background:var(--sheet);transform:translateY(calc(100% + 70px));transition:transform .25s ease;padding-bottom:max(12px,env(safe-area-inset-bottom))}
  body.sheet #gps{transform:none}body.sheet #scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:20}
  .gp{padding:14px 16px;min-height:54px}
  #tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;margin:0;border-radius:18px 18px 0 0;border:0;border-top:1px solid var(--line);background:var(--navbg);backdrop-filter:blur(14px);padding:6px 6px calc(6px + env(safe-area-inset-bottom));gap:2px}
