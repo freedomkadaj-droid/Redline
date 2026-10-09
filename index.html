@@ -41,11 +41,11 @@ header::after{content:"";position:absolute;left:0;bottom:-1px;width:76px;height:
 .brand-mark{width:clamp(46px,6.2vw,64px);height:auto;flex:none;display:block}
 h1.brand-name{font:italic 700 clamp(32px,5.2vw,54px)/.95 'Chakra Petch','Space Grotesk',system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase}
 .tag{color:var(--mute);margin-top:7px;font:500 clamp(13px,1.6vw,15px)/1.35 Inter,system-ui,sans-serif;letter-spacing:.02em}
-.last{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;max-width:100%;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--red);border-radius:12px;padding:8px 14px;backdrop-filter:blur(10px)}
-.last .lr{display:flex;align-items:center;gap:10px;min-width:0}.last .lt{min-width:0}
-.rnd{font:700 12px 'Space Grotesk';letter-spacing:.06em;background:var(--red);color:#fff;border-radius:6px;padding:3px 7px}
-.last b{font:600 14.5px/1.25 'Space Grotesk';display:block}.last small{color:var(--mute);font-size:12px}
-.lnx{display:flex;align-items:baseline;gap:6px;padding-left:16px;border-left:1px solid var(--line)}.lnx b{display:inline;font-size:13.5px}
+.last{display:flex;align-items:center;flex-wrap:wrap;gap:8px 22px;max-width:100%;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--red);border-radius:14px;padding:12px 20px;backdrop-filter:blur(10px)}
+.last .lr{display:flex;align-items:center;gap:14px;min-width:0}.last .lt{min-width:0}
+.rnd{font:700 15px 'Space Grotesk';letter-spacing:.06em;background:var(--red);color:#fff;border-radius:8px;padding:5px 10px}
+.last b{font:600 18px/1.25 'Space Grotesk';display:block}.last small{color:var(--mute);font-size:13px}
+.lnx{display:flex;align-items:baseline;gap:8px;padding-left:22px;border-left:1px solid var(--line)}.lnx b{display:inline;font-size:15.5px}
 button,select{font-family:inherit}
 .season{display:flex;gap:10px;align-items:center;margin-bottom:16px}
 select{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:15px}
@@ -92,7 +92,7 @@ audio{width:100%;height:36px}
 .stat b{font:600 26px 'Space Grotesk'}.stat small{display:block;color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
 .ch{padding:14px 18px 6px}.chh{display:flex;justify-content:space-between;font:600 12px 'Space Grotesk';letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:4px}
 .ch svg{color:var(--txt);width:100%;height:110px;background:var(--soft);border-radius:8px}.ch svg *{vector-effect:non-scaling-stroke}
-.mt{border-bottom:1px solid var(--line)}.mth{all:unset;box-sizing:border-box;display:grid;grid-template-columns:38px 1fr auto;gap:12px;align-items:center;width:100%;padding:12px 18px;cursor:pointer}
+.mt{border-bottom:1px solid var(--line)}.mth{all:unset;box-sizing:border-box;display:grid;grid-template-columns:38px 1fr auto auto;gap:12px;align-items:center;width:100%;padding:12px 18px;cursor:pointer}
 .mth:focus-visible{outline:2px solid var(--red)}.rn{font:600 20px 'Space Grotesk';color:var(--mute)}.mi b{font:600 17px 'Space Grotesk';display:block}.mi small{color:var(--mute)}
 .mtd{padding:0 18px 14px 68px;font-size:14px;color:var(--mute)}.mtd table{border-collapse:collapse;margin-top:8px;width:100%;color:var(--txt)}.mtd td,.mtd th{padding:5px 10px 5px 0;text-align:left;font-weight:400}.mtd th{color:var(--mute);font-size:12px;text-transform:uppercase}
 .mtd button{margin-top:10px;background:var(--red);color:#fff;border:0;border-radius:10px;padding:7px 14px;cursor:pointer}
@@ -128,32 +128,29 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
  .who b{font-size:16px}.pts{font-size:20px}
  .tools{padding:10px 12px}.tools select{flex:1 1 100%;min-height:44px}.tools button{min-height:44px}
  .msg{grid-template-columns:1fr;gap:2px}.stats{grid-template-columns:1fr 1fr;padding:12px 12px 2px}.ch{padding:12px 12px 4px}
- .mth{grid-template-columns:30px 1fr auto;padding:14px 12px}.mtd{padding:0 14px 14px}.mtd table{display:block;overflow-x:auto}
+ .mth{grid-template-columns:30px 1fr auto auto;padding:14px 12px}.mtd{padding:0 14px 14px}.mtd table{display:block;overflow-x:auto}
  .scroll{max-height:none}footer{padding-bottom:8px}
 }
 .pill{display:inline-flex;align-items:center;gap:8px;margin:0 0 14px;padding:9px 16px;min-height:44px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:600 14px 'Space Grotesk';cursor:pointer}.pill:hover,.pill[aria-pressed=true]{border-color:var(--red)}
 .lnk{color:var(--txt);text-decoration:none;border:1px solid var(--line);border-radius:99px;padding:8px 16px;min-height:40px;display:inline-flex;align-items:center;font:500 14px Inter}
 .lnk:hover{border-color:var(--red);background:rgba(255,30,0,.12)}
 .links{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
-.foot{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:flex-end;padding-top:6px}.credit{margin-left:auto;text-align:right}.credit a{color:var(--txt)}
+.foot{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:flex-end;padding-top:6px}.credit{margin-left:auto;text-align:right}#prog:not(:empty)::before,#net:not(:empty)::before{content:" · "}.credit a{color:var(--txt)}
 .nlist{list-style:none;padding:0;margin:0}.nlist li{border-bottom:1px solid var(--line)}.nlist li:last-child{border:0}
-.ncard{position:relative;display:grid;grid-template-columns:160px 1fr;gap:14px;padding:14px 18px;color:inherit;text-decoration:none}
-a.ncard:hover .nt{color:var(--red)}a.ncard:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
-.ncard img{width:160px;height:96px;object-fit:cover;border-radius:10px;background:var(--chip)}.ncard.noimg{grid-template-columns:1fr}
 .nmeta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;color:var(--mute);font-size:12.5px;margin-bottom:4px}
-.nsource{font:600 11px 'Space Grotesk';letter-spacing:.08em;text-transform:uppercase;color:var(--txt);background:var(--chip);padding:2px 8px;border-radius:99px}
+.nsource{font:700 11px 'Space Grotesk';letter-spacing:.08em;text-transform:uppercase;color:var(--on,#fff);background:var(--sc,var(--chip));padding:2px 9px;border-radius:99px}
 .nabs::before{content:"· "}
 .nt{font:600 17px/1.3 'Space Grotesk';overflow-wrap:anywhere}
-.ncard p{color:var(--mute);font-size:14px;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .nchips{display:flex;gap:8px;overflow-x:auto;padding:10px 18px;border-bottom:1px solid var(--line);scrollbar-width:thin}
 .nchips .chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:none;color:var(--txt);border-radius:99px;padding:7px 14px;min-height:40px;cursor:pointer;font:500 14px Inter;white-space:nowrap}
-.nchips .chip:hover{border-color:var(--red)}.nchips .chip[aria-pressed=true]{background:var(--red);border-color:var(--red);color:#fff}
+.nchips .chip:hover{border-color:var(--red)}.nchips .chip i{width:9px;height:9px;border-radius:50%;background:var(--sc);flex:none}
+.nchips .chip[aria-pressed=true]{border-color:var(--sc);box-shadow:inset 0 0 0 1px var(--sc);background:rgba(255,30,0,.12);background:color-mix(in srgb,var(--sc) 16%,transparent)}
 .cnt{font:600 12px 'Space Grotesk';opacity:.75}.nmore{text-align:center}.nmore .lnk{cursor:pointer;background:none;font-family:inherit}
 .nnote{padding:10px 18px;background:rgba(255,30,0,.1);border-bottom:1px solid var(--line);font-size:14px}
 #nsrc{margin-left:auto}
 .state p{margin:6px 0}.state details{margin-top:12px;font-size:13px;text-align:left;display:inline-block;max-width:100%}.state .lnk{cursor:pointer;background:none;font-family:inherit}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media(max-width:820px){.nchips{padding:10px 12px}.ncard{grid-template-columns:96px 1fr;padding:12px;gap:10px}.ncard img{width:96px;height:68px}.ncard.noimg{grid-template-columns:1fr}#nsrc{margin-left:0}}
+@media(max-width:820px){.nchips{padding:10px 12px}.nlist.cards{padding:12px;gap:12px}#nsrc{margin-left:0}}
 .ncount{display:block;color:var(--mute);font-size:13px;margin-bottom:8px}.nmore{padding:14px 18px 18px}
 /* light mode: timing-sheet look with a faded chequered flag, red-topped cards and slanted heading bars */
 :root[data-theme=light] body::before{opacity:1;background:repeating-conic-gradient(rgba(21,21,30,.075) 0 25%,transparent 0 50%) 0 0/44px 44px;
@@ -173,11 +170,56 @@ a.ncard:hover .nt{color:var(--red)}a.ncard:focus-visible{outline:2px solid var(-
 @media(min-width:821px){.nchips{flex-wrap:wrap;overflow:visible}}
 @media(max-width:820px){#newsList.scroll{max-height:none}}
 .nt,.nbody{min-width:0}
+.nt a{color:inherit;text-decoration:none}.nt a:hover{color:var(--red)}.nt a:focus-visible,.nread:focus-visible,.nexp:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:4px}
+.ndesc{color:var(--mute);font-size:14px;line-height:1.5;margin-top:4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.ndesc.open{display:block;-webkit-line-clamp:unset;overflow:visible}
+.nacts{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin-top:6px;font-size:13px}
+.nexp{background:none;border:0;padding:4px 0;min-height:32px;color:var(--red);font:600 13px Inter,system-ui,sans-serif;cursor:pointer}
+.nexp:hover{text-decoration:underline}
+.nread{color:var(--mute);text-decoration:none;padding:4px 0}.nread:hover{color:var(--txt);text-decoration:underline}
+/* news layouts, Reddit style: big picture cards or a compact list */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--mute);padding:7px 12px;min-height:40px;font:500 14px Inter,system-ui,sans-serif;cursor:pointer}
+.seg button svg{fill:currentColor}.seg button[aria-pressed=true]{background:var(--red);color:#fff}.seg button:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+.nimg{display:block;position:relative;overflow:hidden;background:var(--chip)}.nimg img{display:block;width:100%;height:100%;object-fit:cover}
+.nimg.ph{display:grid;place-items:center;background:linear-gradient(135deg,#1b1b24,#0b0b10)}
+.nimg.ph::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 14px,rgba(255,30,0,.07) 14px 15px)}
+.ph-mark{position:relative;width:min(44%,72px);height:auto}
+.nlist.rows .ncard{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;padding:10px 18px}
+.nlist.rows .nimg{width:96px;height:64px;border-radius:8px}.nlist.rows .ph-mark{width:34px}
+.nlist.rows .nt{font-size:15.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nlist.rows .ndesc,.nlist.rows .nacts{display:none}.nlist.rows .nmeta{margin-bottom:2px}
+.nlist.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;padding:16px 18px}
+.nlist.cards li{display:flex;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--soft)}
+.nlist.cards li:last-child{border:1px solid var(--line)}
+.nlist.cards .ncard{display:flex;flex-direction:column;width:100%}
+.nlist.cards .nimg{width:100%;aspect-ratio:16/9;border-radius:0}
+.nlist.cards .nbody{display:flex;flex-direction:column;flex:1;padding:12px 14px 14px}
+.nlist.cards .nt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.nlist.cards .nacts{margin-top:auto;padding-top:6px}
+.nlist.cards .ndesc.open,.nlist.cards .nt.open{display:block;-webkit-line-clamp:unset;overflow:visible}
+@media(max-width:820px){.nlist.rows .ncard{grid-template-columns:84px minmax(0,1fr);padding:10px 12px}.nlist.rows .nimg{width:84px;height:58px}}
+/* source colour accents: top edge on cards, left edge in the list, tint on the logo tile */
+.nlist.cards li{border-top:3px solid var(--sc,var(--line))}
+.nlist.rows li{box-shadow:inset 3px 0 0 var(--sc,transparent)}
+.nimg.ph::before{background:repeating-linear-gradient(115deg,transparent 0 14px,rgba(255,30,0,.08) 14px 15px);background:repeating-linear-gradient(115deg,transparent 0 14px,color-mix(in srgb,var(--sc,#FF1E00) 18%,transparent) 14px 15px)}
+/* calendar rows: the title turns red and underlines on hover/focus, and the arrow shows it opens */
+.chev{font:600 22px/1 'Space Grotesk';color:var(--mute);transition:transform .15s ease,color .15s ease}
+.mth[aria-expanded=true] .chev{transform:rotate(90deg);color:var(--red)}
+.mi b{text-decoration:underline;text-decoration-color:transparent;text-decoration-thickness:2px;text-underline-offset:4px;transition:color .15s ease,text-decoration-color .15s ease}
+.mth:focus-visible .mi b{color:var(--red);text-decoration-color:var(--red)}
+@media(hover:hover){.mth:hover{background:var(--hover)}.mth:hover .mi b{color:var(--red);text-decoration-color:var(--red)}.mth:hover .chev{color:var(--red)}}
+.rtools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}.tnote{color:var(--mute);font-size:12px}
+.tbtn{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:99px;padding:6px 14px;min-height:36px;font:500 13px Inter,system-ui,sans-serif;cursor:pointer}
+.tbtn:hover{border-color:var(--red)}.tbtn:focus-visible{outline:2px solid var(--red);outline-offset:2px}.tbtn[disabled]{opacity:.55;cursor:default}
+.tx{margin-top:8px;padding:10px 12px;border-left:3px solid var(--red);background:var(--soft);border-radius:0 8px 8px 0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.tx .ai{display:block;color:var(--mute);font:600 11px 'Space Grotesk';letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}.tx.err{border-left-color:#f5c400}
 [hidden]{display:none!important}
 footer{color:var(--mute);font-size:14px}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="rl-mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0B0B10"/><rect x=".75" y=".75" width="62.5" height="62.5" rx="13.3" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.5"/><g transform="translate(6.8 0) skewX(-12)"><path fill="#F4F4F6" fill-rule="evenodd" d="M16 14L38 14L48 19L50 26L50 29L47 35L41 38L24 38L24 50L16 50ZM24 21L36 21L42 24L42 28L36 31L24 31Z"/><path fill="#FF1E00" d="M30 38L40 38L51 50L40.5 50Z"/></g></symbol></svg>
 <div class="kerb"></div><button id="themebtn" class="themebtn" aria-label="Switch to light mode">☀</button>
 <div class="wrap">
  <header>
@@ -213,7 +255,10 @@ footer{color:var(--mute);font-size:14px}
   <div class="tools"><select id="lsess" aria-label="Session"></select><select id="ldrv" aria-label="Driver"></select><select id="clap" aria-label="Lap" hidden></select></div>
   <div class="scroll" id="lapList"><div class="state">Loading…</div></div><div id="carView" hidden></div></section>
  <section class="panel pane" id="v-news" hidden><h2>Latest F1 news</h2>
-  <div class="tools"><button id="nrefresh">Refresh</button><small id="nsrc" role="status" aria-live="polite"></small></div>
+  <div class="tools"><div class="seg" role="group" aria-label="News layout">
+   <button type="button" data-view="cards" aria-pressed="true"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>Cards</button>
+   <button type="button" data-view="rows" aria-pressed="false"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="2" width="14" height="3" rx="1.2"/><rect x="1" y="6.5" width="14" height="3" rx="1.2"/><rect x="1" y="11" width="14" height="3" rx="1.2"/></svg>List</button></div>
+  <button id="nrefresh">Refresh</button><small id="nsrc" role="status" aria-live="polite"></small></div>
   <div class="nchips" id="nchips" role="group" aria-label="Filter by source"></div>
   <div class="nnote" id="nnote" role="status" hidden></div>
   <div id="newsList" class="scroll" aria-live="off" aria-busy="false"><div class="state">Loading news…</div></div></section>
@@ -230,7 +275,7 @@ footer{color:var(--mute);font-size:14px}
   <a class="lnk" href="https://www.facebook.com/Formula1" target="_blank" rel="noopener">Facebook</a>
   <a class="lnk" href="https://f1tv.formula1.com" target="_blank" rel="noopener">F1 TV</a>
  </div>
- <footer class="foot"><span>Data from OpenF1. Pick a Grand Prix from the list to see everything as it stood after it. <span id="prog"></span> <span id="net"></span></span><span class="credit">Designed by Claude AI, Powered by <a href="https://openf1.org" target="_blank" rel="noopener">Open F1 API</a></span></footer>
+ <footer class="foot"><span>Data from OpenF1<span id="prog"></span><span id="net"></span></span><span class="credit">Designed by Claude AI, Powered by <a href="https://openf1.org" target="_blank" rel="noopener">Open F1 API</a></span></footer>
 </div>
 
 <script>
@@ -245,8 +290,8 @@ const nameBook={},KNOWN={1:"Max Verstappen",3:"Daniel Ricciardo",4:"Lando Norris
 const who=(by,n)=>(by&&by[n])||nameBook[n]||{driver_number:+n,full_name:KNOWN[n]||""};
 const hits=[];const setNet=t=>{const e=document.getElementById("net");if(e)e.textContent=t};
 async function throttle(){for(;;){const now=Date.now();while(hits.length&&now-hits[0]>60000)hits.shift();
- if(hits.length<26){hits.push(now);setNet("· OpenF1 requests this minute: "+hits.length+"/30");return}
- setNet("· Waiting a moment for OpenF1's free rate limit…");await sleep(hits[0]+60050-now)}}
+ if(hits.length<26){hits.push(now);setNet("");return}
+ setNet("Waiting a moment for OpenF1's free rate limit…");await sleep(hits[0]+60050-now)}}
 async function fetchRetry(p){for(let i=0;i<4;i++){await throttle();let r;try{r=await fetch(API+p)}catch(_){throw new Error("Can't reach OpenF1. Open this file in your own browser (not the Claude preview) and check your internet")}
   if(r.status===429){await sleep(1500*(i+1));continue} if(r.status===404)return[];
   if(!r.ok)throw new Error("OpenF1 returned "+r.status);const j=await r.json();if(p.startsWith("/drivers")&&Array.isArray(j))j.forEach(d=>{if(d.full_name)nameBook[d.driver_number]=d});return j} throw new Error("OpenF1 is busy, try again soon")}
@@ -370,9 +415,47 @@ async function loadRadio(){
 }
 function drawRadio(){
  const l=rclips.slice(0,40);
- $("radioList").innerHTML=l.map(c=>{const d=who(rby,c.driver_number);
-  return `<div class="radio${isFavD(d)?" hot":""}"><div class="top">${av(d.headshot_url,d.full_name,d.team_colour)}<b>${esc(d.full_name||"Driver #"+c.driver_number)}</b><small>${new Date(c.date).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</small></div><audio controls preload="none" src="${esc(c.recording_url)}"></audio></div>`}).join("")||'<div class="state">No radio clips for this session.</div>';
+ $("radioList").innerHTML=l.map((c,i)=>{const d=who(rby,c.driver_number),done=txCache.get(c.recording_url);
+  return `<div class="radio${isFavD(d)?" hot":""}"><div class="top">${av(d.headshot_url,d.full_name,d.team_colour)}<b>${esc(d.full_name||"Driver #"+c.driver_number)}</b><small>${new Date(c.date).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</small></div><audio controls preload="none" src="${esc(c.recording_url)}"></audio>
+  <div class="rtools"><button type="button" class="tbtn" data-i="${i}">${done!=null?"Hide transcript":"✦ AI transcript"}</button><small class="tnote">Generated in your browser</small></div>
+  <div class="tx" id="tx${i}" role="status" aria-live="polite" ${done!=null?`data-ok="1"><span class="ai">AI transcript · may contain errors</span>${esc(done||"(No speech detected)")}`:"hidden>"}</div></div>`}).join("")||'<div class="state">No radio clips for this session.</div>';
 }
+
+// ---- AI transcript: Whisper speech-to-text running inside the browser (no server, no API key) ----
+// First use downloads a small speech model (about 40 MB, then cached by the browser). Radio audio is noisy, so results can contain mistakes.
+// If the radio audio server refuses cross-origin reads (CORS), set audioProxy to your own proxy, e.g. "https://your-worker.workers.dev/?url=".
+const RADIO_AI={lib:"https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2",model:"Xenova/whisper-tiny.en",audioProxy:"",loader:u=>import(u)};
+const txCache=new Map();let asrP=null,txBusy=false;
+try{Object.entries(JSON.parse(localStorage.getItem("redline-radio-tx")||"{}")).forEach(([k,v])=>txCache.set(k,v))}catch(e){}
+function saveTx(){try{localStorage.setItem("redline-radio-tx",JSON.stringify(Object.fromEntries([...txCache].slice(-60))))}catch(e){}}
+function getAsr(onProgress){
+ if(!asrP)asrP=(async()=>{const m=await RADIO_AI.loader(RADIO_AI.lib);m.env.allowLocalModels=false;
+  return m.pipeline("automatic-speech-recognition",RADIO_AI.model,{progress_callback:onProgress})})().catch(e=>{asrP=null;e.stage="model";throw e});
+ return asrP}
+async function transcribe(url,onProgress,onStage){
+ if(txCache.has(url))return txCache.get(url);
+ const asr=await getAsr(onProgress);onStage&&onStage();
+ let out;try{out=await asr(RADIO_AI.audioProxy?RADIO_AI.audioProxy+encodeURIComponent(url):url,{chunk_length_s:30})}catch(e){e.stage="audio";throw e}
+ const text=String(out&&out.text||"").replace(/\s+/g," ").trim();txCache.set(url,text);saveTx();return text}
+function txError(e){
+ if(e&&e.stage==="model")return"Couldn't download the speech model. Check your connection and try again.";
+ if(e&&e.stage==="audio")return"Couldn't read this clip. The radio audio server may not allow other websites to use its files, so an audio proxy is needed (RADIO_AI.audioProxy). You can still play the clip above.";
+ return"Transcription failed: "+String(e&&e.message||e)}
+async function onRadioClick(e){
+ const b=e.target.closest&&e.target.closest(".tbtn");if(!b||b.disabled)return;
+ const i=+b.dataset.i,c=rclips[i],box=document.getElementById("tx"+i);if(!c||!box)return;
+ if(!box.hidden&&box.dataset.ok){box.hidden=true;b.textContent="✦ AI transcript";return}
+ if(txBusy)return;
+ txBusy=true;b.disabled=true;box.hidden=false;box.className="tx";delete box.dataset.ok;
+ const say=(t,ok)=>{box.innerHTML=`<span class="ai">AI transcript${ok?" · may contain errors":""}</span>${esc(t)}`};
+ say("Preparing…");
+ try{
+  const text=await transcribe(c.recording_url,p=>{if(p&&p.status==="progress"&&typeof p.progress==="number")say("Downloading the speech model (first time only)… "+Math.round(p.progress)+"%")},()=>say("Transcribing…"));
+  say(text||"(No speech detected)",true);box.dataset.ok="1";b.textContent="Hide transcript"}
+ catch(err){box.className="tx err";say(txError(err));b.textContent="✦ Try again"}
+ finally{txBusy=false;b.disabled=false}
+}
+$("radioList").addEventListener("click",onRadioClick);
 $("rsess").onchange=loadRadio;
 
 // ---------- Lap times ----------
@@ -432,7 +515,7 @@ $("wsess").onchange=loadWeather;
 //   Only `title` is required. `tags` is empty today and reserved for future categories.
 //
 // ADDING A SOURCE: append an object to NEWS_SOURCES. Nothing else needs to change.
-//   { id:"example", name:"Example Site", label:"Example (chip text)", type:"rss", url:"<a real RSS/Atom feed URL>", homepage:"<site url>", enabled:true }
+//   { id:"example", name:"Example Site", label:"Example (chip text)", color:"#8B5CF6", type:"rss", url:"<a real RSS/Atom feed URL>", homepage:"<site url>", enabled:true }
 // A new `type` (e.g. "json") is a new function in NEWS_ADAPTERS that returns { items, via }.
 //
 // GITHUB PAGES / CORS: this page is static, so a browser can only read a feed directly if that site sends
@@ -443,15 +526,21 @@ $("wsess").onchange=loadWeather;
 const NEWS_CONFIG={
  proxyUrl:"",          // e.g. "https://your-worker.workers.dev/?url="  (the feed URL is appended, encoded)
  publicRelays:true,    // set to false to use only direct requests and your own proxy
- timeoutMs:10000,maxArticles:150,pageSize:12,concurrency:3,freshMs:5*60*1000,cacheKey:"redline-news-v2"};
-const NEWS_SOURCES=[
- {id:"f1",name:"Formula 1",label:"Formula 1 Official",type:"rss",url:"https://www.formula1.com/en/latest/all.xml",homepage:"https://www.formula1.com/en/latest",enabled:true},
- {id:"autosport",name:"Autosport",label:"Autosport",type:"rss",url:"https://www.autosport.com/rss/f1/news/",homepage:"https://www.autosport.com/f1/news/",enabled:true},
- {id:"motorsport",name:"Motorsport.com",label:"Motorsport.com",type:"rss",url:"https://www.motorsport.com/rss/f1/news/",homepage:"https://www.motorsport.com/f1/news/",enabled:true},
- {id:"racefans",name:"RaceFans",label:"RaceFans",type:"rss",url:"https://www.racefans.net/feed/",homepage:"https://www.racefans.net/",enabled:true},
- {id:"planetf1",name:"PlanetF1",label:"PlanetF1",type:"rss",url:"https://www.planetf1.com/rss",homepage:"https://www.planetf1.com/",enabled:true},
- {id:"racingnews365",name:"RacingNews365",label:"RacingNews365",type:"rss",url:"https://racingnews365.com/feed/news.xml",homepage:"https://racingnews365.com/",enabled:true}
+ timeoutMs:10000,maxArticles:150,pageSize:12,concurrency:3,freshMs:5*60*1000,cacheKey:"redline-news-v3"};
+const NEWS_SOURCES=[   // `color` = the tag/accent colour readers learn to associate with that publisher
+ {id:"f1",name:"Formula 1",label:"Formula 1 Official",color:"#E10600",type:"rss",url:"https://www.formula1.com/en/latest/all.xml",homepage:"https://www.formula1.com/en/latest",enabled:true},
+ {id:"sky",name:"Sky Sports",label:"Sky Sports F1",color:"#17C3D6",type:"rss",url:"https://www.skysports.com/rss/12433",homepage:"https://www.skysports.com/f1",enabled:true},
+ {id:"bbc",name:"BBC Sport",label:"BBC Sport",color:"#E0359A",type:"rss",url:"https://feeds.bbci.co.uk/sport/formula1/rss.xml",homepage:"https://www.bbc.com/sport/formula1",enabled:true},
+ {id:"autosport",name:"Autosport",label:"Autosport",color:"#F58220",type:"rss",url:"https://www.autosport.com/rss/f1/news/",homepage:"https://www.autosport.com/f1/news/",enabled:true},
+ {id:"motorsport",name:"Motorsport.com",label:"Motorsport.com",color:"#3B6CFF",type:"rss",url:"https://www.motorsport.com/rss/f1/news/",homepage:"https://www.motorsport.com/f1/news/",enabled:true},
+ {id:"racefans",name:"RaceFans",label:"RaceFans",color:"#19B37A",type:"rss",url:"https://www.racefans.net/feed/",homepage:"https://www.racefans.net/",enabled:true},
+ {id:"planetf1",name:"PlanetF1",label:"PlanetF1",color:"#9B5CFF",type:"rss",url:"https://www.planetf1.com/rss",homepage:"https://www.planetf1.com/",enabled:true},
+ {id:"racingnews365",name:"RacingNews365",label:"RacingNews365",color:"#F2C230",type:"rss",url:"https://racingnews365.com/feed/news.xml",homepage:"https://racingnews365.com/",enabled:true},
+ {id:"guardian",name:"The Guardian",label:"The Guardian",color:"#7C8CA3",type:"rss",url:"https://www.theguardian.com/sport/formulaone/rss",homepage:"https://www.theguardian.com/sport/formulaone",enabled:true}
 ];
+// readable text colour for a coloured tag
+function onColor(h){const n=parseInt(String(h).slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return(0.2126*r+0.7152*g+0.0722*b)/255>.5?"#15151E":"#fff"}
+function srcStyle(id){const c=(newsSrc(id)||{}).color||"#8B8B98";return`--sc:${c};--on:${onColor(c)}`}
 
 // ---- helpers (pure) ----
 const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],p2=n=>String(n).padStart(2,"0");
@@ -464,7 +553,8 @@ function parseDate(v){
  const s=String(v??"").trim();if(!s)return null;
  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):?(\d{2})?$/);          // no zone given (rss2json): treat as GMT
  if(m)return Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0));
- const t=Date.parse(s);return Number.isFinite(t)?t:null}
+ const Z={BST:"+0100",CEST:"+0200",CET:"+0100",EDT:"-0400",EST:"-0500",CDT:"-0500",CST:"-0600",MDT:"-0600",MST:"-0700",PDT:"-0700",PST:"-0800",UTC:"+0000",UT:"+0000"};
+ const t=Date.parse(s.replace(/\s(BST|CEST|CET|EDT|EST|CDT|CST|MDT|MST|PDT|PST|UTC|UT)$/i,(m,z)=>" "+Z[z.toUpperCase()]));return Number.isFinite(t)?t:null}
 const fmtAbs=ms=>{const d=new Date(ms);return `${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())} GMT`};
 function relTime(ms,now=Date.now()){
  const s=Math.round((now-ms)/1000);if(s<60)return"Just now";
@@ -477,12 +567,15 @@ function urlKey(u){try{const x=new URL(u);
  return x.hostname.replace(/^www\./i,"").toLowerCase()+x.pathname.replace(/\/+$/,"")+(q?"?"+q:"")}catch(e){return""}}
 const titleKey=t=>t.toLowerCase().normalize("NFKD").replace(/[^\p{L}\p{N}]+/gu," ").trim();
 
+// Trim long text at a sentence end if possible, otherwise at a word, so it never stops mid-word.
+function clip(t,n){t=String(t||"");if(t.length<=n)return t;const cut=t.slice(0,n),k=Math.max(cut.lastIndexOf(". "),cut.lastIndexOf("! "),cut.lastIndexOf("? "));
+ return k>n*.6?cut.slice(0,k+1):cut.slice(0,cut.lastIndexOf(" ")).replace(/[,;:\s]+$/,"")+"…"}
 // ---- normalise one raw item. `pre` = already plain text (articles read back from the saved cache) ----
 function coerceArticle(o,src,pre){
  if(!o||!src)return null;const T=pre?x=>String(x??"").trim():plain;
  const title=T(o.title).slice(0,300);if(!title)return null;
  return{id:"",title,source:src.name,sourceId:src.id,url:safeUrl(o.url||o.link,src.url),publishedAt:parseDate(o.publishedAt??o.date),
-  image:safeImg(o.image),description:T(o.description).slice(0,240),tags:[]}}
+  image:safeImg(o.image),description:clip(T(o.description),1000),tags:[]}}
 
 // ---- duplicates: same URL first; else same source + identical normalised title published within 3 days of each other ----
 function dedupe(list){
@@ -538,7 +631,8 @@ const NEWS_ADAPTERS={
   throw Object.assign(new Error("Couldn't reach "+src.name),{details:why})}};
 
 // ---- state + saved copy (so the tab shows something instantly and survives a failed refresh) ----
-const newsState={articles:[],sources:{},via:{},updatedAt:null,fromCache:false,busy:false,loaded:false,filter:"",shown:NEWS_CONFIG.pageSize};
+const newsState={articles:[],sources:{},via:{},updatedAt:null,fromCache:false,busy:false,loaded:false,filter:"",shown:NEWS_CONFIG.pageSize,view:(()=>{try{return localStorage.getItem("redline-news-view")==="rows"?"rows":"cards"}catch(e){return"cards"}})()};
+const pgSize=()=>NEWS_CONFIG.pageSize*(newsState.view==="rows"?2:1);   // the compact list fits twice as many
 const newsSrc=id=>NEWS_SOURCES.find(s=>s.id===id);
 function hydrateNews(){
  try{const c=JSON.parse(localStorage.getItem(NEWS_CONFIG.cacheKey));if(!c||!Array.isArray(c.articles))return;
@@ -564,23 +658,31 @@ async function loadNews(force){
  if(okIds.size){   // articles from sources that failed this time are kept, so one bad source never empties the feed
   newsState.articles=prepare([...fresh,...newsState.articles.filter(a=>!okIds.has(a.sourceId))]);
   newsState.updatedAt=Date.now();newsState.fromCache=false;saveNews()}
- newsState.loaded=true;newsState.busy=false;newsState.shown=NEWS_CONFIG.pageSize;drawNews()}
+ newsState.loaded=true;newsState.busy=false;newsState.shown=pgSize();drawNews()}
 
 // ---- rendering ----
-function itemHtml(a,now){
+const PH='<svg class="ph-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><use href="#rl-mark"/></svg>';
+function itemHtml(a,now,i){
  const has=a.publishedAt!=null,rel=has?relTime(a.publishedAt,now):"",abs=has?fmtAbs(a.publishedAt):"";
  const when=has?`<time datetime="${new Date(a.publishedAt).toISOString()}" title="${esc(abs)}" data-ts="${a.publishedAt}">${esc(rel||abs)}</time>${rel?`<span class="nabs">${esc(abs)}</span>`:""}`:"";
- const inner=`${a.image?`<img src="${esc(a.image)}" width="160" height="96" alt="" loading="lazy" decoding="async">`:""}<div class="nbody"><div class="nmeta"><span class="nsource">${esc(a.source)}</span>${when}</div><h3 class="nt">${esc(a.title)}</h3>${a.description?`<p>${esc(a.description)}</p>`:""}</div>`;
- const cls="ncard"+(a.image?"":" noimg");
- return `<li><article>${a.url?`<a class="${cls}" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${inner}<span class="sr"> (opens in a new tab)</span></a>`:`<div class="${cls}">${inner}</div>`}</article></li>`}
+ const href=a.url?`href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"`:"",NEW='<span class="sr"> (opens in a new tab)</span>',tag=a.url?"a":"span";
+ const pic=`<${tag} class="nimg${a.image?"":" ph"}" ${a.url?href+' tabindex="-1" aria-hidden="true"':""}>${a.image?`<img src="${esc(a.image)}" width="160" height="96" alt="" loading="lazy" decoding="async">`:PH}</${tag}>`;
+ const title=a.url?`<a ${href}>${esc(a.title)}${NEW}</a>`:esc(a.title);
+ const desc=a.description?`<p class="ndesc" id="nd${i}">${esc(a.description)}</p>`:"";
+ const acts=a.description||a.url?`<div class="nacts">${a.description?`<button type="button" class="nexp" hidden aria-expanded="false" aria-controls="nd${i}">Show more</button>`:""}${a.url?`<a class="nread" ${href}>Read full article ↗${NEW}</a>`:""}</div>`:"";
+ return `<li style="${srcStyle(a.sourceId)}"><article class="ncard">${pic}<div class="nbody"><div class="nmeta"><span class="nsource">${esc(a.source)}</span>${when}</div><h3 class="nt">${title}</h3>${desc}${acts}</div></article></li>`}
+// Show the "Show more" link only where the text is actually cut off (depends on screen width, so re-checked on resize)
+function markClamped(){document.querySelectorAll("#newsList .ndesc:not(.open)").forEach(p=>{const b=p.parentNode.querySelector(".nexp");if(b)b.hidden=!(p.scrollHeight>p.clientHeight+1)})}
+let clampTimer=null;window.addEventListener("resize",()=>{clearTimeout(clampTimer);clampTimer=setTimeout(markClamped,150)});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(markClamped);
 function drawChips(){
  const S=newsState,counts={};S.articles.forEach(a=>counts[a.sourceId]=(counts[a.sourceId]||0)+1);
- const chip=(id,label,n,bad)=>`<button class="chip" data-src="${esc(id)}" aria-pressed="${S.filter===id}"${bad?' title="Couldn\'t load this source"':""}>${esc(label)}${bad?" ⚠":` <span class="cnt">${n}</span>`}</button>`;
+ const chip=(id,label,n,bad)=>`<button class="chip" data-src="${esc(id)}" style="${id?srcStyle(id):"--sc:var(--red)"}" aria-pressed="${S.filter===id}"${bad?' title="Couldn\'t load this source"':""}>${id?"<i></i>":""}${esc(label)}${bad?" ⚠":` <span class="cnt">${n}</span>`}</button>`;
  $("nchips").innerHTML=chip("","All sources",S.articles.length,false)+NEWS_SOURCES.filter(s=>s.enabled).map(s=>chip(s.id,s.label||s.name,counts[s.id]||0,S.sources[s.id]&&S.sources[s.id].ok===false&&!counts[s.id])).join("")}
 function drawNews(){
  const S=newsState,box=$("newsList"),note=$("nnote"),stat=$("nsrc");
  const failed=Object.entries(S.sources).filter(([,v])=>!v.ok),at=S.updatedAt?new Date(S.updatedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
- box.setAttribute("aria-busy",S.busy?"true":"false");drawChips();
+ box.setAttribute("aria-busy",S.busy?"true":"false");drawChips();document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
  const msgs=[];
  if(S.articles.length&&S.busy&&S.fromCache)msgs.push(`Showing saved articles from ${esc(at)} while updating…`);
  else if(S.articles.length&&failed.length)msgs.push(`Couldn't load ${esc(failed.map(([id])=>newsSrc(id)?.name||id).join(", "))}. Showing everything else${at?" (updated "+esc(at)+")":""}. <button class="lnk" data-act="retry">Try again</button>`);
@@ -595,15 +697,20 @@ function drawNews(){
    :'<div class="state"><p>No articles are available right now.</p><p><button class="lnk" data-act="retry">Refresh</button></p></div>';return}
  if(!list.length){const n=newsSrc(S.filter);box.innerHTML=`<div class="state"><p>No articles from ${esc(n?n.name:"this source")} right now.</p><p><button class="lnk" data-act="clear">Show all sources</button></p></div>`;return}
  const now=Date.now();
- box.innerHTML=`<ul class="nlist">${shown.map(a=>itemHtml(a,now)).join("")}</ul>`+`<div class="nmore"><span class="ncount">${list.length>shown.length?`Showing ${shown.length} of ${list.length} articles`:list.length>NEWS_CONFIG.pageSize?`All ${list.length} articles shown`:`${list.length} article${list.length===1?"":"s"}, which is everything these feeds list right now`}</span>${list.length>shown.length?` <button class="lnk" data-act="more">Show ${Math.min(NEWS_CONFIG.pageSize,list.length-shown.length)} more</button>`:""}</div>`}
+ box.dataset.view=S.view;box.innerHTML=`<ul class="nlist ${S.view}">${shown.map((a,i)=>itemHtml(a,now,i)).join("")}</ul>`+`<div class="nmore"><span class="ncount">${list.length>shown.length?`Showing ${shown.length} of ${list.length} articles`:list.length>pgSize()?`All ${list.length} articles shown`:`${list.length} article${list.length===1?"":"s"}, which is everything these feeds list right now`}</span>${list.length>shown.length?` <button class="lnk" data-act="more">Show ${Math.min(pgSize(),list.length-shown.length)} more</button>`:""}</div>`;
+ requestAnimationFrame(markClamped)}
 
 // ---- wiring ----
 $("nrefresh").onclick=()=>loadNews(true);
-$("nchips").addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-src]");if(!b)return;newsState.filter=b.dataset.src;newsState.shown=NEWS_CONFIG.pageSize;drawNews()});
-$("newsList").addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
- if(a==="retry")loadNews(true);else if(a==="clear"){newsState.filter="";newsState.shown=NEWS_CONFIG.pageSize;drawNews()}else if(a==="more"){newsState.shown+=NEWS_CONFIG.pageSize;drawNews()}});
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{newsState.view=b.dataset.view;newsState.shown=pgSize();try{localStorage.setItem("redline-news-view",newsState.view)}catch(e){}drawNews()});
+$("nchips").addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-src]");if(!b)return;newsState.filter=b.dataset.src;newsState.shown=pgSize();drawNews()});
+$("newsList").addEventListener("click",e=>{
+ const x=e.target.closest&&e.target.closest(".nexp");
+ if(x){const p=document.getElementById(x.getAttribute("aria-controls"));if(p){const o=p.classList.toggle("open");x.textContent=o?"Show less":"Show more";x.setAttribute("aria-expanded",String(o))}return}
+ const b=e.target.closest&&e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
+ if(a==="retry")loadNews(true);else if(a==="clear"){newsState.filter="";newsState.shown=pgSize();drawNews()}else if(a==="more"){newsState.shown+=pgSize();drawNews()}});
 $("nnote").addEventListener("click",e=>{if(e.target.closest&&e.target.closest("[data-act=retry]"))loadNews(true)});
-$("newsList").addEventListener("error",e=>{const el=e.target;if(el&&el.tagName==="IMG"){el.closest(".ncard")?.classList.add("noimg");el.remove()}},true);
+$("newsList").addEventListener("error",e=>{const el=e.target;if(el&&el.tagName==="IMG"){const w=el.closest(".nimg");if(w){w.classList.add("ph");w.innerHTML=PH}else el.remove()}},true);
 setInterval(()=>{document.querySelectorAll("#newsList time[data-ts]").forEach(t=>{const ms=+t.dataset.ts,r=relTime(ms);t.textContent=r||fmtAbs(ms)})},60000);
 
 // ---------- Car data ----------
@@ -627,8 +734,9 @@ async function loadCar(repop){
   const grid=[.25,.5,.75].map(f=>`<line x1="0" x2="${W}" y1="${H*f}" y2="${H*f}" stroke="currentColor" stroke-opacity=".12"/>`).join("");
   const ch=(t,u,body)=>`<div class="ch"><div class="chh"><span>${t}</span><span>${u}</span></div><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${t} over the lap">${grid}${body}</svg></div>`;
   const top=Math.max(...d.map(r=>r.speed)),rpm=Math.max(...d.map(r=>r.rpm));
+  let shifts=0;for(let i=1;i<d.length;i++)if(d[i].n_gear>0&&d[i-1].n_gear>0&&d[i].n_gear!==d[i-1].n_gear)shifts++;   // ignores neutral/zero readings
   box.innerHTML=`<div class="stats"><div class="stat"><b>${top}</b><small>Top speed km/h</small></div><div class="stat"><b>${rpm}</b><small>Max RPM</small></div>
-   <div class="stat"><b>${pc(r=>r.throttle>=98)}%</b><small>Full throttle</small></div><div class="stat"><b>${pc(r=>r.brake>0)}%</b><small>Braking</small></div><div class="stat"><b>${pc(r=>r.drs>=10)}%</b><small>DRS open</small></div></div>`+
+   <div class="stat"><b>${pc(r=>r.throttle>=98)}%</b><small>Full throttle</small></div><div class="stat"><b>${pc(r=>r.brake>0)}%</b><small>Braking</small></div><div class="stat"><b>${shifts}</b><small>Gear shifts</small></div><div class="stat"><b>${Math.min(...d.map(r=>r.speed))}</b><small>Slowest point km/h</small></div></div>`+
    ch("Speed","km/h · start to finish line",line(d.map(r=>r.speed),Math.max(top,100),"currentColor"))+
    ch("Throttle (green) and brake (red)","%",line(d.map(r=>r.throttle),100,"#22c55e")+line(d.map(r=>r.brake?100:0),100,"#FF1E00"))+
    ch("Gear","1 to 8",line(d.map(r=>r.n_gear),8,"#f5c400"))+ch("Engine","RPM",line(d.map(r=>r.rpm),Math.max(rpm,1000),"#c77dff"));
@@ -643,7 +751,7 @@ async function loadCal(){
  try{const m=(await get(`/meetings?year=${year}`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
   const now=Date.now(),nx=m.findIndex(x=>new Date(x.date_start)>now);calMap={};
   $("calList").innerHTML=m.map((x,i)=>{calMap[x.meeting_key]=x;const st=new Date(x.date_start)>now?(i===nx?"Next":"Upcoming"):"Done";
-   return `<div class="mt" data-k="${x.meeting_key}"><button class="mth" aria-expanded="false"><span class="rn">${String(i+1).padStart(2,"0")}</span><span class="mi"><b>${esc(x.meeting_name)}</b><small>${esc(x.location)}, ${esc(x.country_name)} · ${new Date(x.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span><span class="badge${st==="Done"?" off":""}">${st}</span></button><div class="mtd" hidden></div></div>`}).join("")||'<div class="state">No meetings found.</div>';
+   return `<div class="mt" data-k="${x.meeting_key}"><button class="mth" aria-expanded="false"><span class="rn">${String(i+1).padStart(2,"0")}</span><span class="mi"><b>${esc(x.meeting_name)}</b><small>${esc(x.location)}, ${esc(x.country_name)} · ${new Date(x.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span><span class="badge${st==="Done"?" off":""}">${st}</span><span class="chev" aria-hidden="true">›</span></button><div class="mtd" hidden></div></div>`}).join("")||'<div class="state">No meetings found.</div>';
  }catch(e){fail("calList",e)}
 }
 $("calList").onclick=async e=>{
