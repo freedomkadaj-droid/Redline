@@ -83,6 +83,15 @@ select{background:var(--card2);color:var(--txt);border:1px solid var(--line);bor
 .flag{display:inline-block;font:600 11px 'Space Grotesk';letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;margin-right:8px;background:var(--chip)}
 .flag.YELLOW,.flag.DOUBLE{background:#f5c400;color:#111}.flag.RED{background:var(--red)}.flag.GREEN,.flag.CLEAR{background:#16a34a}.flag.BLUE{background:#2a6df5}.flag.CHEQUERED,.flag.BLACK{background:#fff;color:#111}
 .state{padding:30px 18px;text-align:center;color:var(--mute)}
+.api-fallback{margin:16px;padding:22px;background:var(--card2);border:1px solid var(--line);border-radius:14px;text-align:left}
+.api-fallback .af-kicker{font:600 10px 'Space Grotesk';letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+.api-fallback h3{font:600 18px 'Space Grotesk';margin:0 0 8px;color:var(--txt)}
+.api-fallback p{font-size:13px;line-height:1.6;color:var(--mute);margin:0 0 14px}
+.api-fallback .af-links{display:flex;gap:9px;flex-wrap:wrap}
+.api-fallback a{display:inline-flex;align-items:center;gap:7px;padding:10px 13px;border-radius:9px;background:var(--soft);border:1px solid var(--line);color:var(--txt);text-decoration:none;font-size:12px;font-weight:600}
+.api-fallback a.primary{background:var(--red);border-color:var(--red);color:#fff}
+.api-fallback a:hover{filter:brightness(1.08)}
+.api-fallback .af-foot{font-size:11px;margin-top:12px;color:var(--mute)}
 .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--mute);padding:12px 18px;border-bottom:1px solid var(--line)}
 .tools button{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:7px 14px;cursor:pointer}
 .badge{display:inline-block;font:600 11px 'Space Grotesk';letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:99px;background:var(--red);color:#fff}.badge.off{background:var(--chip);color:var(--mute)}
@@ -314,8 +323,9 @@ async function useJolpicaForCurrentRace(){
  Object.assign(original,match);cur=original;fallbackNote();return cur;
 }
 const fallbackNote=()=>setNet("Jolpica-F1 fallback active · historical data only");
-const noJolpicaLive='<div class="state">OpenF1 session data is unavailable. Jolpica-F1 provides schedules, completed results and standings, but not live timing, telemetry, radio or race-control messages.</div>';
-const fail=(id,e)=>$(id).innerHTML=`<div class="state">Couldn't load this (${esc(e.message)}). Refresh in a moment.</div>`;
+const timingHelp=(title,detail="Live timing and telemetry aren't available from Redline right now.")=>`<div class="api-fallback"><div class="af-kicker">Redline · Data connection</div><h3>${esc(title)}</h3><p>${esc(detail)} If an F1 session is currently live, OpenF1 access may be restricted until the session ends. Please try again later, or follow the action on another live timing page.</p><div class="af-links"><a class="primary" href="https://app.formula1dashboard.com/live-timing/" target="_blank" rel="noopener noreferrer">Open free live timing <span aria-hidden="true">↗</span></a><a href="https://www.formula1.com/en/timing/f1-live" target="_blank" rel="noopener noreferrer">Official F1 Live Timing <span aria-hidden="true">↗</span></a></div><div class="af-foot">The independent dashboard is free to use. Official F1 timing may require an account or subscription for full access.</div></div>`;
+const noJolpicaLive=timingHelp("Live data isn't available here","Jolpica-F1 can provide historical schedules, results and standings, but not live timing, telemetry, team radio or race-control messages.");
+const fail=(id,e)=>{const titles={liveList:"Live timing is temporarily unavailable",calList:"The calendar couldn't be loaded",drivers:"Driver standings are temporarily unavailable",teams:"Constructor standings are temporarily unavailable",result:"Race results are temporarily unavailable",control:"Race control data is unavailable",radioList:"Team radio data is unavailable",lapList:"Lap data is unavailable",weatherView:"Weather data is unavailable"};$(id).innerHTML=timingHelp(titles[id]||"We couldn't load this data","Redline couldn't get a response from its data providers. The data may return once the provider is available again.")};
 
 // Avatars: image sits over initials, so if the image fails the initials stay visible.
 const initials=n=>(n||"?").split(/\s+/).map(w=>w[0]).join("").slice(0,3).toUpperCase();
