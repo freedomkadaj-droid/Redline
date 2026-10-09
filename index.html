@@ -403,6 +403,7 @@ async function loadControl(){
  const l=rclips.slice(0,40);
  $("radioList").innerHTML=l.map((c,i)=>{
   const d=who(rby,c.driver_number),dt=new Date(c.date),time=dt.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  const sessionLabel=(($("rsess").selectedOptions[0]||{}).textContent||"Selected session").split(" · ").pop();
   const ctx=radioContext.key===radioFor?radioContext:{control:[],positions:[],intervals:[],stints:[]};
   const at=dt.getTime(),driver=String(c.driver_number);
   const nearest=(arr,field,maxMs=180000)=>{const list=(arr||[]).filter(x=>String(x.driver_number)===driver&&x[field]&&Math.abs(new Date(x[field]).getTime()-at)<=maxMs);return list.sort((a,b)=>Math.abs(new Date(a[field])-at)-Math.abs(new Date(b[field])-at))[0]||null};
@@ -427,7 +428,7 @@ async function loadControl(){
   return `<article class="radio${isFavD(d)?" hot":""}">
    <div class="radio-head"><div class="av" style="background:var(--hover);border:1px solid color-mix(in srgb,#${esc(d.team_colour||"8B8B98")} 65%,white)"><img src="${esc(d.headshot_url||"")}" alt="" loading="lazy" onerror="this.remove()"></div><div class="radio-id"><div class="radio-kicker">Original team radio</div><b>${esc(d.full_name||"Driver #"+c.driver_number)}</b><small>${esc(d.team_name||"")} · Driver #${esc(c.driver_number)}</small></div><div class="radio-time">${esc(time)}<br><span>${esc(dt.toLocaleDateString([],{day:"numeric",month:"short"}))}</span></div></div>
    <div class="radio-audio"><div class="radio-wave" aria-hidden="true">${[5,10,7,15,9,18,11,6,14,20,8,12,17,7,10,15,5,13,8,18,11,6,14,9,16,7,12,5,10,15,8,13].map((h,j)=>`<i style="height:${h}px;opacity:${.45+(j%4)*.15}"></i>`).join("")}</div><audio controls preload="none" src="${esc(c.recording_url)}">Your browser does not support audio playback.</audio></div>
-   <section class="radio-context"><div class="context-head"><b>REDLINE TEAM RADIO CONTEXT</b><small>${esc(cur&&cur.country_name?cur.country_name+" Grand Prix":"Race weekend")} · ${esc(($("rsess").selectedOptions[0]||{}).textContent||"Selected session")} · ${lapNo!=null?"Lap "+lapNo:"Lap not available"}</small></div>
+   <section class="radio-context"><div class="context-head"><b>REDLINE TEAM RADIO CONTEXT</b><small>${esc(cur&&cur.country_name?cur.country_name+" Grand Prix":"Race weekend")} · ${esc(sessionLabel)} · ${lapNo!=null?"Lap "+lapNo:"Lap not available"}</small></div>
     <div class="context-grid">
      <div class="context-card"><small>Race Control</small><b>${esc(nearby&&nearby.flag||"Session notes")}</b><p>${esc(raceText)}</p></div>
      <div class="context-card"><small>Driver Performance</small><b>${esc(posText)}</b><p>${esc(gap&&gap.interval!=null?"Interval to car ahead: "+gapText:gap&&gap.gap_to_leader!=null?"Gap to leader: "+gapText:"Position gap not recorded nearby")}</p></div>
@@ -451,28 +452,6 @@ async function loadRadio(){
   radioContext={key:k,control,positions,intervals,stints};drawRadio()
  }catch(e){fail("radioList",e)}
 }
-$("rsess").onchange=loadRadio;
-
-t}
-function txError(e){
- if(e&&e.stage==="model")return"Couldn't download the speech model. Check your connection and try again.";
- if(e&&e.stage==="audio")return"Couldn't read this clip. The radio audio server may not allow other websites to use its files, so an audio proxy is needed (RADIO_AI.audioProxy). You can still play the clip above.";
- return"Transcription failed: "+String(e&&e.message||e)}
-async function onRadioClick(e){
- const b=e.target.closest&&e.target.closest(".tbtn");if(!b||b.disabled)return;
- const i=+b.dataset.i,c=rclips[i],box=document.getElementById("tx"+i);if(!c||!box)return;
- if(!box.hidden&&box.dataset.ok){box.hidden=true;b.textContent="✦ AI transcript";return}
- if(txBusy)return;
- txBusy=true;b.disabled=true;box.hidden=false;box.className="tx";delete box.dataset.ok;
- const say=(t,ok)=>{box.innerHTML=`<span class="ai">AI transcript${ok?" · may contain errors":""}</span>${esc(t)}`};
- say("Preparing…");
- try{
-  const text=await transcribe(c.recording_url,p=>{if(p&&p.status==="progress"&&typeof p.progress==="number")say("Downloading the speech model (first time only)… "+Math.round(p.progress)+"%")},()=>say("Transcribing…"));
-  say(text||"(No speech detected)",true);box.dataset.ok="1";b.textContent="Hide transcript"}
- catch(err){box.className="tx err";say(txError(err));b.textContent="✦ Try again"}
- finally{txBusy=false;b.disabled=false}
-}
-$("radioList").addEventListener("click",onRadioClick);
 $("rsess").onchange=loadRadio;
 
 // ---------- Lap times ----------
