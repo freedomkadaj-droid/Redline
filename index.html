@@ -458,11 +458,11 @@ function drawRadio(){
      <div class="context-card"><small>Driver Performance</small><b>${esc(posText)}</b><p>${esc(gap&&gap.interval!=null?"Interval to car ahead: "+gapText:gap&&gap.gap_to_leader!=null?"Gap to leader: "+gapText:"Position gap not recorded nearby")}</p></div>
      <div class="context-card"><small>Previous Lap</small><b>${esc(lapText)}</b><p>${prevLap&&lapNo!=null?"Lap "+lapNo+(prevLap.is_pit_out_lap?" · pit-out lap":""):"No completed lap time found before this clip"}</p></div>
      <div class="context-card"><small>Tyre Stint</small><b>${esc(tyre)}</b><p>${esc(tyreAge||"Stint detail not recorded for this lap")}</p></div>
-    </div><div class="context-summary"><b>What was happening?</b><p>${esc(what)} ${nearby?"Race control: "+String(nearby.message||"message recorded")+".":""}</p></div><small class="context-foot">Original audio from the session. Context is based on recorded timing and race-control data near this timestamp; no AI transcript or invented quotes.</small>
+    </div><div class="context-summary"><b>What was happening?</b><p>${esc(what)} ${nearby?"Race control: "+esc(String(nearby.message||"message recorded"))+".":""}</p></div><small class="context-foot">Original audio from the session. Context is based on recorded timing and race-control data near this timestamp; no AI transcript or invented quotes.</small>
    </section></article>`
  }).join("")||'<div class="state">No radio clips for this session.</div>';
 }
-$("rsess").onchange=loadRadio;
+$("rsess").onchange=()=>{$("lsess").value=$("rsess").value;loadRadio();loadLaps()};
 
 // ---------- Lap times ----------
 let lapsFor=null,lapData={};
