@@ -279,7 +279,7 @@ footer{color:var(--mute);font-size:14px}
 </div>
 
 <script>
-const API="https://api.openf1.org/v1";
+const API="https://api.openf1.org/v1",JOLPICA="https://api.jolpi.ca/ergast/f1";
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const isFavT=()=>false,isFavD=()=>false;
@@ -297,6 +297,13 @@ async function fetchRetry(p){for(let i=0;i<4;i++){await throttle();let r;try{r=a
   if(!r.ok)throw new Error("OpenF1 returned "+r.status);const j=await r.json();if(p.startsWith("/drivers")&&Array.isArray(j))j.forEach(d=>{if(d.full_name)nameBook[d.driver_number]=d});return j} throw new Error("OpenF1 is busy, try again soon")}
 function get(p){if(cache.has(p))return cache.get(p);const q=chain.then(()=>fetchRetry(p));
   chain=q.catch(()=>{}).then(()=>sleep(450));cache.set(p,q);q.catch(()=>cache.delete(p));return q}
+const jolpicaCache=new Map();
+async function jget(path){if(jolpicaCache.has(path))return jolpicaCache.get(path);const task=(async()=>{let last;for(let i=0;i<2;i++){try{const url=JOLPICA+path+(path.includes("?")?"&":"?")+"limit=100";const res=await fetch(url,{headers:{Accept:"application/json"}});if(!res.ok)throw new Error("Jolpica-F1 returned "+res.status);const data=await res.json();if(!data?.MRData)throw new Error("Unexpected Jolpica-F1 response");return data.MRData}catch(e){last=e;if(i===0)await sleep(500)}}throw last||new Error("Jolpica-F1 is unavailable")})();jolpicaCache.set(path,task);task.catch(()=>jolpicaCache.delete(path));return task}
+const jdate=session=>session?.date?new Date(session.date+"T"+(session.time||"12:00:00Z")):null;
+function jolpicaSessionList(r){const defs=[["First Practice","FirstPractice"],["Second Practice","SecondPractice"],["Third Practice","ThirdPractice"],["Sprint Qualifying","SprintQualifying"],["Sprint Shootout","SprintShootout"],["Sprint","Sprint"],["Qualifying","Qualifying"],["Race",null]],out=[];defs.forEach(([name,key])=>{const v=key?r[key]:{date:r.date,time:r.time};if(v?.date){const d=jdate(v);if(d&&!Number.isNaN(+d))out.push({name,date:d})}});const seen=new Set();return out.filter(x=>{const k=x.name+"|"+x.date.toISOString();if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>a.date-b.date)}
+async function jolpicaRounds(y){const data=await jget(`/${y}/races/`),races=data.RaceTable?.Races||[];return races.map(r=>{const sessions=jolpicaSessionList(r),raceDate=jdate({date:r.date,time:r.time})||new Date(r.date+"T12:00:00Z"),start=sessions[0]?.date||raceDate,round=Number(r.round),key=`jolpica-${y}-${round}`;return {_source:"jolpica",jolpicaRound:round,meeting_key:key,session_key:key,date_start:start.toISOString(),date_end:new Date(raceDate.getTime()+7200000).toISOString(),location:r.Circuit?.Location?.locality||r.Circuit?.circuitName||"",country_name:r.Circuit?.Location?.country||"",circuit_short_name:r.Circuit?.circuitName||"",meeting_name:r.raceName||"Grand Prix",raceName:r.raceName||"Grand Prix",jolpicaRace:r}})}
+const fallbackNote=()=>setNet("Jolpica-F1 fallback active · historical data only");
+const noJolpicaLive='<div class="state">OpenF1 session data is unavailable. Jolpica-F1 provides schedules, completed results and standings, but not live timing, telemetry, radio or race-control messages.</div>';
 const fail=(id,e)=>$(id).innerHTML=`<div class="state">Couldn't load this (${esc(e.message)}). Refresh in a moment.</div>`;
 
 // Avatars: image sits over initials, so if the image fails the initials stay visible.
@@ -334,8 +341,9 @@ document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>show(b.datase
 
 async function loadYear(y){
  year=y;$("year").value=y;$("rounds").innerHTML="";
- try{rounds=(await get(`/sessions?year=${y}&session_name=Race`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start))}catch(e){["drivers","teams"].forEach(id=>fail(id,e));$("last").innerHTML="<small>Couldn't reach OpenF1</small>";return}
- if(!rounds.length&&y===nowY&&y>2023)return loadYear(y-1);
+ try{rounds=(await get(`/sessions?year=${y}&session_name=Race`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start))}catch(e){rounds=[]}
+ if(!rounds.length){try{rounds=await jolpicaRounds(y);fallbackNote()}catch(e){if(y===nowY&&y>2023)return loadYear(y-1);$("rounds").innerHTML='<div class="state">OpenF1 and Jolpica-F1 are unavailable. Please try again later.</div>';$("last").innerHTML="<small>Couldn't load the season schedule.</small>";return}}
+
  if(!rounds.length){$("last").innerHTML="<small>No races found for this season.</small>";return}
  const done=rounds.filter(r=>new Date(r.date_end)<Date.now());
  if(!done.length&&y===nowY&&y>2023)return loadYear(y-1);
@@ -382,6 +390,7 @@ function ensure(){
 }
 const ok=t=>t===tok,drvOf=async key=>{try{return await get(`/drivers?session_key=${key}`)}catch(e){return[]}};
 async function loadStandings(){
+ if(cur?._source==="jolpica")return loadJolpicaStandings();
  const t=tok,key=cur.session_key,drv=await drvOf(key),by=Object.fromEntries(drv.map(d=>[d.driver_number,d]));
  try{const st=(await get(`/championship_drivers?session_key=${key}`)).sort((a,b)=>a.position_current-b.position_current);if(!ok(t))return;
   $("drivers").innerHTML=st.map(s=>{const d=who(by,s.driver_number);return row(s.position_current,driverNoBadge(s.driver_number,d.team_colour),d.full_name||"Driver #"+s.driver_number,d.team_name||(Number(s.driver_number)===22?"Racing Bulls":""),s.points_current,isFavD(d))}).join("")||'<div class="state">No standings yet.</div>'}catch(e){ok(t)&&fail("drivers",e)}
@@ -389,7 +398,21 @@ async function loadStandings(){
   const col=Object.fromEntries(drv.map(d=>[d.team_name,d.team_colour]));
   $("teams").innerHTML=st.map(s=>{const tc=teamIconColor(s.team_name,col[s.team_name]);return row(s.position_current,av(logoUrl(s.team_name,year),s.team_name,tc,true).replace('class="av logo"','class="av logo team-icon"'),s.team_name,"",s.points_current,isFavT(s.team_name))}).join("")||'<div class="state">No standings yet.</div>'}catch(e){ok(t)&&fail("teams",e)}
 }
+async function loadJolpicaStandings(){
+ const t=tok,y=year,r=cur.jolpicaRound;
+ try{const [a,b]=await Promise.all([jget(`/${y}/${r}/driverstandings/`),jget(`/${y}/${r}/constructorstandings/`)]);if(!ok(t))return;const ds=a.StandingsTable?.StandingsLists?.[0]?.DriverStandings||[],ts=b.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings||[];
+ $("drivers").innerHTML=ds.map(v=>{const d=v.Driver||{},team=v.Constructors?.[0]?.name||"";return row(v.position,driverNoBadge(d.permanentNumber||d.code,teamIconColor(team)),[d.givenName,d.familyName].filter(Boolean).join(" ")||d.driverId||"Driver",team,v.points,isFavD(d))}).join("")||'<div class="state">No historical driver standings for this round.</div>';
+ $("teams").innerHTML=ts.map(v=>{const c=v.Constructor||{},col=teamIconColor(c.name);return row(v.position,av(logoUrl(c.name,y),c.name,col,true).replace('class="av logo"','class="av logo team-icon"'),c.name||"Team","",v.points,isFavT(c.name))}).join("")||'<div class="state">No historical constructor standings for this round.</div>';
+ }catch(e){if(ok(t)){fail("drivers",e);fail("teams",e)}}
+}
+async function loadJolpicaResult(){
+ const t=tok,y=year,r=cur.jolpicaRound;
+ try{const data=await jget(`/${y}/${r}/results/`);if(!ok(t))return;const res=data.RaceTable?.Races?.[0]?.Results||[];
+ $("result").innerHTML=res.map(v=>{const d=v.Driver||{},c=v.Constructor||{},name=[d.givenName,d.familyName].filter(Boolean).join(" ")||d.driverId||"Driver",gap=v.Time?.time||v.status||"";return row(v.position||"-",driverNoBadge(d.permanentNumber||v.number,teamIconColor(c.name)),name,(c.name||"")+(v.points?` · +${v.points} pts`:""),gap,false,"")}).join("")||'<div class="state">No completed race result is available from Jolpica-F1 yet.</div>';
+ }catch(e){if(ok(t))fail("result",e)}
+}
 async function loadResult(){
+ if(cur?._source==="jolpica")return loadJolpicaResult();
  const t=tok,key=cur.session_key,drv=await drvOf(key),by=Object.fromEntries(drv.map(d=>[d.driver_number,d]));
  try{const res=(await get(`/session_result?session_key=${key}`)).sort((a,b)=>(a.position??99)-(b.position??99));if(!ok(t))return;
   $("result").innerHTML=res.map(r=>{const d=who(by,r.driver_number);const out=r.dsq?"DSQ":r.dns?"DNS":r.dnf?"DNF":null;
@@ -397,6 +420,7 @@ async function loadResult(){
    return row(r.position??"-",av(0,d.full_name,d.team_colour),d.full_name||"Driver #"+r.driver_number,(d.team_name||"")+(r.points?` · +${r.points} pts`:""),gap,isFavD(d),"")}).join("")||'<div class="state">No result data.</div>'}catch(e){ok(t)&&fail("result",e)}
 }
 async function loadControl(){
+ if(cur?._source==="jolpica"){$("control").innerHTML=noJolpicaLive;return}
  const t=tok;
  try{const m=(await get(`/race_control?session_key=${cur.session_key}`)).sort((a,b)=>new Date(b.date)-new Date(a.date));if(!ok(t))return;
   $("control").innerHTML=m.slice(0,80).map(x=>`<div class="msg"><time>${x.lap_number?"Lap "+x.lap_number:new Date(x.date).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</time><div>${x.flag?`<span class="flag ${esc(String(x.flag).split(" ")[0])}">${esc(x.flag)}</span>`:""}${esc(x.message)}</div></div>`).join("")||'<div class="state">No messages.</div>'}catch(e){ok(t)&&fail("control",e)}
@@ -405,6 +429,7 @@ async function loadControl(){
 // Team radio: any session of the selected race weekend
 let rclips=[],rby={};
 async function loadSessions(race){const t0=tok;
+ if(race?._source==="jolpica"){$("rsess").innerHTML='<option value="">Live session data unavailable</option>';$("lsess").innerHTML=$("rsess").innerHTML;$("wsess").innerHTML=$("rsess").innerHTML;$("radioList").innerHTML=noJolpicaLive;$("lapList").innerHTML=noJolpicaLive;$("weatherView").innerHTML=noJolpicaLive;$("ldrv").innerHTML='<option value="">Unavailable</option>';return}
  try{const ss=(await get(`/sessions?meeting_key=${race.meeting_key}`)).filter(s=>new Date(s.date_start)<Date.now()).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
   if(!ok(t0))return;$("rsess").innerHTML=ss.map(s=>`<option value="${s.session_key}">${esc(race.country_name)} · ${esc(s.session_name)}</option>`).join("");
   $("rsess").value=race.session_key;$("lsess").innerHTML=$("rsess").innerHTML;$("lsess").value=race.session_key;$("wsess").innerHTML=$("rsess").innerHTML;$("wsess").value=race.session_key;lapsFor=null;await loadRadio();await loadLaps();await loadWeather()}catch(e){fail("radioList",e)}
@@ -754,21 +779,28 @@ let calFor=null,calMap={};
 const trackTime=(t,gmt)=>{const o=(gmt||"").match(/(-?)(\d+):(\d+)/);const ms=o?(o[1]?-1:1)*(+o[2]*60+ +o[3])*6e4:0;const d=new Date(new Date(t).getTime()+ms);return d.toUTCString().slice(5,11)+" "+d.toISOString().slice(11,16)};
 async function loadCal(){
  calFor=year;$("calList").innerHTML='<div class="state">Loading…</div>';
- try{const m=(await get(`/meetings?year=${year}`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
-  const now=Date.now(),nx=m.findIndex(x=>new Date(x.date_start)>now);calMap={};
-  $("calList").innerHTML=m.map((x,i)=>{calMap[x.meeting_key]=x;const st=new Date(x.date_start)>now?(i===nx?"Next":"Upcoming"):"Done";
-   return `<div class="mt" data-k="${x.meeting_key}"><button class="mth" aria-expanded="false"><span class="rn">${String(i+1).padStart(2,"0")}</span><span class="mi"><b>${esc(x.meeting_name)}</b><small>${esc(x.location)}, ${esc(x.country_name)} · ${new Date(x.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span><span class="badge${st==="Done"?" off":""}">${st}</span><span class="chev" aria-hidden="true">›</span></button><div class="mtd" hidden></div></div>`}).join("")||'<div class="state">No meetings found.</div>';
- }catch(e){fail("calList",e)}
+ try{const m=(await get(`/meetings?year=${year}`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));const now=Date.now(),nx=m.findIndex(x=>new Date(x.date_start)>now);calMap={};
+ $("calList").innerHTML=m.map((x,i)=>{calMap[x.meeting_key]=x;const st=new Date(x.date_start)>now?(i===nx?"Next":"Upcoming"):"Done";return `<div class="mt" data-k="${x.meeting_key}"><button class="mth" aria-expanded="false"><span class="rn">${String(i+1).padStart(2,"0")}</span><span class="mi"><b>${esc(x.meeting_name)}</b><small>${esc(x.location)}, ${esc(x.country_name)} · ${new Date(x.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span><span class="badge${st==="Done"?" off":""}">${st}</span><span class="chev" aria-hidden="true">›</span></button><div class="mtd" hidden></div></div>`}).join("")||'<div class="state">No meetings found.</div>';
+ }catch(e){try{await loadJolpicaCalendar()}catch(j){fail("calList",j)}}
+}
+async function loadJolpicaCalendar(){
+ const data=await jget(`/${year}/races/`),races=data.RaceTable?.Races||[];if(!races.length)throw new Error("Jolpica-F1 returned no calendar data");const now=Date.now();calMap={};
+ const mapped=races.map(r=>{const sessions=jolpicaSessionList(r),raceDate=jdate({date:r.date,time:r.time})||new Date(r.date+"T12:00:00Z"),start=sessions[0]?.date||raceDate,key=`jolpica-${r.season}-${r.round}`;const x={...r,_source:"jolpica",meeting_key:key,meeting_name:r.raceName,location:r.Circuit?.Location?.locality||"",country_name:r.Circuit?.Location?.country||"",date_start:start.toISOString(),date_end:new Date(raceDate.getTime()+7200000).toISOString(),_sessions:sessions};calMap[key]=x;return x});
+ const nx=mapped.findIndex(x=>new Date(x.date_start)>now);
+ $("calList").innerHTML=mapped.map((x,i)=>{const st=new Date(x.date_start)>now?(i===nx?"Next":"Upcoming"):"Done";return `<div class="mt" data-k="${x.meeting_key}"><button class="mth" aria-expanded="false"><span class="rn">${String(i+1).padStart(2,"0")}</span><span class="mi"><b>${esc(x.raceName)}</b><small>${esc(x.location)}, ${esc(x.country_name)} · ${new Date(x.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span><span class="badge${st==="Done"?" off":""}">${st}</span><span class="chev" aria-hidden="true">›</span></button><div class="mtd" hidden></div></div>`}).join("");fallbackNote();
 }
 $("calList").onclick=async e=>{
- const h=e.target.closest(".mth");if(!h)return;const box=h.parentNode,det=box.querySelector(".mtd"),x=calMap[box.dataset.k],open=det.hidden;
- det.hidden=!open;h.setAttribute("aria-expanded",open);if(!open||det.dataset.done)return;det.textContent="Loading sessions…";
- try{const ss=(await get(`/sessions?meeting_key=${x.meeting_key}`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
-  const ri=rounds.findIndex(r=>r.meeting_key==x.meeting_key);
-  det.innerHTML=`${esc(x.meeting_official_name||"")}<br>${esc(x.circuit_short_name||"")} · track time is UTC${esc((x.gmt_offset||"").slice(0,6))}
-   <table><tr><th>Session</th><th>Your time</th><th>Track time</th></tr>${ss.map(s=>`<tr><td>${esc(s.session_name)}</td><td>${new Date(s.date_start).toLocaleString(undefined,{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</td><td>${trackTime(s.date_start,x.gmt_offset)}</td></tr>`).join("")}</table>`+
-   (ri>=0&&new Date(rounds[ri].date_end)<Date.now()?`<button data-ri="${ri}">See standings and result after this race</button>`:"");
-  det.dataset.done=1;const bt=det.querySelector("button");if(bt)bt.onclick=()=>{loadRound(+bt.dataset.ri);show("standings")};
+ const h=e.target.closest(".mth");if(!h)return;const box=h.parentNode,det=box.querySelector(".mtd"),x=calMap[box.dataset.k],open=det.hidden;det.hidden=!open;h.setAttribute("aria-expanded",open);if(!open||det.dataset.done)return;
+ try{
+  if(x._source==="jolpica"){
+   const ss=x._sessions||[];let html="<b>"+esc(x.raceName)+"</b><br>"+esc(x.Circuit?.circuitName||"")+"<table><tr><th>Session</th><th>Scheduled time</th></tr>";
+   ss.forEach(q=>{html+="<tr><td>"+esc(q.name)+"</td><td>"+q.date.toLocaleString(undefined,{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+"</td></tr>"});
+   det.innerHTML=html+"</table>";det.dataset.done=1;return;
+  }
+  const ss=(await get(`/sessions?meeting_key=${x.meeting_key}`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
+  let html=esc(x.meeting_official_name||"")+"<br>"+esc(x.circuit_short_name||"")+" · track time is UTC"+esc((x.gmt_offset||"").slice(0,6))+"<table><tr><th>Session</th><th>Your time</th><th>Track time</th></tr>";
+  ss.forEach(q=>{html+="<tr><td>"+esc(q.session_name)+"</td><td>"+new Date(q.date_start).toLocaleString(undefined,{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+"</td><td>"+trackTime(q.date_start,x.gmt_offset)+"</td></tr>"});
+  det.innerHTML=html+"</table>";det.dataset.done=1;
  }catch(err){det.textContent="Couldn't load sessions: "+err.message}
 };
 
@@ -786,7 +818,7 @@ async function startLive(){
   L.by=Object.fromEntries(drv.map(x=>[x.driver_number,x]));mergeLive(pos);
   try{mergeGaps(await fresh(`/intervals?session_key=${L.k}&date>${encodeURIComponent(iso(ref-180000))}`))}catch(e){}
   drawLive();if(on)liveTimer=setInterval(livePoll,10000);
- }catch(e){$("liveBar").innerHTML="";fail("liveList",new Error(e.message+". Live data during a session may need an OpenF1 API subscription"))}
+ }catch(e){$("liveBar").innerHTML="";fail("liveList",new Error(e.message+". Jolpica-F1 can provide historical results and standings, but not live timing."))}
 }
 function mergeLive(rows){rows.forEach(r=>{const o=L.pos[r.driver_number];if(!o||r.date>=o.date)L.pos[r.driver_number]={pos:r.position,date:r.date};if(!L.since||r.date>L.since)L.since=r.date})}
 function mergeGaps(rows){rows.forEach(r=>{const o=L.gap[r.driver_number];if(!o||r.date>=o.date)L.gap[r.driver_number]={g:r.gap_to_leader,date:r.date}})}
