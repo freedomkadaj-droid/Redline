@@ -1293,9 +1293,11 @@ function circuitGuideHTML(x){
  const fallbackUrl=`${assetBase}/minimal/white-outline/${slug}-${layout}.svg`;
  // Track Atlas renders numbered corner markers directly on the track map.
  // Keep the existing F1DB outline as a fallback for circuits/layouts not covered there.
- const atlasAliases={spielberg:"red-bull-ring","austin":"circuit-of-the-americas","marina-bay":"singapore",lusail:"losail","mexico-city":"mexico-city","yas-marina":"yas-marina",catalunya:"barcelona",madring:"madrid"};
+ const atlasAliases={spielberg:"red-bull-ring","austin":"circuit-of-the-americas","marina-bay":"singapore",lusail:"losail","mexico-city":"mexico-city","yas-marina":"yas-marina",catalunya:"barcelona",madring:"madring"};
  const atlasSlug=atlasAliases[slug]||slug;
- const atlasUrl=`https://raw.githubusercontent.com/tobi/track-atlas/main/tracks/${atlasSlug}/raw/render/${atlasSlug}.svg`;
+ // Track Atlas does not yet publish Madring or Sepang. Use their distinct numbered SVG maps directly instead of letting both fall through to a missing Atlas asset.
+ const specialMaps={madring:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Madring%20Formula%201%20Circuit.svg",sepang:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sepang.svg"};
+ const atlasUrl=specialMaps[slug]||`https://raw.githubusercontent.com/tobi/track-atlas/main/tracks/${atlasSlug}/raw/render/${atlasSlug}.svg`;
  const mapLink=`https://github.com/tobi/track-atlas/tree/main/tracks`;
  return `<section class="circuit-guide" aria-label="${esc(title)} circuit guide">
   <div class="circuit-guide-head"><div><div class="circuit-guide-title">${esc(title)}</div><div class="circuit-guide-sub">${esc([locality,country].filter(Boolean).join(" · ")||"Formula 1 circuit")} · Track layout</div></div><span class="badge">Circuit guide</span></div>
