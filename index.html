@@ -1353,11 +1353,12 @@ async function refreshAlternateLive(){
  L={...old,k:"alternate",source:"alternate",s:{
    country_name:status.country||status.country_name||status.meeting?.country||"Formula 1",
    session_name:timing.session||status.session?.name||status.session_name||"Live timing"
-  },on,pos,gap,since:stamp,by,updatedAt:Number.isFinite(stampMs)?stampMs:Date.now()};
+  },on,pos,gap,since:stamp,by,updatedAt:Number.isFinite(stampMs)?stampMs:Date.now(),stale:false};
  drawLive();
 }
 async function startLive(){
  stopLive();
+ const previous=L;
  if(!Object.keys(L.pos||{}).length)$("liveList").innerHTML='<div class="state">Finding the latest session…';
  try{
   const ss=await fresh("/sessions?session_key=latest");const s=ss[0];if(!s)throw new Error("No session found");
@@ -1370,9 +1371,10 @@ async function startLive(){
   try{mergeGaps(await fresh(`/intervals?session_key=${L.k}&date>${encodeURIComponent(iso(ref-180000))}`))}catch(e){}
   L.updatedAt=Date.now();drawLive();if(on)liveTimer=setInterval(livePoll,10000);
  }catch(e){
+  L=previous;
   try{await refreshAlternateLive();liveTimer=setInterval(livePoll,15000)}
   catch(altError){
-   if(Object.keys(L.pos||{}).length){L.stale=true;drawLive();$("liveBar").insertAdjacentHTML("beforeend",'<span class="badge off">Connection lost · showing last saved positions</span>')}
+   if(Object.keys(L.pos||{}).length){L.stale=true;drawLive()}
    else{$("liveBar").innerHTML="";fail("liveList",new Error("OpenF1 and the alternative live feed are unavailable. Try again later."))}
   }
  }
