@@ -1318,26 +1318,76 @@ $("calList").onclick=async e=>{
 };
 
 // ---------- Live positions ----------
+const ALT_LIVE_API="https://f1-live-api.onrender.com";
 let liveTimer=null,L={};
 const iso=t=>new Date(t).toISOString(),fresh=p=>{cache.delete(p);return get(p)};
 function stopLive(){clearInterval(liveTimer);liveTimer=null}
+async function altLiveGet(path){
+ const r=await fetch(ALT_LIVE_API+path,{headers:{Accept:"application/json"}});
+ if(!r.ok)throw new Error("Alternative live feed returned "+r.status);
+ const data=await r.json();
+ if(!data||typeof data!=="object")throw new Error("Alternative live feed returned invalid data");
+ return data;
+}
+async function refreshAlternateLive(){
+ const [status,timing,drivers]=await Promise.all([
+  altLiveGet("/status"),altLiveGet("/timing"),altLiveGet("/drivers")
+ ]);
+ const rows=Array.isArray(timing.drivers)?timing.drivers:[];
+ if(!rows.length)throw new Error("Alternative live feed has no leaderboard data");
+ const stamp=timing.timestamp||status.timestamp||new Date().toISOString();
+ const stampMs=Date.parse(stamp),on=Number.isFinite(stampMs)&&Date.now()-stampMs<120000;
+ const by={};
+ (Array.isArray(drivers)?drivers:[]).forEach(d=>{by[String(d.driver_number)]={...d,full_name:d.name||d.full_name,team_name:d.team||d.team_name}});
+ const pos={},gap={};
+ rows.forEach(d=>{
+  const n=String(d.driver_number??"");if(!n)return;
+  const p=Number(d.position);if(!Number.isFinite(p))return;
+  pos[n]={pos:p,date:stamp};
+  const g=Number.parseFloat(d.gap_to_leader);
+  if(Number.isFinite(g))gap[n]={g,date:stamp};
+  if(!by[n])by[n]={driver_number:n,full_name:d.name||d.acronym||"Driver #"+n,team_name:d.team||"",team_colour:d.team_colour};
+  else by[n]={...by[n],...d,full_name:d.name||by[n].full_name,team_name:d.team||by[n].team_name};
+ });
+ const old=L;
+ L={...old,k:"alternate",source:"alternate",s:{
+   country_name:status.country||status.country_name||status.meeting?.country||"Formula 1",
+   session_name:timing.session||status.session?.name||status.session_name||"Live timing"
+  },on,pos,gap,since:stamp,by,updatedAt:Number.isFinite(stampMs)?stampMs:Date.now()};
+ drawLive();
+}
 async function startLive(){
- stopLive();$("liveList").innerHTML='<div class="state">Finding the latest session…</div>';
- try{const ss=await fresh("/sessions?session_key=latest");const s=ss[0];if(!s)throw new Error("No session found");
+ stopLive();
+ if(!Object.keys(L.pos||{}).length)$("liveList").innerHTML='<div class="state">Finding the latest session…';
+ try{
+  const ss=await fresh("/sessions?session_key=latest");const s=ss[0];if(!s)throw new Error("No session found");
   const now=Date.now(),on=new Date(s.date_start)<=now&&now<=new Date(s.date_end);
   const ref=on?now:new Date(s.date_end).getTime();
-  L={k:s.session_key,s,on,pos:{},gap:{},since:null,by:{}};
+  const old=L;
+  L={...old,k:s.session_key,s,on,pos:{},gap:{},since:null,by:{},source:"openf1"};
   const [drv,pos]=await Promise.all([get(`/drivers?session_key=${L.k}`),fresh(`/position?session_key=${L.k}`)]);
   L.by=Object.fromEntries(drv.map(x=>[x.driver_number,x]));mergeLive(pos);
   try{mergeGaps(await fresh(`/intervals?session_key=${L.k}&date>${encodeURIComponent(iso(ref-180000))}`))}catch(e){}
-  drawLive();if(on)liveTimer=setInterval(livePoll,10000);
- }catch(e){$("liveBar").innerHTML="";fail("liveList",new Error(e.message+". Jolpica-F1 can provide historical results and standings, but not live timing."))}
+  L.updatedAt=Date.now();drawLive();if(on)liveTimer=setInterval(livePoll,10000);
+ }catch(e){
+  try{await refreshAlternateLive();liveTimer=setInterval(livePoll,15000)}
+  catch(altError){
+   if(Object.keys(L.pos||{}).length){L.stale=true;drawLive();$("liveBar").insertAdjacentHTML("beforeend",'<span class="badge off">Connection lost · showing last saved positions</span>')}
+   else{$("liveBar").innerHTML="";fail("liveList",new Error("OpenF1 and the alternative live feed are unavailable. Try again later."))}
+  }
+ }
 }
 function mergeLive(rows){rows.forEach(r=>{const o=L.pos[r.driver_number];if(!o||r.date>=o.date)L.pos[r.driver_number]={pos:r.position,date:r.date};if(!L.since||r.date>L.since)L.since=r.date})}
 function mergeGaps(rows){rows.forEach(r=>{const o=L.gap[r.driver_number];if(!o||r.date>=o.date)L.gap[r.driver_number]={g:r.gap_to_leader,date:r.date}})}
 async function livePoll(){
- try{if(L.since)mergeLive(await fresh(`/position?session_key=${L.k}&date>${encodeURIComponent(L.since)}`));
-  mergeGaps(await fresh(`/intervals?session_key=${L.k}&date>${encodeURIComponent(iso(Date.now()-30000))}`));drawLive()}catch(e){}
+ try{
+  if(L.source==="alternate"){await refreshAlternateLive();return}
+  if(L.since)mergeLive(await fresh(`/position?session_key=${L.k}&date>${encodeURIComponent(L.since)}`));
+  mergeGaps(await fresh(`/intervals?session_key=${L.k}&date>${encodeURIComponent(iso(Date.now()-30000))}`));
+  L.updatedAt=Date.now();L.stale=false;drawLive()
+ }catch(e){
+  if(Object.keys(L.pos||{}).length){L.stale=true;drawLive()}
+ }
 }
 
 /* ---------- Driver Stats / offline-friendly head-to-head ---------- */
@@ -1456,10 +1506,12 @@ function initDriverStats(){
 initDriverStats();
 
 function drawLive(){
- const s=L.s;$("liveTitle").textContent=`${s.country_name} · ${s.session_name}`;
- $("liveBar").innerHTML=(L.on?'<span class="badge">Live</span> Updates every 10 seconds':'<span class="badge off">Finished</span> Showing the final positions of the latest session')+` <span id="upd">· ${new Date().toLocaleTimeString()}</span> <button id="rl">Refresh</button>`;
+ const s=L.s||{};$("liveTitle").textContent=`${s.country_name||"Formula 1"} · ${s.session_name||"Live positions"}`;
+ const source=L.source==="alternate"?"Alternative feed":"OpenF1";
+ const state=L.stale?'<span class="badge off">Delayed</span> Connection lost · showing last successful positions':L.on?'<span class="badge">Live</span> Updating automatically':'<span class="badge off">Latest available</span> Showing the latest positions available';
+ $("liveBar").innerHTML=state+` <span id="upd">· ${new Date(L.updatedAt||Date.now()).toLocaleTimeString()} · ${source}</span> <button id="rl">Refresh</button>`;
  $("rl").onclick=startLive;
- const list=Object.keys(L.pos).sort((a,b)=>L.pos[a].pos-L.pos[b].pos);
+ const list=Object.keys(L.pos||{}).sort((a,b)=>L.pos[a].pos-L.pos[b].pos);
  $("liveList").innerHTML=list.map(n=>{const d=who(L.by,n),g=L.gap[n]?.g,p=L.pos[n].pos;
   const gap=p===1?"Leader":typeof g==="number"?"+"+g.toFixed(3):g?String(g):"";
   return row(p,av(d.headshot_url,d.full_name,d.team_colour),d.full_name||"Driver #"+n,d.team_name||"",gap,isFavD(d),"")}).join("")||'<div class="state">No position data for this session yet.</div>';
