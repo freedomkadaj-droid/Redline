@@ -146,6 +146,10 @@ select{background:var(--card2);color:var(--txt);border:1px solid var(--line);bor
 @media(max-width:600px){.stats-head{align-items:stretch;flex-direction:column;gap:12px;padding:18px 14px 14px}.stats-head>div{min-width:0}.stats-head h2{font-size:clamp(25px,7vw,30px);line-height:1.12}.stats-season{width:100%;justify-content:space-between}.stats-season select{flex:1;min-width:0}.stats-pair{gap:8px}.stats-driver{padding:10px}.stats-lower{grid-template-columns:1fr}.stats-body{padding:0 12px 14px}.stats-subnav{gap:7px;padding:0 12px 14px;scroll-snap-type:x proximity}.stats-subnav button{flex:0 0 auto;padding:10px 13px;font-size:12px;scroll-snap-align:start}.stats-verdict{padding:13px}.stats-dual{gap:7px}}
 @media(max-width:820px){body{padding-bottom:calc(82px + env(safe-area-inset-bottom))}#tabs{justify-content:flex-start;gap:6px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;scroll-snap-type:x proximity;padding:7px 10px calc(7px + env(safe-area-inset-bottom))}#tabs::-webkit-scrollbar{display:none}#tabs button{flex:0 0 auto;min-width:72px;padding:10px 12px;font-size:12px;line-height:1.15;scroll-snap-align:start}#tabs button[data-v="stats"]{min-width:96px}#tabs button[data-v="standings"]{min-width:86px}}
 
+@media(min-width:601px) and (max-width:820px){
+ #tabs{justify-content:center;gap:6px}
+ #tabs button{flex:1 1 0;min-width:0;padding-left:8px;padding-right:8px}
+}
 @media(max-width:760px){.grid{grid-template-columns:1fr}}
 .row{display:grid;grid-template-columns:34px auto 1fr auto;gap:12px;align-items:center;padding:9px 16px;border-bottom:1px solid var(--line)}
 .row:last-child{border:0}
@@ -360,9 +364,9 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
  #tabs button{flex:0 0 auto;border-radius:0;padding:12px 18px;font-size:13.5px;letter-spacing:.09em;text-transform:uppercase;border-bottom:3px solid transparent;margin-bottom:-1px}
  #tabs button[aria-selected=true],#tabs button[aria-selected=true]:hover{background:none;color:var(--txt);border-bottom-color:var(--red)}
  :root[data-theme=light] #tabs{box-shadow:none}}
-/* Center the primary navigation on tablet-sized landscape layouts. */
+/* Center the primary navigation across tablet and compact desktop widths. */
  @media(min-width:821px) and (max-width:1100px){
-  #tabs{justify-content:center;flex-wrap:wrap;overflow:visible;row-gap:0}
+  #tabs{width:100%;box-sizing:border-box;justify-content:center;flex-wrap:wrap;overflow:visible;row-gap:0}
  }
  @media(max-width:380px){h1.brand-name{font-size:27px;letter-spacing:.05em}.brand-mark{width:40px}}
 #newsList.scroll{max-height:max(380px,calc(100vh - 330px))}
