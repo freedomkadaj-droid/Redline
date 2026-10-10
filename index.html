@@ -314,19 +314,21 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 .nheadline .nacts{padding-top:12px}
 .nheadline .nread{font-size:11px}
 
-/* Headline-only list view: override the legacy image + text row grid. */
-.nlist.rows{display:block;grid-template-columns:minmax(0,1fr);gap:0;padding:0 18px}
+/* News list: use Redline's own mark as a consistent thumbnail, never publisher imagery. */
+.nlist.rows{display:block;gap:0;padding:0 18px}
 .nlist.rows li{display:block;padding:0 0 0 3px;border-bottom:1px solid var(--line);box-shadow:inset 3px 0 0 var(--sc,var(--line));background:transparent;transition:background .15s ease}
 .nlist.rows li:hover{background:var(--hover)}
-.nlist.rows .nheadline{display:block;min-height:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
-.nlist.rows .nheadline .nbody{display:block;min-width:0;padding:13px 14px}
+.nlist.rows .nheadline{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;min-height:0;padding:10px 14px;border:0;border-radius:0;background:transparent;box-shadow:none;width:100%;min-width:0}
+.nlist.rows .nheadline .nimg{width:96px;height:64px;border-radius:8px;flex:none}
+.nlist.rows .nheadline .ph-mark{width:34px}
+.nlist.rows .nheadline .nbody{display:block;min-width:0;padding:0}
 .nlist.rows .nheadline .nmeta{gap:5px 9px;margin-bottom:7px}
-.nlist.rows .nheadline .nt{display:block;font-size:15px;line-height:1.5;overflow:visible;overflow-wrap:anywhere;-webkit-line-clamp:unset;-webkit-box-orient:initial}
-.nlist.rows .nheadline .nacts{display:block;padding-top:8px}
+.nlist.rows .nheadline .nt{display:block;min-width:0;font-size:15px;line-height:1.5;white-space:normal;overflow:visible;overflow-wrap:anywhere;-webkit-line-clamp:unset;-webkit-box-orient:initial}
+.nlist.rows .nheadline .nacts{display:block;padding-top:6px}
 .nlist.rows .nheadline .nread{display:inline-flex;align-items:center;color:var(--red);font-size:11px;font-weight:600;text-decoration:none}
 .nlist.rows .nheadline .nread:hover{text-decoration:underline}
 .nlist.rows li:last-child{border-bottom:0}
-@media(max-width:620px){.nlist.rows{padding:0 12px}.nlist.rows .nheadline .nbody{padding:12px 11px}.nlist.rows .nheadline .nt{font-size:14px;line-height:1.5}}
+@media(max-width:620px){.nlist.rows{padding:0 12px}.nlist.rows .nheadline{grid-template-columns:72px minmax(0,1fr);gap:10px;padding:10px 9px}.nlist.rows .nheadline .nimg{width:72px;height:54px}.nlist.rows .nheadline .ph-mark{width:29px}.nlist.rows .nheadline .nt{font-size:14px;line-height:1.45}}
 
 @media(max-width:620px){.news-directory{padding:12px}.news-directory .nlist.cards{grid-template-columns:1fr;gap:10px}.publisher-card{min-height:0}.news-directory .nlist.rows .publisher-card{grid-template-columns:minmax(0,1fr);gap:10px}.news-directory .nlist.rows .publisher-link{justify-content:space-between;padding-top:10px;border-top:1px solid var(--line)}}
 .nmeta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;color:var(--mute);font-size:12.5px;margin-bottom:4px}
@@ -476,7 +478,7 @@ footer{color:var(--mute);font-size:14px}
  <section class="panel pane" id="v-tele" hidden><h2>Telemetry</h2>
   <div class="tools"><select id="lsess" aria-label="Session"></select><select id="ldrv" aria-label="Driver"></select><select id="clap" aria-label="Lap" hidden></select></div>
   <div class="scroll" id="lapList"><div class="state">Loading…</div></div><div id="carView" hidden></div></section>
- <section class="panel pane" id="v-news"><h2>Latest F1 News</h2><p class="news-policy-note">Headlines and publication times only. Each story links to its publisher; Redline does not display article images or summaries. Publisher terms still apply.</p>
+ <section class="panel pane" id="v-news"><h2>Latest F1 News</h2><p class="news-policy-note">Headlines and publication times only. Each story links to its publisher; Redline uses its own logo artwork instead of republishing article images or summaries. Publisher terms still apply.</p>
   <div class="tools"><div class="seg" role="group" aria-label="News layout">
    <button type="button" data-view="cards" aria-pressed="true"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>Cards</button>
    <button type="button" data-view="rows" aria-pressed="false"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="2" width="14" height="3" rx="1.2"/><rect x="1" y="6.5" width="14" height="3" rx="1.2"/><rect x="1" y="11" width="14" height="3" rx="1.2"/></svg>List</button></div>
@@ -1075,7 +1077,7 @@ function itemHtml(a,now,i){
  const href=a.url?`href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"`:"",NEW='<span class="sr"> (opens in a new tab)</span>',tag=a.url?"a":"span";
  const title=a.url?`<a ${href}>${esc(a.title)}${NEW}</a>`:esc(a.title);
  const acts=a.url?`<div class="nacts"><a class="nread" ${href}>Read at publisher ↗${NEW}</a></div>`:"";
- return `<li style="${srcStyle(a.sourceId)}"><article class="ncard nheadline"><div class="nbody"><div class="nmeta"><span class="nsource">${esc(a.source)}</span>${when}</div><h3 class="nt">${title}</h3>${acts}</div></article></li>`}
+ return `<li style="${srcStyle(a.sourceId)}"><article class="ncard nheadline"><div class="nimg ph" aria-hidden="true">${PH}</div><div class="nbody"><div class="nmeta"><span class="nsource">${esc(a.source)}</span>${when}</div><h3 class="nt">${title}</h3>${acts}</div></article></li>`}
 // Show the "Show more" link only where the text is actually cut off (depends on screen width, so re-checked on resize)
 function markClamped(){document.querySelectorAll("#newsList .ndesc:not(.open)").forEach(p=>{const b=p.parentNode.querySelector(".nexp");if(b)b.hidden=!(p.scrollHeight>p.clientHeight+1)})}
 let clampTimer=null;window.addEventListener("resize",()=>{clearTimeout(clampTimer);clampTimer=setTimeout(markClamped,150)});
