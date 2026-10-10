@@ -480,7 +480,7 @@ async function readStaticSeasonArchive(y){if(staticArchiveCache.has(y))return st
 function deriveArchivedJolpica(path,responses){
  if(responses[path])return responses[path];
  const m=path.match(/^\/(\d{4})\/(\d+)\/(results|qualifying|driverstandings|constructorstandings)\/$/);if(!m)return null;
- const [,year,round,kind]=m,base=kind==="driverstandings"?"driverStandings":kind==="constructorstandings"?"constructorStandings":kind;
+ const [,year,round,kind]=m,base=kind;
  const season=responses["/"+year+"/"+base+"/"];if(!season)return null;
  const mr={...season};
  if(kind==="results"||kind==="qualifying"){const rows=season.RaceTable?.Races||[];mr.RaceTable={...(season.RaceTable||{}),Races:rows.filter(r=>String(r.round)===round)};return mr}
