@@ -1235,9 +1235,9 @@ async function livePoll(){
 }
 
 /* ---------- Driver Stats / offline-friendly head-to-head ---------- */
-const statsState={year:nowY,view:"head",data:null,loading:false,cacheKey:y=>"redline-driver-stats-v1-"+y};
+const statsState={year:nowY,view:"head",data:null,loading:false,offline:false,cacheKey:y=>"redline-driver-stats-v1-"+y};
 function statsEsc(v){return esc(v)}
-function statsNum(v){const n=Number(v);return Number.isFinite(n)?n:null}
+function statsNum(v){if(v===null||v===undefined||v==="")return null;const n=Number(v);return Number.isFinite(n)?n:null}
 function statsDriverId(d){return d?.Driver?.driverId||d?.driverId||""}
 function statsName(d){const x=d?.Driver||d;return [x?.givenName,x?.familyName].filter(Boolean).join(" ")||x?.name||x?.driverId||"Unknown driver"}
 function statsTeam(d){return d?.Constructors?.[0]?.name||d?.team||""}
@@ -1256,11 +1256,11 @@ function statsMerge(year,standingData,raceData,qualData,prior){
  if(raceData){
   Object.values(by).forEach(d=>{d.podiums=0;d.poles=0;d.fastest=0;d.finishSum=0;d.finishCount=0;d.roundPoints={}});
   const races=raceData.RaceTable?.Races||[];
-  races.forEach(r=>{(r.Results||[]).forEach(v=>{const id=statsDriverId(v);if(!by[id])by[id]={id,name:statsName(v),team:statsTeam(v),points:0,wins:0,position:null};const d=by[id],pos=statsNum(v.position);if(pos&&pos<=3)d.podiums++;if(pos){d.finishSum+=pos;d.finishCount++}const round=Number(r.round);d.roundPoints[round]=(d.roundPoints[round]||0)+(statsNum(v.points)||0);if(v.FastestLap?.rank==="1"||Number(v.FastestLap?.rank)===1)d.fastest++})});
+  races.forEach(r=>{(r.Results||[]).forEach(v=>{const id=statsDriverId(v);if(!by[id])by[id]={id,name:statsName(v),team:statsTeam(v),points:null,wins:null,position:null,podiums:0,poles:0,fastest:0,finishSum:0,finishCount:0,roundPoints:{}};const d=by[id],pos=statsNum(v.position);if(pos&&pos<=3)d.podiums++;if(pos){d.finishSum+=pos;d.finishCount++}const round=Number(r.round);d.roundPoints[round]=(d.roundPoints[round]||0)+(statsNum(v.points)||0);if(v.FastestLap?.rank==="1"||Number(v.FastestLap?.rank)===1)d.fastest++})});
  }
  if(qualData){
   const races=qualData.RaceTable?.Races||[];
-  races.forEach(r=>(r.QualifyingResults||[]).forEach(v=>{const id=statsDriverId(v);if(!by[id])by[id]={id,name:statsName(v),team:statsTeam(v),points:null,wins:null};const d=by[id],pos=statsNum(v.position);if(pos===1)d.poles=(d.poles||0)+1;if(pos){d.qualSum=(d.qualSum||0)+pos;d.qualCount=(d.qualCount||0)+1}}));
+  races.forEach(r=>(r.QualifyingResults||[]).forEach(v=>{const id=statsDriverId(v);if(!by[id])by[id]={id,name:statsName(v),team:statsTeam(v),points:null,wins:null,podiums:0,poles:0,fastest:0,finishSum:0,finishCount:0,roundPoints:{}};const d=by[id],pos=statsNum(v.position);if(pos===1)d.poles=(d.poles||0)+1;if(pos){d.qualSum=(d.qualSum||0)+pos;d.qualCount=(d.qualCount||0)+1}}));
  }
  const drivers=Object.values(by).sort((a,b)=>(a.position||999)-(b.position||999));
  drivers.forEach(d=>{d.avgFinish=d.finishCount?Math.round(d.finishSum/d.finishCount*10)/10:null;d.avgQual=d.qualCount?Math.round(d.qualSum/d.qualCount*10)/10:null;d.podiums=Number.isFinite(d.podiums)?d.podiums:null;d.poles=Number.isFinite(d.poles)?d.poles:null;d.fastest=Number.isFinite(d.fastest)?d.fastest:null;d.roundPoints=d.roundPoints||{}});
@@ -1309,7 +1309,7 @@ function renderDriverStats(){
  const summary=statsSummary(a,b),stamp=data.updatedAt?new Date(data.updatedAt).toLocaleString():"Unknown";
  let html='<div class="stats-body">';
  if(statsState.view==="head"){
-  html+=`<div class="stats-pair">${statsDriverCard(a,"a",b.id)}${statsDriverCard(b,"b",a.id)}</div><div class="stats-verdict"><div class="sv-kicker">▰ &nbsp; THE EDITORIAL VERDICT</div><h3>${statsEsc(summary.headline)}</h3><p>${statsEsc(summary.paragraph)}</p><div class="stats-meta"><span>◉ &nbsp; ${data.hasRaces&&data.hasQualifying?"Race & qualifying data loaded":data.hasRaces?"Race data loaded":"Standings data available"} </span><span>Saved ${statsEsc(stamp)}</span></div></div><div class="stats-lower"><div><h3 class="stats-section-title">The numbers behind the verdict</h3>${statsMetric("Championship points","points",a,b)}${statsMetric("Race wins","wins",a,b)}${statsMetric("Podiums","podiums",a,b)}${statsMetric("Pole positions","poles",a,b)}${statsMetric("Fastest laps","fastest",a,b)}${statsMetric("Average qualifying position","avgQual",a,b,true)}${statsMetric("Average finishing position","avgFinish",a,b,true)}</div><aside class="stats-side"><h3>At a glance</h3><div class="stats-takeaway"><span>↗</span><span><b>${statsEsc(a.name)}</b> — ${a.points!=null&&b.points!=null?(a.points===b.points?"level on points":a.points>b.points?"championship points advantage":"trails on championship points"):"points data unavailable"}</span></div><div class="stats-takeaway"><span>↗</span><span><b>${statsEsc(b.name)}</b> — ${b.fastest!=null&&a.fastest!=null&&b.fastest>a.fastest?"more fastest laps":b.wins!=null&&a.wins!=null&&b.wins>a.wins?"more race wins":"comparison depends on the selected metrics"}</span></div><div class="stats-takeaway"><span>◎</span><span>Missing statistics are shown as dashes, not zero.</span></div></aside></div><p class="stats-note">Summary is generated from recorded statistics only. Average qualifying and finishing positions are lower-is-better. Historical and cached data may be incomplete.</p>`;
+  html+=`<div class="stats-pair">${statsDriverCard(a,"a",b.id)}${statsDriverCard(b,"b",a.id)}</div><div class="stats-verdict"><div class="sv-kicker">▰ &nbsp; THE EDITORIAL VERDICT</div><h3>${statsEsc(summary.headline)}</h3><p>${statsEsc(summary.paragraph)}</p><div class="stats-meta"><span>◉ &nbsp; ${statsState.offline?"OFFLINE CACHE":data.hasRaces&&data.hasQualifying?"Race & qualifying data loaded":data.hasRaces?"Race data loaded":"Standings data available"} </span><span>${statsState.offline?"Last saved ":"Saved "}${statsEsc(stamp)}</span></div></div><div class="stats-lower"><div><h3 class="stats-section-title">The numbers behind the verdict</h3>${statsMetric("Championship points","points",a,b)}${statsMetric("Race wins","wins",a,b)}${statsMetric("Podiums","podiums",a,b)}${statsMetric("Pole positions","poles",a,b)}${statsMetric("Fastest laps","fastest",a,b)}${statsMetric("Average qualifying position","avgQual",a,b,true)}${statsMetric("Average finishing position","avgFinish",a,b,true)}</div><aside class="stats-side"><h3>At a glance</h3><div class="stats-takeaway"><span>↗</span><span><b>${statsEsc(a.name)}</b> — ${a.points!=null&&b.points!=null?(a.points===b.points?"level on points":a.points>b.points?"championship points advantage":"trails on championship points"):"points data unavailable"}</span></div><div class="stats-takeaway"><span>↗</span><span><b>${statsEsc(b.name)}</b> — ${b.fastest!=null&&a.fastest!=null&&b.fastest>a.fastest?"more fastest laps":b.wins!=null&&a.wins!=null&&b.wins>a.wins?"more race wins":"comparison depends on the selected metrics"}</span></div><div class="stats-takeaway"><span>◎</span><span>Missing statistics are shown as dashes, not zero.</span></div></aside></div><p class="stats-note">Summary is generated from recorded statistics only. Average qualifying and finishing positions are lower-is-better. Historical and cached data may be incomplete.</p>`;
  }else if(statsState.view==="overview"){
   html+='<h3 class="stats-section-title">Season driver standings</h3>'+drivers.map((d,i)=>`<div class="stats-metric"><div class="stats-metric-head"><b>${i+1}. ${statsEsc(d.name)}</b><b>${d.points==null?"—":d.points} pts</b></div><div class="stats-track"><div class="stats-fill a" style="width:${d.points==null?0:Math.min(100,d.points/Math.max(...drivers.map(x=>x.points||0),1)*100)}%"></div></div><div class="stats-note">${statsEsc(d.team||"Team unavailable")} · ${d.wins==null?"—":d.wins+" wins"} · ${d.podiums==null?"—":d.podiums+" podiums"}</div></div>`).join("");
  }else{
@@ -1335,12 +1335,13 @@ async function loadDriverStats(force=false){
   const raceData=raceResult.status==="fulfilled"?raceResult.value:null;
   const qualData=qualResult.status==="fulfilled"?qualResult.value:null;
   if(standingData||raceData||qualData){
+   statsState.offline=false;
    const fresh=statsMerge(y,standingData,raceData,qualData,cached);
    if(fresh.drivers.length){statsState.data=fresh;statsSaveCache(y,fresh);renderDriverStats()}
    else if(!cached)throw new Error("No driver rows returned");
   }else if(!cached){throw new Error("Both F1 data providers are unavailable")}
-  if(!standingData&&!raceData&&!qualData&&cached){$("statsContent").querySelector(".stats-meta")?.insertAdjacentHTML("beforeend",'<span>Offline cache</span>')}
  }catch(e){
+  if(cached||statsState.data){statsState.offline=true;renderDriverStats()}
   if(!cached&&!statsState.data)$("statsContent").innerHTML='<div class="stats-empty">The F1 data APIs are unavailable and no saved driver stats exist for this season yet. Try again when online; Redline will cache successful data for later outages.</div>';
  }finally{statsState.loading=false}
 }
