@@ -216,14 +216,8 @@ audio{width:100%;height:36px}
 .circuit-guide-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
 .circuit-guide-title{font:600 16px 'Space Grotesk';color:var(--txt)}
 .circuit-guide-sub{font-size:12px;color:var(--mute);margin-top:3px}
-.circuit-guide-map{display:flex;align-items:center;justify-content:center;min-height:150px;width:100%;min-width:0;box-sizing:border-box;margin:4px 0 10px;padding:8px;border-radius:10px;background:#000;overflow:hidden}
+.circuit-guide-map{display:flex;align-items:center;justify-content:center;min-height:150px;margin:4px 0 10px;padding:12px;border-radius:10px;background:#000;overflow:hidden}
 .circuit-guide-map img{display:block;width:min(100%,290px);height:auto;max-height:230px;object-fit:contain}
-.redline-map{display:block!important;width:100%;min-width:0;min-height:0!important;aspect-ratio:1/1;height:auto;padding:0!important;position:relative;box-sizing:border-box;overflow:hidden}
-.redline-map svg{display:block;width:100%;height:100%;max-width:100%;max-height:none;aspect-ratio:1/1;margin:0;overflow:hidden;box-sizing:border-box}
-.redline-map-loading{font:700 10px 'Space Grotesk',sans-serif;letter-spacing:2.2px;color:#777;text-align:center;padding:45px 8px}
-.redline-corner circle{fill:#000;stroke:#ff3038;stroke-width:1.8}
-.redline-corner text{fill:#fff;font:700 9px Arial,sans-serif;text-anchor:middle;dominant-baseline:central}
-.redline-map-error{font:600 11px 'Space Grotesk',sans-serif;letter-spacing:1px;color:#888;text-align:center;padding:30px 8px}
 .circuit-guide-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:10px 0 14px}
 .circuit-stat{min-width:0;padding:9px 8px;border-radius:9px;background:var(--hover)}
 .circuit-stat b{display:block;font:600 15px 'Space Grotesk';color:var(--txt);white-space:nowrap}
@@ -1186,66 +1180,6 @@ async function loadJolpicaCalendar(){
  const nx=mapped.findIndex(x=>new Date(x.date_start)>now);
  $("calList").innerHTML=mapped.map((x,i)=>{const st=new Date(x.date_start)>now?(i===nx?"Next":"Upcoming"):"Done";return `<div class="mt" data-k="${x.meeting_key}"><button class="mth" aria-expanded="false"><span class="rn">${String(i+1).padStart(2,"0")}</span><span class="mi"><b>${esc(x.raceName)}</b><small>${esc(x.location)}, ${esc(x.country_name)} · ${new Date(x.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span><span class="badge${st==="Done"?" off":""}">${st}</span><span class="chev" aria-hidden="true">›</span></button><div class="mtd" hidden></div></div>`}).join("");fallbackNote();
 }
-async function renderRedlineCircuitMaps(root=document){
- root.querySelectorAll(".redline-map[data-map-url]:not([data-rendered])").forEach(async box=>{
-  box.dataset.rendered="1";
-  const urls=[box.dataset.mapUrl,box.dataset.mapFallback];
-  try{
-   let response;
-   for(const url of urls){response=await fetch(url,{cache:"force-cache"});if(response.ok)break;}
-   if(!response?.ok)throw new Error("map unavailable");
-   const source=new DOMParser().parseFromString(await response.text(),"image/svg+xml");
-   const original=source.documentElement;
-   if(original.localName!=="svg"||source.querySelector("parsererror"))throw new Error("invalid SVG");
-   const viewBox=original.getAttribute("viewBox")||"0 0 600 400";
-   const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
-   svg.setAttribute("role","img");svg.setAttribute("aria-label",box.getAttribute("aria-label")||"Circuit map");
-   svg.setAttribute("preserveAspectRatio","xMidYMid meet");svg.setAttribute("width","100%");svg.setAttribute("height","100%");
-   svg.setAttribute("viewBox",viewBox);
-   const vb=viewBox.trim().split(/[ ,]+/).map(Number),w=vb[2]||600,h=vb[3]||400;
-   // Use only the longest continuous track outline. Importing every SVG shape also
-   // pulled in labels, decorative details and duplicate borders, making maps look cluttered.
-   const candidates=Array.from(original.querySelectorAll("path,polyline")).filter(el=>{
-    try{return el.getTotalLength()>Math.max(w,h)*.2}catch(e){return false}
-   });
-   candidates.sort((a,b)=>{try{return b.getTotalLength()-a.getTotalLength()}catch(e){return 0}});
-   const trackGroup=document.createElementNS(svg.namespaceURI,"g");
-   const track=candidates[0]?document.importNode(candidates[0],true):null;
-   if(!track)throw new Error("track outline missing");
-   track.removeAttribute("style");track.removeAttribute("class");
-   track.setAttribute("fill","none");track.setAttribute("stroke","#f5f5f7");
-   track.setAttribute("stroke-linecap","round");track.setAttribute("stroke-linejoin","round");
-   trackGroup.appendChild(track);svg.appendChild(trackGroup);
-   // Scale all styling from the real track dimensions, not the source SVG canvas.
-   // F1DB source files use different viewBox sizes, which previously made some
-   // corner markers oversized and crowded together.
-   const trackBounds=track.getBBox();
-   const trackSize=Math.max(trackBounds.width,trackBounds.height)||1;
-   track.setAttribute("stroke-width",String(trackSize*.0035));
-   const count=Math.min(30,Math.max(0,Number(box.dataset.corners)||0));
-   if(track&&count){
-    const total=track.getTotalLength(),group=document.createElementNS(svg.namespaceURI,"g");group.setAttribute("class","redline-corner");
-    const radius=Math.max(trackSize*.009,2.5);
-    for(let i=0;i<count;i++){
-     const pt=track.getPointAtLength(total*(i+.5)/count),g=document.createElementNS(svg.namespaceURI,"g"),c=document.createElementNS(svg.namespaceURI,"circle"),t=document.createElementNS(svg.namespaceURI,"text");
-     c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",radius);
-     t.setAttribute("x",pt.x);t.setAttribute("y",pt.y+.15);t.setAttribute("font-size",String(radius*1.05));t.textContent=String(i+1);
-     g.append(c,t);group.appendChild(g);
-    }
-    trackGroup.appendChild(group);
-   }
-   // Rotate portrait-shaped circuits and keep only a modest, consistent safety margin.
-   const bounds=trackGroup.getBBox(),cx=bounds.x+bounds.width/2,cy=bounds.y+bounds.height/2;
-   const rotate=bounds.height>bounds.width*1.12;
-   if(rotate)trackGroup.setAttribute("transform",`rotate(90 ${cx} ${cy})`);
-   const side=Math.max(bounds.width,bounds.height)*1.24||Math.max(w,h),half=side/2;
-   const bg=document.createElementNS(svg.namespaceURI,"rect");bg.setAttribute("x",cx-half);bg.setAttribute("y",cy-half);bg.setAttribute("width",side);bg.setAttribute("height",side);bg.setAttribute("fill","#000");
-   svg.insertBefore(bg,trackGroup);
-   svg.setAttribute("viewBox",`${cx-half} ${cy-half} ${side} ${side}`);
-   box.replaceChildren(svg);
-  }catch(err){box.innerHTML='<div class="redline-map-error">CIRCUIT MAP TEMPORARILY UNAVAILABLE</div>';delete box.dataset.rendered;}
- });
-}
 function circuitGuideHTML(x){
  const name=String(x?.Circuit?.circuitName||x?.circuit_short_name||x?.meeting_official_name||x?.raceName||"").trim();
  const country=String(x?.Circuit?.Location?.country||x?.country_name||"").trim();
@@ -1357,13 +1291,16 @@ function circuitGuideHTML(x){
  const assetBase=`https://raw.githubusercontent.com/f1db/f1-circuits-svg/main/circuits`;
  const mapUrl=`${assetBase}/detailed/white-outline/${slug}-${layout}.svg`;
  const fallbackUrl=`${assetBase}/minimal/white-outline/${slug}-${layout}.svg`;
- // Redline renders the map itself: black canvas, white geometry, and numbered corner markers.
- // The SVG catalogue is used only as geometric reference data; Track Atlas is not used.
- const mapLink="https://github.com/f1db/f1-circuits-svg";
+  // Use the F1 Circuits SVG catalogue for standard layouts, with dedicated numbered maps for Madrid and Sepang.
+  // Track Atlas is intentionally not used as a circuit-map source.
+  const specialMaps={madring:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Madring%20Formula%201%20Circuit.svg",sepang:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sepang.svg"};
+  const primaryMapUrl=specialMaps[slug]||mapUrl;
+  const firstFallbackUrl=specialMaps[slug]?mapUrl:fallbackUrl;
+  const mapLink="https://github.com/julesr0y/f1-circuits-svg";
  return `<section class="circuit-guide" aria-label="${esc(title)} circuit guide">
   <div class="circuit-guide-head"><div><div class="circuit-guide-title">${esc(title)}</div><div class="circuit-guide-sub">${esc([locality,country].filter(Boolean).join(" · ")||"Formula 1 circuit")} · Track layout</div></div><span class="badge">Circuit guide</span></div>
-  <div class="circuit-guide-map redline-map" data-map-url="${mapUrl}" data-map-fallback="${fallbackUrl}" data-corners="${Number(meta?.corners)||0}" role="img" aria-label="${esc(title)} circuit map"><div class="redline-map-loading">REDLINE CIRCUIT MAP</div></div>
-  <div class="circuit-guide-sub">🏁 REDLINE TRACK DESIGN · Original black-and-white map rendering</div>
+  <div class="circuit-guide-map"><img src="${primaryMapUrl}" alt="${esc(title)} circuit map" loading="lazy" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${firstFallbackUrl}'}else if(this.dataset.fallback==='1'){this.dataset.fallback='2';this.src='${fallbackUrl}'}else{this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span class=&quot;circuit-guide-sub&quot;>Circuit outline unavailable for this layout</span>')}"></div>
+  <div class="circuit-guide-sub">🏁 Circuit layout · F1 Circuits SVG catalogue; dedicated numbered map for Madrid and Sepang</div>
   <div class="circuit-guide-stats">${stats.map(q=>`<div class="circuit-stat"><b>${q[0]}</b><span>${q[1]}</span></div>`).join("")}</div>
   <div class="circuit-guide-title" style="font-size:13px">Sector breakdown</div>
   <div class="circuit-sectorbar" role="img" aria-label="Sector 1 red, Sector 2 blue, Sector 3 yellow"><span></span><span></span><span></span></div>
@@ -1378,12 +1315,12 @@ $("calList").onclick=async e=>{
   if(x._source==="jolpica"){
    const ss=x._sessions||[];let html=circuitGuideHTML(x)+'<div class="schedule-intro"><b>'+esc(x.raceName)+'</b><span>·</span><span>'+esc(x.Circuit?.circuitName||"")+'</span></div><div class="schedule-table"><table><thead><tr><th>Session</th><th>Your local time</th></tr></thead><tbody>';
    ss.forEach(q=>{const date=q.date;html+='<tr><td><span class="session-name"><i class="session-dot"></i>'+esc(q.name)+'</span></td><td><span class="time-main">'+date.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"})+'</span><span class="time-date">'+date.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})+'</span></td></tr>'});
-   det.innerHTML=html+'</tbody></table></div>';renderRedlineCircuitMaps(det);det.dataset.done=1;return;
+   det.innerHTML=html+'</tbody></table></div>';det.dataset.done=1;return;
   }
   const ss=(await get(`/sessions?meeting_key=${x.meeting_key}`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
   let html=circuitGuideHTML(x)+'<div class="schedule-intro"><b>'+esc(x.meeting_official_name||"Grand Prix weekend")+'</b><span>·</span><span>'+esc(x.circuit_short_name||"")+'</span><span class="time-zone">TRACK TIME <b>UTC'+esc((x.gmt_offset||"").slice(0,6))+'</b></span></div><div class="schedule-table"><table><thead><tr><th>Session</th><th>Your time</th><th>Track time</th></tr></thead><tbody>';
   ss.forEach(q=>{const date=new Date(q.date_start);html+='<tr><td><span class="session-name"><i class="session-dot"></i>'+esc(q.session_name)+'</span></td><td><span class="time-main">'+date.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"})+'</span><span class="time-date">'+date.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})+'</span></td><td><span class="time-main">'+esc(trackTime(q.date_start,x.gmt_offset))+'</span><span class="time-date">Circuit local time</span></td></tr>'});
-  det.innerHTML=html+'</tbody></table></div>';renderRedlineCircuitMaps(det);det.dataset.done=1;
+  det.innerHTML=html+'</tbody></table></div>';det.dataset.done=1;
  }catch(err){det.textContent="Couldn't load sessions: "+err.message}
 };
 
