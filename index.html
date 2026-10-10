@@ -969,29 +969,36 @@ async function loadBriefingRecap(force=false){
  const y=nowY;
  if(!force&&briefingRecapKey===String(y)&&box.dataset.loaded==="true")return;
  briefingRecapBusy=true;briefingRecapKey=String(y);
- box.innerHTML='<div class="state">Checking completed race results…</div>';
+ box.innerHTML='<div class="state">Checking the latest completed Grand Prix…</div>';
  try{
-  // Fetch live results without the app cache: its offline archive can lag behind the current season.
-  const response=await fetch(`${JOLPICA}/${y}/results/?limit=1000&_redline=${Date.now()}`,{cache:"no-store",headers:{Accept:"application/json"}});
-  if(!response.ok)throw new Error("Live race results unavailable ("+response.status+")");
-  const payload=await response.json();
-  const data=payload?.MRData;
-  if(!data?.RaceTable?.Races)throw new Error("Live race results returned an unexpected response");
-  const races=(data.RaceTable.Races||[]).filter(r=>Array.isArray(r.Results)&&r.Results.length&&r.date&&new Date(r.date+"T"+(r.time||"12:00:00Z")).getTime()<=Date.now()).sort((a,b)=>new Date((b.date||"")+"T"+(b.time||"12:00:00Z"))-new Date((a.date||"")+"T"+(a.time||"12:00:00Z")));
-  const race=races[0],res=(race?.Results||[]).slice().sort((a,b)=>Number(a.position)-Number(b.position));
-  if(!race||!res.length)throw new Error("No completed race result found");
-  const driverName=v=>[v?.Driver?.givenName,v?.Driver?.familyName].filter(Boolean).join(" ")||v?.Driver?.driverId||"Driver";
+  // Use OpenF1's session list to identify the latest actual Grand Prix, then request its classification.
+  // Do not use a season-wide cached results list: stale archives can stop at an old race (e.g. Canada).
+  const liveJson=async path=>{const r=await fetch(API+path+(path.includes("?")?"&":"?")+"_redline="+Date.now(),{cache:"no-store",headers:{Accept:"application/json"}});if(!r.ok)throw new Error("Live timing API returned "+r.status);const v=await r.json();if(!Array.isArray(v))throw new Error("Unexpected live timing response");return v};
+  const sessions=await liveJson("/sessions?year="+y);
+  const now=Date.now();
+  const races=sessions.filter(s=>String(s.session_name||"").toLowerCase()==="race"&&s.date_start&&new Date(s.date_start).getTime()<=now&&s.session_key).sort((a,b)=>new Date(b.date_start)-new Date(a.date_start));
+  if(!races.length)throw new Error("No completed Grand Prix session found");
+  let race=null,res=[],drivers=[];
+  for(const candidate of races){
+   try{
+    const results=await liveJson("/session_result?session_key="+encodeURIComponent(candidate.session_key));
+    if(results.length){race=candidate;res=results.sort((a,b)=>(a.position??999)-(b.position??999));break}
+   }catch(e){}
+  }
+  if(!race||!res.length)throw new Error("Latest Grand Prix classification is not available yet");
+  try{drivers=await liveJson("/drivers?session_key="+encodeURIComponent(race.session_key))}catch(e){}
+  const byNo=Object.fromEntries(drivers.map(d=>[String(d.driver_number),d]));
+  const driverName=v=>{const d=byNo[String(v.driver_number)]||{};return d.full_name||[d.first_name,d.last_name].filter(Boolean).join(" ")||("Driver #"+v.driver_number)};
   const winner=res.find(v=>Number(v.position)===1)||res[0],second=res.find(v=>Number(v.position)===2),third=res.find(v=>Number(v.position)===3);
-  const winnerName=driverName(winner),team=winner.Constructor?.name||"";
-  const gp=race.raceName||"Grand Prix",date=new Date(race.date+"T"+(race.time||"12:00:00Z"));
+  const winnerName=driverName(winner),team=(byNo[String(winner.driver_number)]||{}).team_name||"";
+  const gp=race.meeting_name||"Grand Prix",date=new Date(race.date_start);
   const podium=[winner,second,third].filter(Boolean);
-  const podiumLine=podium.map((v,i)=>`<div class="briefing-podium-row"><span class="briefing-podium-pos">${i+1}</span><span class="briefing-podium-name">${esc(driverName(v))}<small>${esc(v.Constructor?.name||"")}</small></span><b>${esc(v.Time?.time||v.status||"—")}</b></div>`).join("");
-  const secondGap=second?(second.Time?.time||second.status||""):"";
-  const outcome=second?(`${esc(winnerName)} won the ${esc(gp)}, with ${esc(driverName(second))} second${third?", and "+esc(driverName(third))+" third":""}.`):`${esc(winnerName)} finished first in the ${esc(gp)}.`;
-  box.innerHTML=`<div class="briefing-recap-top"><div><div class="briefing-statusline"><span class="briefing-live-dot"></span><span>RESULT AVAILABLE</span></div><p class="briefing-lead">${esc(gp)}</p><p>${date.toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"})} · Winner: <strong>${esc(winnerName)}</strong>${team?" · "+esc(team):""}</p></div><span class="briefing-recap-points">${winner.points?esc(winner.points)+" pts":""}</span></div><p class="briefing-recap-summary">${outcome}</p><div class="briefing-podium">${podiumLine}</div><p class="briefing-recap-foot">${secondGap?"Winner's listed time: "+esc(winner.Time?.time||winner.status||"not listed")+". ":""}Results sourced from Jolpica-F1; classifications can be updated after penalties or official reviews.</p><a class="briefing-result-link" href="https://www.formula1.com/en/results/${y}/races" target="_blank" rel="noopener noreferrer">View official F1 results ↗</a>`;
+  const podiumLine=podium.map((v,i)=>{const d=byNo[String(v.driver_number)]||{};const status=v.dsq?"DSQ":v.dns?"DNS":v.dnf?"DNF":(typeof v.duration==="number"?fmtTime(v.duration):typeof v.gap_to_leader==="number"?(v.position===1?fmtTime(v.duration):"+"+v.gap_to_leader.toFixed(3)+"s"):"—");return '<div class="briefing-podium-row"><span class="briefing-podium-pos">'+(v.position||i+1)+'</span><span class="briefing-podium-name">'+esc(driverName(v))+'<small>'+esc(d.team_name||"")+'</small></span><b>'+esc(status)+'</b></div>'}).join("");
+  const outcome=second?esc(winnerName)+" won the "+esc(gp)+", with "+esc(driverName(second))+" second"+(third?", and "+esc(driverName(third))+" third":"")+".":esc(winnerName)+" finished first in the "+esc(gp)+".";
+  box.innerHTML='<div class="briefing-recap-top"><div><div class="briefing-statusline"><span class="briefing-live-dot"></span><span>RESULT AVAILABLE</span></div><p class="briefing-lead">'+esc(gp)+'</p><p>'+date.toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"})+' · Winner: <strong>'+esc(winnerName)+'</strong>'+(team?" · "+esc(team):"")+'</p></div><span class="briefing-recap-points">'+(winner.points?esc(winner.points)+" pts":"")+'</span></div><p class="briefing-recap-summary">'+outcome+'</p><div class="briefing-podium">'+podiumLine+'</div><p class="briefing-recap-foot">Classification from OpenF1 for the latest completed Grand Prix. Official classifications may change after penalties or reviews.</p><a class="briefing-result-link" href="https://www.formula1.com/en/results/'+y+'/races" target="_blank" rel="noopener noreferrer">View official F1 results ↗</a>';
   box.dataset.loaded="true";
  }catch(e){
-  box.innerHTML='<p class="briefing-lead">Live race results are temporarily unavailable.</p><p>Redline could not verify the latest classification, so it will not display an older saved race as if it were current. Please refresh in a moment or check the official results page.</p><a class="briefing-result-link" href="https://www.formula1.com/en/results" target="_blank" rel="noopener noreferrer">Check official F1 results ↗</a>';
+  box.innerHTML='<p class="briefing-lead">Latest Grand Prix results could not be verified.</p><p>Redline could not confirm the newest race classification, so it will not show an older saved race as if it were current. Refresh in a moment or check the official results page.</p><a class="briefing-result-link" href="https://www.formula1.com/en/results/'+y+'/races" target="_blank" rel="noopener noreferrer">Check official F1 results ↗</a>';
   box.dataset.loaded="true";
  }finally{briefingRecapBusy=false}
 }
