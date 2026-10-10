@@ -96,6 +96,51 @@ select{background:var(--card2);color:var(--txt);border:1px solid var(--line);bor
 .panel h2{font:600 13px 'Space Grotesk';letter-spacing:.14em;text-transform:uppercase;color:var(--mute);padding:14px 18px;border-bottom:1px solid var(--line)}
 .scroll{max-height:560px;overflow-y:auto}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}.grid .panel{margin:0}
+
+/* Driver Stats: editorial summary + transparent comparison data */
+.stats-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:20px 18px 16px}
+.stats-kicker{font:600 10px 'Space Grotesk';letter-spacing:.16em;color:var(--red);margin-bottom:5px}
+.stats-head h2{font:700 clamp(24px,4vw,32px)/1.1 'Space Grotesk';letter-spacing:-.03em;color:var(--txt)}
+.stats-intro{font-size:13px;color:var(--mute);margin-top:6px}
+.stats-season{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mute);white-space:nowrap}
+.stats-season select{font-size:13px;padding:7px 9px}
+.stats-subnav{display:flex;gap:6px;padding:0 18px 16px;overflow-x:auto}
+.stats-subnav button{flex:1;min-width:max-content;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--mute);padding:9px 12px;font:600 13px 'Space Grotesk';cursor:pointer}
+.stats-subnav button[aria-selected=true]{background:var(--red);border-color:var(--red);color:#fff}
+.stats-body{padding:0 18px 18px}
+.stats-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.stats-driver{border:1px solid var(--line);border-radius:13px;padding:13px;background:var(--soft);min-width:0}
+.stats-driver.a{border-top:3px solid var(--red)}.stats-driver.b{border-top:3px solid #3987E8}
+.stats-driver .stats-team{font-size:11px;color:var(--mute);margin-top:2px;overflow-wrap:anywhere}
+.stats-driver .stats-points{font:700 clamp(25px,4vw,34px)/1.1 'Space Grotesk';margin-top:10px;font-variant-numeric:tabular-nums}
+.stats-driver .stats-points small{font:500 10px Inter;color:var(--mute);margin-left:4px}
+.stats-select{width:100%;max-width:100%;margin-top:9px;font-size:13px}
+.stats-verdict{border:1px solid var(--line);border-radius:13px;background:var(--card2);padding:16px;margin-bottom:18px}
+.stats-verdict .sv-kicker{display:flex;align-items:center;gap:8px;font:600 10px 'Space Grotesk';letter-spacing:.13em;text-transform:uppercase;color:var(--red)}
+.stats-verdict h3{font:700 20px/1.25 'Space Grotesk';margin:9px 0;color:var(--txt)}
+.stats-verdict p{font-size:13px;line-height:1.65;color:var(--mute)}
+.stats-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:13px;padding-top:11px;border-top:1px solid var(--line);font-size:11px;color:var(--mute)}
+.stats-section-title{font:600 12px 'Space Grotesk';letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:18px 0 10px}
+.stats-metric{padding:11px 0;border-bottom:1px solid var(--line)}
+.stats-metric:last-child{border-bottom:0}
+.stats-metric-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;margin-bottom:7px}
+.stats-metric-head span{color:var(--mute)}.stats-metric-head b{font:600 14px 'Space Grotesk';font-variant-numeric:tabular-nums}
+.stats-dual{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stats-barline{display:flex;align-items:center;gap:7px;margin-top:5px}
+.stats-barline b{font:600 12px 'Space Grotesk';width:25px;flex:none}
+.stats-track{height:7px;background:var(--chip);border-radius:99px;overflow:hidden;flex:1}
+.stats-fill{height:100%;border-radius:99px}
+.stats-fill.a{background:var(--red)}.stats-fill.b{background:#3987E8}
+.stats-lower{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr);gap:16px}
+.stats-side{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--soft)}
+.stats-side h3{font:600 12px 'Space Grotesk';letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.stats-takeaway{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px;color:var(--mute)}
+.stats-takeaway:last-child{border-bottom:0}.stats-takeaway b{color:var(--txt)}
+.stats-empty{padding:22px 16px;text-align:center;color:var(--mute);font-size:13px}
+.stats-trend{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:10px;background:var(--soft);margin-top:10px}
+.stats-note{font-size:11px;color:var(--mute);margin-top:10px;line-height:1.5}
+@media(max-width:600px){.stats-head{align-items:flex-start;flex-direction:column}.stats-season{width:100%;justify-content:space-between}.stats-season select{flex:1}.stats-pair{gap:8px}.stats-driver{padding:10px}.stats-lower{grid-template-columns:1fr}.stats-body{padding:0 12px 14px}.stats-subnav{padding-left:12px;padding-right:12px}.stats-verdict{padding:13px}.stats-dual{gap:7px}}
+
 @media(max-width:760px){.grid{grid-template-columns:1fr}}
 .row{display:grid;grid-template-columns:34px auto 1fr auto;gap:12px;align-items:center;padding:9px 16px;border-bottom:1px solid var(--line)}
 .row:last-child{border:0}
@@ -348,6 +393,7 @@ footer{color:var(--mute);font-size:14px}
   <button role="tab" aria-selected="true" data-v="news">News</button>
   <button role="tab" aria-selected="false" data-v="cal">Calendar</button>
   <button role="tab" aria-selected="false" data-v="standings">Standings</button>
+  <button role="tab" aria-selected="false" data-v="stats">Driver Stats</button>
   <button role="tab" aria-selected="false" data-v="race">Race</button>
   <button role="tab" aria-selected="false" data-v="live">Live</button>
   <button role="tab" aria-selected="false" data-v="tele">Telemetry</button>
@@ -360,7 +406,12 @@ footer{color:var(--mute);font-size:14px}
   <section class="panel"><h2>Drivers</h2><div id="drivers"><div class="state">Loading…</div></div></section>
   <section class="panel"><h2>Constructors</h2><div id="teams"><div class="state">Loading…</div></div></section>
  </div>
- <section class="panel pane" id="v-live" hidden><h2 id="liveTitle">Live positions</h2><div class="tools" id="liveBar"></div><div class="scroll" id="liveList"><div class="state">Loading…</div></div></section>
+ <section class="panel pane" id="v-stats" hidden>
+  <div class="stats-head"><div><p class="stats-kicker">DRIVER ANALYTICS</p><h2>Driver Stats</h2><p class="stats-intro">Explore the numbers behind every season.</p></div><label class="stats-season">Season <select id="statsYear" aria-label="Driver statistics season"></select></label></div>
+  <div class="stats-subnav" role="tablist" aria-label="Driver statistics sections"><button type="button" data-stats-view="overview" aria-selected="false">Overview</button><button type="button" data-stats-view="head" aria-selected="true">Head-to-Head</button><button type="button" data-stats-view="trends" aria-selected="false">Season Trends</button></div>
+  <div id="statsContent"><div class="state">Loading driver statistics…</div></div>
+</section>
+<section class="panel pane" id="v-live" hidden><h2 id="liveTitle">Live positions</h2><div class="tools" id="liveBar"></div><div class="scroll" id="liveList"><div class="state">Loading…</div></div></section>
  <section class="panel pane" id="v-result" hidden><h2 id="resTitle">Race result</h2><div class="scroll" id="result"><div class="state">Loading…</div></div></section>
  <section class="panel pane" id="v-control" hidden><h2>Race control</h2><div class="scroll" id="control"><div class="state">Loading…</div></div></section>
  <section class="panel pane" id="v-radio" hidden><h2>Team radio</h2><div class="tools"><select id="rsess" aria-label="Session"></select></div><div class="scroll" id="radioList"><div class="state">Loading…</div></div></section>
@@ -559,7 +610,7 @@ async function prefetchAll(){
  if(ok(t)&&$("prog"))$("prog").innerHTML="<small>All tabs are loaded and ready</small>";
 }
 function ensure(){
- const sub=curSub;if(!cur)return;
+ const sub=curSub;if(sub==="stats"){loadDriverStats();return;}if(!cur)return;
  if(sub==="standings"&&!loaded.st){loaded.st=1;loadStandings()}
  if(sub==="result"&&!loaded.res){loaded.res=1;loadResult()}
  if(sub==="control"&&!loaded.ctl){loaded.ctl=1;loadControl()}
@@ -1182,6 +1233,125 @@ async function livePoll(){
  try{if(L.since)mergeLive(await fresh(`/position?session_key=${L.k}&date>${encodeURIComponent(L.since)}`));
   mergeGaps(await fresh(`/intervals?session_key=${L.k}&date>${encodeURIComponent(iso(Date.now()-30000))}`));drawLive()}catch(e){}
 }
+
+/* ---------- Driver Stats / offline-friendly head-to-head ---------- */
+const statsState={year:nowY,view:"head",data:null,loading:false,cacheKey:y=>"redline-driver-stats-v1-"+y};
+function statsEsc(v){return esc(v)}
+function statsNum(v){const n=Number(v);return Number.isFinite(n)?n:null}
+function statsDriverId(d){return d?.Driver?.driverId||d?.driverId||""}
+function statsName(d){const x=d?.Driver||d;return [x?.givenName,x?.familyName].filter(Boolean).join(" ")||x?.name||x?.driverId||"Unknown driver"}
+function statsTeam(d){return d?.Constructors?.[0]?.name||d?.team||""}
+function statsColor(team,index){return teamIconColor(team)||(["FF1E00","3987E8","19A58C","E7B94D"][index%4])}
+function statsReadCache(y){try{const x=JSON.parse(localStorage.getItem(statsState.cacheKey(y))||"null");return x&&Array.isArray(x.drivers)?x:null}catch(e){return null}}
+function statsSaveCache(y,data){try{localStorage.setItem(statsState.cacheKey(y),JSON.stringify(data))}catch(e){}}
+async function statsEndpoint(path){
+ const res=await fetch(JOLPICA+path+(path.includes("?")?"&":"?")+"limit=1000",{headers:{Accept:"application/json"}});
+ if(!res.ok)throw new Error("Jolpica-F1 returned "+res.status);
+ const data=await res.json();if(!data?.MRData)throw new Error("Unexpected Jolpica-F1 response");return data.MRData;
+}
+function statsMerge(year,standingData,raceData,qualData,prior){
+ const by={};(prior?.drivers||[]).forEach(d=>{by[d.id]={...d}});
+ const standings=standingData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings||[];
+ standings.forEach((v,i)=>{const id=statsDriverId(v);if(!id)return;const d=by[id]||{id};d.name=statsName(v);d.code=v.Driver?.code||"";d.number=v.Driver?.permanentNumber||"";d.team=statsTeam(v);d.points=statsNum(v.points);d.wins=statsNum(v.wins);d.position=statsNum(v.position)||i+1;d.championshipAvailable=true;by[id]=d});
+ if(raceData){
+  Object.values(by).forEach(d=>{d.podiums=0;d.poles=0;d.fastest=0;d.finishSum=0;d.finishCount=0;d.roundPoints={}});
+  const races=raceData.RaceTable?.Races||[];
+  races.forEach(r=>{(r.Results||[]).forEach(v=>{const id=statsDriverId(v);if(!by[id])by[id]={id,name:statsName(v),team:statsTeam(v),points:0,wins:0,position:null};const d=by[id],pos=statsNum(v.position);if(pos&&pos<=3)d.podiums++;if(pos){d.finishSum+=pos;d.finishCount++}const round=Number(r.round);d.roundPoints[round]=(d.roundPoints[round]||0)+(statsNum(v.points)||0);if(v.FastestLap?.rank==="1"||Number(v.FastestLap?.rank)===1)d.fastest++})});
+ }
+ if(qualData){
+  const races=qualData.RaceTable?.Races||[];
+  races.forEach(r=>(r.QualifyingResults||[]).forEach(v=>{const id=statsDriverId(v);if(!by[id])by[id]={id,name:statsName(v),team:statsTeam(v),points:null,wins:null};const d=by[id],pos=statsNum(v.position);if(pos===1)d.poles=(d.poles||0)+1;if(pos){d.qualSum=(d.qualSum||0)+pos;d.qualCount=(d.qualCount||0)+1}}));
+ }
+ const drivers=Object.values(by).sort((a,b)=>(a.position||999)-(b.position||999));
+ drivers.forEach(d=>{d.avgFinish=d.finishCount?Math.round(d.finishSum/d.finishCount*10)/10:null;d.avgQual=d.qualCount?Math.round(d.qualSum/d.qualCount*10)/10:null;d.podiums=Number.isFinite(d.podiums)?d.podiums:null;d.poles=Number.isFinite(d.poles)?d.poles:null;d.fastest=Number.isFinite(d.fastest)?d.fastest:null;d.roundPoints=d.roundPoints||{}});
+ return {year,updatedAt:Date.now(),source:"jolpica",drivers,hasRaces:!!raceData,hasQualifying:!!qualData};
+}
+function statsMetric(label,key,a,b,lowerBetter=false){
+ const av=statsNum(a[key]),bv=statsNum(b[key]),max=Math.max(av||0,bv||0,1);
+ const display=v=>v===null?"—":(key.startsWith("avg")?v.toFixed(1):v);
+ const winner=av===null||bv===null||av===bv?"":(lowerBetter?(av<bv?a.name:b.name):(av>bv?a.name:b.name));
+ return `<div class="stats-metric"><div class="stats-metric-head"><span>${label}</span><b>${winner?statsEsc(winner)+" leads":av===null||bv===null?"Data unavailable":av===bv?"Level":display(av)+" vs "+display(bv)}</b></div><div class="stats-dual"><div class="stats-barline"><b>${display(av)}</b><div class="stats-track"><div class="stats-fill a" style="width:${av===null?0:Math.max(0,av/max*100)}%"></div></div></div><div class="stats-barline"><b>${display(bv)}</b><div class="stats-track"><div class="stats-fill b" style="width:${bv===null?0:Math.max(0,bv/max*100)}%"></div></div></div></div></div>`;
+}
+function statsSummary(a,b){
+ const ptsA=statsNum(a.points),ptsB=statsNum(b.points),winsA=statsNum(a.wins),winsB=statsNum(b.wins),fastA=statsNum(a.fastest),fastB=statsNum(b.fastest);
+ let headline="A comparison still taking shape",paragraph="There isn't enough comparable data to call an overall advantage yet. Check the individual metrics below; unavailable values are left blank rather than treated as zero.";
+ if(ptsA!==null&&ptsB!==null){
+  const lead=ptsA===ptsB?0:(ptsA>ptsB?1:-1),winner=lead===0?"Neither driver leads on championship points":(lead>0?a.name:b.name)+" leads by "+Math.abs(ptsA-ptsB)+" championship points";
+  headline=lead===0?"Level on championship points":(lead>0?a.name:b.name)+" leads the championship battle";
+  paragraph=winner+". ";
+  if(winsA!==null&&winsB!==null)paragraph+=(winsA===winsB?"Both drivers have "+winsA+" race wins.":(winsA>winsB?a.name:b.name)+" has "+Math.abs(winsA-winsB)+" more race "+(Math.abs(winsA-winsB)===1?"win":"wins")+".")+" ";
+  if(fastA!==null&&fastB!==null)paragraph+=(fastA===fastB?"They are level on fastest laps.":(fastA>fastB?a.name:b.name)+" leads the fastest-lap count.")+" ";
+  paragraph+="These figures describe the selected season's recorded results; they don't, by themselves, establish who is the faster driver in every condition.";
+ }
+ return {headline,paragraph};
+}
+function statsTrendSVG(a,b){
+ const rounds=Array.from(new Set([...Object.keys(a.roundPoints||{}),...Object.keys(b.roundPoints||{})])).map(Number).sort((x,y)=>x-y);
+ if(rounds.length<2)return '<div class="stats-empty">Round-by-round trend will appear when enough race results are available.</div>';
+ let ca=0,cb=0;const av=[],bv=[];rounds.forEach(r=>{ca+=a.roundPoints?.[r]||0;cb+=b.roundPoints?.[r]||0;av.push(ca);bv.push(cb)});
+ const max=Math.max(...av,...bv,1),w=620,h=180,p=24;
+ const path=arr=>arr.map((v,i)=>(i?"L":"M")+(p+i*(w-p*2)/(arr.length-1)).toFixed(1)+","+(h-p-v/max*(h-p*2)).toFixed(1)).join(" ");
+ return `<svg class="stats-trend" viewBox="0 0 ${w} ${h}" role="img" aria-label="Cumulative points progression by round"><path d="M${p} ${h-p}H${w-p}" stroke="currentColor" opacity=".2" fill="none"/><path d="${path(av)}" stroke="#FF1E00" stroke-width="2.5" fill="none"/><path d="${path(bv)}" stroke="#3987E8" stroke-width="2.5" fill="none"/><text x="${p}" y="15" fill="currentColor" font-size="10">Cumulative points</text><text x="${p}" y="${h-5}" fill="currentColor" opacity=".65" font-size="10">Round ${rounds[0]}</text><text x="${w-p}" y="${h-5}" fill="currentColor" opacity=".65" text-anchor="end" font-size="10">Round ${rounds[rounds.length-1]}</text></svg>`;
+}
+function statsOptions(selected,other){return statsState.data.drivers.filter(d=>d.id!==other).map(d=>`<option value="${statsEsc(d.id)}" ${d.id===selected?"selected":""}>${statsEsc(d.name)}</option>`).join("")}
+function statsDriverCard(d,side,other){
+ const color=side==="a"?"#FF1E00":"#3987E8";
+ return `<div class="stats-driver ${side}"><div class="stats-kicker" style="color:${color}">DRIVER ${side.toUpperCase()}</div><select class="stats-select" data-driver-select="${side}" aria-label="Select Driver ${side.toUpperCase()}">${statsOptions(d.id,other)}</select><div class="stats-team">${statsEsc(d.team||"Team data unavailable")}</div><div class="stats-points">${d.points===null||d.points===undefined?"—":statsEsc(d.points)}<small>PTS</small></div></div>`;
+}
+function renderDriverStats(){
+ const root=$("statsContent");if(!root)return;
+ const data=statsState.data;
+ if(!data?.drivers?.length){root.innerHTML='<div class="stats-empty">Driver statistics are not available yet. Connect to the internet and refresh when OpenF1 or Jolpica-F1 is reachable. Once loaded, Redline will save a local copy for future API outages.</div>';return}
+ const drivers=data.drivers,defaultA=drivers[0],defaultB=drivers.find(d=>d.id!==defaultA?.id)||defaultA;
+ if(!statsState.a||!drivers.some(d=>d.id===statsState.a))statsState.a=defaultA.id;
+ if(!statsState.b||!drivers.some(d=>d.id===statsState.b)||statsState.b===statsState.a)statsState.b=defaultB.id;
+ const a=drivers.find(d=>d.id===statsState.a)||defaultA,b=drivers.find(d=>d.id===statsState.b)||defaultB;
+ const summary=statsSummary(a,b),stamp=data.updatedAt?new Date(data.updatedAt).toLocaleString():"Unknown";
+ let html='<div class="stats-body">';
+ if(statsState.view==="head"){
+  html+=`<div class="stats-pair">${statsDriverCard(a,"a",b.id)}${statsDriverCard(b,"b",a.id)}</div><div class="stats-verdict"><div class="sv-kicker">▰ &nbsp; THE EDITORIAL VERDICT</div><h3>${statsEsc(summary.headline)}</h3><p>${statsEsc(summary.paragraph)}</p><div class="stats-meta"><span>◉ &nbsp; ${data.hasRaces&&data.hasQualifying?"Race & qualifying data loaded":data.hasRaces?"Race data loaded":"Standings data available"} </span><span>Saved ${statsEsc(stamp)}</span></div></div><div class="stats-lower"><div><h3 class="stats-section-title">The numbers behind the verdict</h3>${statsMetric("Championship points","points",a,b)}${statsMetric("Race wins","wins",a,b)}${statsMetric("Podiums","podiums",a,b)}${statsMetric("Pole positions","poles",a,b)}${statsMetric("Fastest laps","fastest",a,b)}${statsMetric("Average qualifying position","avgQual",a,b,true)}${statsMetric("Average finishing position","avgFinish",a,b,true)}</div><aside class="stats-side"><h3>At a glance</h3><div class="stats-takeaway"><span>↗</span><span><b>${statsEsc(a.name)}</b> — ${a.points!=null&&b.points!=null?(a.points===b.points?"level on points":a.points>b.points?"championship points advantage":"trails on championship points"):"points data unavailable"}</span></div><div class="stats-takeaway"><span>↗</span><span><b>${statsEsc(b.name)}</b> — ${b.fastest!=null&&a.fastest!=null&&b.fastest>a.fastest?"more fastest laps":b.wins!=null&&a.wins!=null&&b.wins>a.wins?"more race wins":"comparison depends on the selected metrics"}</span></div><div class="stats-takeaway"><span>◎</span><span>Missing statistics are shown as dashes, not zero.</span></div></aside></div><p class="stats-note">Summary is generated from recorded statistics only. Average qualifying and finishing positions are lower-is-better. Historical and cached data may be incomplete.</p>`;
+ }else if(statsState.view==="overview"){
+  html+='<h3 class="stats-section-title">Season driver standings</h3>'+drivers.map((d,i)=>`<div class="stats-metric"><div class="stats-metric-head"><b>${i+1}. ${statsEsc(d.name)}</b><b>${d.points==null?"—":d.points} pts</b></div><div class="stats-track"><div class="stats-fill a" style="width:${d.points==null?0:Math.min(100,d.points/Math.max(...drivers.map(x=>x.points||0),1)*100)}%"></div></div><div class="stats-note">${statsEsc(d.team||"Team unavailable")} · ${d.wins==null?"—":d.wins+" wins"} · ${d.podiums==null?"—":d.podiums+" podiums"}</div></div>`).join("");
+ }else{
+  html+=`<h3 class="stats-section-title">Points progression by round</h3><div class="stats-side"><div class="stats-takeaway"><span style="color:#FF1E00">●</span><b>${statsEsc(a.name)}</b><span>${a.points??"—"} pts</span><span style="color:#3987E8">●</span><b>${statsEsc(b.name)}</b><span>${b.points??"—"} pts</span></div>${statsTrendSVG(a,b)}</div><p class="stats-note">Cumulative points are calculated from race results available in the selected season. Missing rounds may affect the trend.</p>`;
+ }
+ html+='</div>';root.innerHTML=html;
+ root.querySelectorAll("[data-driver-select]").forEach(sel=>sel.onchange=()=>{const side=sel.dataset.driverSelect;statsState[side]=sel.value;renderDriverStats()});
+}
+async function loadDriverStats(force=false){
+ const y=Number($("statsYear")?.value||statsState.year||nowY);statsState.year=y;
+ const cached=statsReadCache(y);
+ if(cached){statsState.data=cached;renderDriverStats()}
+ else if(!statsState.data){$("statsContent").innerHTML='<div class="state">Loading driver statistics…</div>'}
+ if(statsState.loading&&!force)return;
+ statsState.loading=true;
+ try{
+  const [standingsResult,raceResult,qualResult]=await Promise.allSettled([
+   statsEndpoint(`/${y}/driverstandings/`),
+   statsEndpoint(`/${y}/results/`),
+   statsEndpoint(`/${y}/qualifying/`)
+  ]);
+  const standingData=standingsResult.status==="fulfilled"?standingsResult.value:null;
+  const raceData=raceResult.status==="fulfilled"?raceResult.value:null;
+  const qualData=qualResult.status==="fulfilled"?qualResult.value:null;
+  if(standingData||raceData||qualData){
+   const fresh=statsMerge(y,standingData,raceData,qualData,cached);
+   if(fresh.drivers.length){statsState.data=fresh;statsSaveCache(y,fresh);renderDriverStats()}
+   else if(!cached)throw new Error("No driver rows returned");
+  }else if(!cached){throw new Error("Both F1 data providers are unavailable")}
+  if(!standingData&&!raceData&&!qualData&&cached){$("statsContent").querySelector(".stats-meta")?.insertAdjacentHTML("beforeend",'<span>Offline cache</span>')}
+ }catch(e){
+  if(!cached&&!statsState.data)$("statsContent").innerHTML='<div class="stats-empty">The F1 data APIs are unavailable and no saved driver stats exist for this season yet. Try again when online; Redline will cache successful data for later outages.</div>';
+ }finally{statsState.loading=false}
+}
+function initDriverStats(){
+ const sel=$("statsYear");if(!sel)return;
+ if(!sel.options.length){for(let y=nowY;y>=2023;y--)sel.insertAdjacentHTML("beforeend",`<option value="${y}">${y}</option>`)}
+ sel.value=String(statsState.year);sel.onchange=()=>{statsState.a=null;statsState.b=null;loadDriverStats(true)};
+ document.querySelectorAll("[data-stats-view]").forEach(btn=>btn.onclick=()=>{statsState.view=btn.dataset.statsView;document.querySelectorAll("[data-stats-view]").forEach(x=>x.setAttribute("aria-selected",String(x===btn)));renderDriverStats()});
+}
+initDriverStats();
+
 function drawLive(){
  const s=L.s;$("liveTitle").textContent=`${s.country_name} · ${s.session_name}`;
  $("liveBar").innerHTML=(L.on?'<span class="badge">Live</span> Updates every 10 seconds':'<span class="badge off">Finished</span> Showing the final positions of the latest session')+` <span id="upd">· ${new Date().toLocaleTimeString()}</span> <button id="rl">Refresh</button>`;
