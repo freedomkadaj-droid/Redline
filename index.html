@@ -218,6 +218,10 @@ audio{width:100%;height:36px}
 .circuit-guide-sub{font-size:12px;color:var(--mute);margin-top:3px}
 .circuit-guide-map{display:flex;align-items:center;justify-content:center;min-height:150px;margin:4px 0 10px;padding:12px;border-radius:10px;background:#000;overflow:hidden}
 .circuit-guide-map img{display:block;width:min(100%,290px);height:auto;max-height:230px;object-fit:contain}
+.redline-map{min-height:190px!important;position:relative}
+.redline-map svg{display:block;width:100%;max-width:520px;height:auto;max-height:310px;overflow:visible}
+.redline-map-loading{font:700 10px Space Grotesk,sans-serif;letter-spacing:2.2px;color:#777;text-align:center;padding:45px 8px}
+.redline-map-error{font:600 11px Space Grotesk,sans-serif;letter-spacing:1px;color:#888;text-align:center;padding:30px 8px}
 .circuit-guide-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:10px 0 14px}
 .circuit-stat{min-width:0;padding:9px 8px;border-radius:9px;background:var(--hover)}
 .circuit-stat b{display:block;font:600 15px 'Space Grotesk';color:var(--txt);white-space:nowrap}
@@ -1180,6 +1184,33 @@ async function loadJolpicaCalendar(){
  const nx=mapped.findIndex(x=>new Date(x.date_start)>now);
  $("calList").innerHTML=mapped.map((x,i)=>{const st=new Date(x.date_start)>now?(i===nx?"Next":"Upcoming"):"Done";return `<div class="mt" data-k="${x.meeting_key}"><button class="mth" aria-expanded="false"><span class="rn">${String(i+1).padStart(2,"0")}</span><span class="mi"><b>${esc(x.raceName)}</b><small>${esc(x.location)}, ${esc(x.country_name)} · ${new Date(x.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span><span class="badge${st==="Done"?" off":""}">${st}</span><span class="chev" aria-hidden="true">›</span></button><div class="mtd" hidden></div></div>`}).join("");fallbackNote();
 }
+async function renderRedlineCircuitMaps(root=document){
+ root.querySelectorAll(".redline-map[data-map-url]:not([data-rendered])").forEach(async box=>{
+  box.dataset.rendered="1";
+  const urls=[box.dataset.mapUrl,box.dataset.mapFallback];
+  try{
+   let response;
+   for(const url of urls){response=await fetch(url,{cache:"force-cache"});if(response.ok)break;}
+   if(!response?.ok)throw new Error("map unavailable");
+   const source=new DOMParser().parseFromString(await response.text(),"image/svg+xml");
+   const original=source.documentElement;
+   if(original.localName!=="svg"||source.querySelector("parsererror"))throw new Error("invalid SVG");
+   const viewBox=original.getAttribute("viewBox")||"0 0 600 400";
+   const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+   svg.setAttribute("viewBox",viewBox);svg.setAttribute("role","img");svg.setAttribute("aria-label",box.getAttribute("aria-label")||"Circuit map");
+   svg.setAttribute("preserveAspectRatio","xMidYMid meet");
+   const vb=viewBox.trim().split(/[ ,]+/).map(Number),w=vb[2]||600,h=vb[3]||400;
+   const bg=document.createElementNS(svg.namespaceURI,"rect");bg.setAttribute("x",vb[0]||0);bg.setAttribute("y",vb[1]||0);bg.setAttribute("width",w);bg.setAttribute("height",h);bg.setAttribute("fill","#000");svg.appendChild(bg);
+   const geometry=Array.from(original.querySelectorAll("path,polyline,polygon,line,circle,ellipse")).filter(el=>el!==bg);
+   geometry.forEach(el=>{
+    const clone=document.importNode(el,true);
+    clone.removeAttribute("style");clone.setAttribute("fill","none");clone.setAttribute("stroke","#f5f5f7");clone.setAttribute("stroke-width",String(Math.max(w,h)*.006));clone.setAttribute("stroke-linecap","round");clone.setAttribute("stroke-linejoin","round");clone.removeAttribute("class");
+    svg.appendChild(clone);
+   });
+   box.replaceChildren(svg);
+  }catch(err){box.innerHTML='<div class="redline-map-error">CIRCUIT MAP TEMPORARILY UNAVAILABLE</div>';delete box.dataset.rendered;}
+ });
+}
 function circuitGuideHTML(x){
  const name=String(x?.Circuit?.circuitName||x?.circuit_short_name||x?.meeting_official_name||x?.raceName||"").trim();
  const country=String(x?.Circuit?.Location?.country||x?.country_name||"").trim();
@@ -1291,22 +1322,18 @@ function circuitGuideHTML(x){
  const assetBase=`https://raw.githubusercontent.com/f1db/f1-circuits-svg/main/circuits`;
  const mapUrl=`${assetBase}/detailed/white-outline/${slug}-${layout}.svg`;
  const fallbackUrl=`${assetBase}/minimal/white-outline/${slug}-${layout}.svg`;
-  // Use the F1 Circuits SVG catalogue for standard layouts, with dedicated numbered maps for Madrid and Sepang.
-  // Track Atlas is intentionally not used as a circuit-map source.
-  const specialMaps={madring:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Madring%20Formula%201%20Circuit.svg",sepang:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sepang.svg"};
-  const primaryMapUrl=specialMaps[slug]||mapUrl;
-  const firstFallbackUrl=specialMaps[slug]?mapUrl:fallbackUrl;
-  const mapLink="https://github.com/julesr0y/f1-circuits-svg";
+  // Redline renders SVG geometry on its own black canvas with a white outline; no corner markers or Track Atlas.
+  const mapLink="https://github.com/f1db/f1-circuits-svg";
  return `<section class="circuit-guide" aria-label="${esc(title)} circuit guide">
   <div class="circuit-guide-head"><div><div class="circuit-guide-title">${esc(title)}</div><div class="circuit-guide-sub">${esc([locality,country].filter(Boolean).join(" · ")||"Formula 1 circuit")} · Track layout</div></div><span class="badge">Circuit guide</span></div>
-  <div class="circuit-guide-map"><img src="${primaryMapUrl}" alt="${esc(title)} circuit map" loading="lazy" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${firstFallbackUrl}'}else if(this.dataset.fallback==='1'){this.dataset.fallback='2';this.src='${fallbackUrl}'}else{this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span class=&quot;circuit-guide-sub&quot;>Circuit outline unavailable for this layout</span>')}"></div>
-  <div class="circuit-guide-sub">🏁 Circuit layout · F1 Circuits SVG catalogue; dedicated numbered map for Madrid and Sepang</div>
+  <div class="circuit-guide-map redline-map" data-map-url="${mapUrl}" data-map-fallback="${fallbackUrl}" role="img" aria-label="${esc(title)} circuit map"><div class="redline-map-loading">REDLINE CIRCUIT MAP</div></div>
+  <div class="circuit-guide-sub">🏁 REDLINE TRACK DESIGN · Original black-and-white map rendering</div>
   <div class="circuit-guide-stats">${stats.map(q=>`<div class="circuit-stat"><b>${q[0]}</b><span>${q[1]}</span></div>`).join("")}</div>
   <div class="circuit-guide-title" style="font-size:13px">Sector breakdown</div>
   <div class="circuit-sectorbar" role="img" aria-label="Sector 1 red, Sector 2 blue, Sector 3 yellow"><span></span><span></span><span></span></div>
   <div class="circuit-sectors">${sectorDetails}</div>
   ${corners?`<div class="circuit-guide-sub" style="margin-top:13px">Corner index</div><div class="circuit-corners" aria-label="Circuit corner index">${corners}</div>`:""}
-  <div class="circuit-guide-links"><a href="${mapLink}" target="_blank" rel="noopener">Numbered track maps & data ↗</a><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors ↗</a><a href="https://github.com/f1db/f1-circuits-svg" target="_blank" rel="noopener">Fallback outline source ↗</a></div>
+  <div class="circuit-guide-links"><a href="${mapLink}" target="_blank" rel="noopener">Circuit map data ↗</a><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors ↗</a><a href="https://github.com/f1db/f1-circuits-svg" target="_blank" rel="noopener">Fallback outline source ↗</a></div>
  </section>`;
 }
 $("calList").onclick=async e=>{
