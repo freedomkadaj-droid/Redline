@@ -304,7 +304,7 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 .news-directory .nlist.rows .publisher-desc{margin:0}
 .news-directory .nlist.rows .publisher-link{padding:8px 0;border-top:0;justify-content:flex-end}
 .news-directory-empty{padding:26px;text-align:center;color:var(--mute);font-size:13px}
-.news-policy-note{margin:-5px 0 14px;color:var(--mute);font-size:12px;line-height:1.55}
+.news-policy-note{margin:0;padding:10px 18px 12px;color:var(--mute);font-size:12px;line-height:1.55;border-bottom:1px solid var(--line);background:var(--soft);text-wrap:pretty}
 .nlist.cards .nheadline{min-height:124px}
 .nlist.cards .nheadline .nbody{padding:14px 15px}
 .nlist.cards .nheadline .nt{font-size:15px;line-height:1.45;-webkit-line-clamp:3}
@@ -883,7 +883,7 @@ $("wsess").onchange=loadWeather;
 const NEWS_CONFIG={
  proxyUrl:"",          // e.g. "https://your-worker.workers.dev/?url="  (the feed URL is appended, encoded)
  publicRelays:true,    // set to false to use only direct requests and your own proxy
- timeoutMs:10000,maxArticles:72,pageSize:12,concurrency:2,freshMs:30*60*1000,cacheKey:"redline-news-v5"};
+ timeoutMs:6500,maxArticles:72,pageSize:12,concurrency:6,freshMs:5*60*1000,cacheKey:"redline-news-v6"};
 const NEWS_SOURCES=[   // Show only short headlines with attribution and direct links; do not republish feed summaries or images.
  {id:"f1",name:"Formula 1",label:"Formula 1 Official",color:"#E10600",type:"link",homepage:"https://www.formula1.com/en/latest",enabled:false},
  {id:"sky",name:"Sky Sports",label:"Sky Sports F1",color:"#17C3D6",type:"rss",url:"https://www.skysports.com/rss/12433",homepage:"https://www.skysports.com/f1",enabled:true},
@@ -996,7 +996,7 @@ const pgSize=()=>NEWS_CONFIG.pageSize*(newsState.view==="rows"?2:1);   // the co
 const newsSrc=id=>NEWS_SOURCES.find(s=>s.id===id);
 function hydrateNews(){
  // Article headlines are fetched fresh for this page view; do not persist publisher content in browser storage.
- try{localStorage.removeItem("redline-news-v3");localStorage.removeItem("redline-news-v4");localStorage.removeItem(NEWS_CONFIG.cacheKey)}catch(e){}
+ try{localStorage.removeItem("redline-news-v3");localStorage.removeItem("redline-news-v4");localStorage.removeItem("redline-news-v5");localStorage.removeItem(NEWS_CONFIG.cacheKey)}catch(e){}
 }
 function saveNews(){ /* Deliberately do not persist publisher headlines or feed content. */ }
 
@@ -1104,8 +1104,8 @@ $("newsList").addEventListener("click",e=>{
 $("nnote").addEventListener("click",e=>{if(e.target.closest&&e.target.closest("[data-act=retry]"))loadNews(true)});
 $("newsList").addEventListener("error",e=>{const el=e.target;if(el&&el.tagName==="IMG"){const w=el.closest(".nimg");if(w){w.classList.add("ph");w.innerHTML=PH}else el.remove()}},true);
 setInterval(()=>{document.querySelectorAll("#newsList time[data-ts]").forEach(t=>{const ms=+t.dataset.ts,r=relTime(ms);t.textContent=r||fmtAbs(ms)})},60000);
-// Refresh less frequently to reduce repeat feed requests.
-setInterval(()=>{if(document.visibilityState==="visible")loadNews(true,true)},30*60*1000);
+// Refresh every five minutes while the page is visible; avoid background requests in hidden tabs.
+setInterval(()=>{if(document.visibilityState==="visible")loadNews(true,true)},5*60*1000);
 
 // ---------- Car data ----------
 let carTok=0;function drawTele(){return curSub==="car"?loadCar(true):drawLaps()}
