@@ -30,7 +30,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
  background:var(--bg-image),radial-gradient(900px 520px at 92% -8%,var(--glow),transparent 60%),repeating-linear-gradient(115deg,transparent 0 70px,rgba(255,30,0,.045) 70px 72px),linear-gradient(180deg,var(--veil),var(--bg) 88%);
  background-size:cover,auto,auto,auto;background-position:center}
 .kerb{position:fixed;top:0;left:0;right:0;height:6px;z-index:50;background:repeating-linear-gradient(90deg,#FF1E00 0 26px,#fff 26px 52px)}
-.themebtn{position:fixed;top:16px;right:14px;z-index:15;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:18px;cursor:pointer}
+.themebtn{position:fixed;top:16px;right:14px;z-index:15;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card2);color:var(--txt);display:grid;place-items:center;cursor:pointer}.themebtn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .themebtn:hover{border-color:var(--red)}
 .wrap{max-width:1180px;margin:0 auto;padding:26px 18px 60px}
 header{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-end;margin-bottom:22px}
@@ -381,7 +381,7 @@ footer{color:var(--mute);font-size:14px}
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="rl-mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0B0B10"/><rect x=".75" y=".75" width="62.5" height="62.5" rx="13.3" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.5"/><g transform="translate(6.8 0) skewX(-12)"><path fill="#F4F4F6" fill-rule="evenodd" d="M16 14L38 14L48 19L50 26L50 29L47 35L41 38L24 38L24 50L16 50ZM24 21L36 21L42 24L42 28L36 31L24 31Z"/><path fill="#FF1E00" d="M30 38L40 38L51 50L40.5 50Z"/></g></symbol></svg>
-<div class="kerb"></div><button id="themebtn" class="themebtn" aria-label="Switch to light mode">☀</button>
+<div class="kerb"></div><button id="themebtn" class="themebtn" aria-label="Switch to light mode"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></button>
 <div class="wrap">
  <header>
   <div class="brand">
@@ -1385,7 +1385,7 @@ function drawLive(){
   return row(p,av(d.headshot_url,d.full_name,d.team_colour),d.full_name||"Driver #"+n,d.team_name||"",gap,isFavD(d),"")}).join("")||'<div class="state">No position data for this session yet.</div>';
 }
 const root=document.documentElement,tb=$("themebtn");
-function setTheme(t,save){root.dataset.theme=t;tb.textContent=t==="light"?"☾":"☀";tb.setAttribute("aria-label",t==="light"?"Switch to dark mode":"Switch to light mode");
+function setTheme(t,save){root.dataset.theme=t;tb.innerHTML=t==="light"?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"></path></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>';tb.setAttribute("aria-label",t==="light"?"Switch to dark mode":"Switch to light mode");
  document.querySelector('meta[name=theme-color]')?.setAttribute("content",t==="light"?"#EEF0F3":"#0A0A0D");if(save)try{localStorage.setItem("redline-theme",t)}catch(e){}}
 setTheme(root.dataset.theme==="light"?"light":"dark");tb.onclick=()=>setTheme(root.dataset.theme==="light"?"dark":"light",true);
 // Install the offline app shell; API responses are archived separately in IndexedDB.
