@@ -1035,11 +1035,11 @@ function drawChips(){
  const chip=(id,label,n,bad)=>`<button class="chip" data-src="${esc(id)}" style="${id?srcStyle(id):"--sc:var(--red)"}" aria-pressed="${S.filter===id}"${bad?' title="Couldn\'t load this source"':""}>${id?"<i></i>":""}${esc(label)}${bad?" ⚠":` <span class="cnt">${n}</span>`}</button>`;
  $("nchips").innerHTML=chip("","All sources",S.articles.length,false)+NEWS_SOURCES.filter(s=>s.enabled).map(s=>chip(s.id,s.label||s.name,counts[s.id]||0,S.sources[s.id]&&S.sources[s.id].ok===false&&!counts[s.id])).join("")}
 function drawNews(){
-  if(!NEWS_SOURCES.some(s=>s.enabled)){
-   const tools=document.querySelector("#v-news .tools"),chips=$("nchips");if(tools)tools.hidden=true;if(chips)chips.hidden=true;note.hidden=true;stat.textContent="Publisher links";newBtn.hidden=true;
-   box.innerHTML='<div class="news-directory"><p>To respect publishers’ content and feed terms, Redline links directly to their websites instead of copying or republishing headlines, article text, or images. Select a publisher to read the latest stories on its own site.</p><ul>'+NEWS_SOURCES.map(s=>'<li><a href="'+esc(s.homepage)+'" target="_blank" rel="noopener noreferrer">'+esc(s.name)+' ↗</a></li>').join("")+'</ul></div>';return;
-  }
  const S=newsState,box=$("newsList"),note=$("nnote"),stat=$("nsrc"),newBtn=$("nnew");
+ if(!NEWS_SOURCES.some(s=>s.enabled)){
+  const tools=document.querySelector("#v-news .tools"),chips=$("nchips");if(tools)tools.hidden=true;if(chips)chips.hidden=true;note.hidden=true;stat.textContent="Publisher links";newBtn.hidden=true;
+  box.innerHTML='<div class="news-directory"><p>To respect publishers’ content and feed terms, Redline links directly to their websites instead of copying or republishing headlines, article text, or images. Select a publisher to read the latest stories on its own site.</p><ul>'+NEWS_SOURCES.map(s=>'<li><a href="'+esc(s.homepage)+'" target="_blank" rel="noopener noreferrer">'+esc(s.name)+' ↗</a></li>').join("")+'</ul></div>';return;
+ }
  const failed=Object.entries(S.sources).filter(([,v])=>!v.ok),at=S.updatedAt?new Date(S.updatedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
  newBtn.hidden=!S.pending.length;newBtn.textContent=S.pending.length?"↑ "+S.pending.length+" new article"+(S.pending.length===1?"":"s"):"↑ New articles";
  box.setAttribute("aria-busy",S.busy?"true":"false");drawChips();document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
