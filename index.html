@@ -1291,17 +1291,22 @@ function circuitGuideHTML(x){
  const assetBase=`https://raw.githubusercontent.com/f1db/f1-circuits-svg/main/circuits`;
  const mapUrl=`${assetBase}/detailed/white-outline/${slug}-${layout}.svg`;
  const fallbackUrl=`${assetBase}/minimal/white-outline/${slug}-${layout}.svg`;
- const mapLink=`https://github.com/f1db/f1-circuits-svg/tree/main/circuits`;
+ // Track Atlas renders numbered corner markers directly on the track map.
+ // Keep the existing F1DB outline as a fallback for circuits/layouts not covered there.
+ const atlasAliases={spielberg:"red-bull-ring","austin":"circuit-of-the-americas","marina-bay":"singapore",lusail:"losail","mexico-city":"mexico-city","yas-marina":"yas-marina",catalunya:"barcelona",madring:"madrid"};
+ const atlasSlug=atlasAliases[slug]||slug;
+ const atlasUrl=`https://raw.githubusercontent.com/tobi/track-atlas/main/tracks/${atlasSlug}/raw/render/${atlasSlug}.svg`;
+ const mapLink=`https://github.com/tobi/track-atlas/tree/main/tracks`;
  return `<section class="circuit-guide" aria-label="${esc(title)} circuit guide">
   <div class="circuit-guide-head"><div><div class="circuit-guide-title">${esc(title)}</div><div class="circuit-guide-sub">${esc([locality,country].filter(Boolean).join(" · ")||"Formula 1 circuit")} · Track layout</div></div><span class="badge">Circuit guide</span></div>
-  <div class="circuit-guide-map"><img src="${mapUrl}" alt="${esc(title)} circuit outline" loading="lazy" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${fallbackUrl}'}else{this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span class=&quot;circuit-guide-sub&quot;>Circuit outline unavailable for this layout</span>')}"></div>
-  <div class="circuit-guide-sub">🏁 Track outline · layout source: F1DB / F1 Circuits SVG</div>
+  <div class="circuit-guide-map"><img src="${atlasUrl}" alt="${esc(title)} circuit map with numbered corners" loading="lazy" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${mapUrl}'}else if(this.dataset.fallback==='1'){this.dataset.fallback='2';this.src='${fallbackUrl}'}else{this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span class=&quot;circuit-guide-sub&quot;>Circuit outline unavailable for this layout</span>')}"></div>
+  <div class="circuit-guide-sub">🏁 Map includes numbered corners where available · Track Atlas / OpenStreetMap contributors</div>
   <div class="circuit-guide-stats">${stats.map(q=>`<div class="circuit-stat"><b>${q[0]}</b><span>${q[1]}</span></div>`).join("")}</div>
   <div class="circuit-guide-title" style="font-size:13px">Sector breakdown</div>
   <div class="circuit-sectorbar" role="img" aria-label="Sector 1 red, Sector 2 blue, Sector 3 yellow"><span></span><span></span><span></span></div>
   <div class="circuit-sectors">${sectorDetails}</div>
   ${corners?`<div class="circuit-guide-sub" style="margin-top:13px">Corner index</div><div class="circuit-corners" aria-label="Circuit corner index">${corners}</div>`:""}
-  <div class="circuit-guide-links"><a href="${mapLink}" target="_blank" rel="noopener">Circuit layouts & data ↗</a><a href="https://github.com/f1db/f1-circuits-svg" target="_blank" rel="noopener">Track outline: F1 Circuits SVG (CC BY 4.0) ↗</a></div>
+  <div class="circuit-guide-links"><a href="${mapLink}" target="_blank" rel="noopener">Numbered track maps & data ↗</a><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors ↗</a><a href="https://github.com/f1db/f1-circuits-svg" target="_blank" rel="noopener">Fallback outline source ↗</a></div>
  </section>`;
 }
 $("calList").onclick=async e=>{
