@@ -216,10 +216,10 @@ audio{width:100%;height:36px}
 .circuit-guide-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
 .circuit-guide-title{font:600 16px 'Space Grotesk';color:var(--txt)}
 .circuit-guide-sub{font-size:12px;color:var(--mute);margin-top:3px}
-.circuit-guide-map{display:flex;align-items:center;justify-content:center;min-height:150px;margin:4px 0 10px;padding:12px;border-radius:10px;background:#000;overflow:hidden}
+.circuit-guide-map{display:flex;align-items:center;justify-content:center;min-height:150px;width:100%;min-width:0;box-sizing:border-box;margin:4px 0 10px;padding:8px;border-radius:10px;background:#000;overflow:hidden}
 .circuit-guide-map img{display:block;width:min(100%,290px);height:auto;max-height:230px;object-fit:contain}
-.redline-map{min-height:190px!important;position:relative}
-.redline-map svg{display:block;width:100%;max-width:520px;height:auto;max-height:310px;overflow:visible}
+.redline-map{min-height:190px!important;position:relative;box-sizing:border-box}
+.redline-map svg{display:block;flex:0 1 100%;width:100%;max-width:100%;height:auto;max-height:none;margin:0 auto;overflow:visible;box-sizing:border-box}
 .redline-map-loading{font:700 10px 'Space Grotesk',sans-serif;letter-spacing:2.2px;color:#777;text-align:center;padding:45px 8px}
 .redline-corner circle{fill:#000;stroke:#ff3038;stroke-width:1.8}
 .redline-corner text{fill:#fff;font:700 9px Arial,sans-serif;text-anchor:middle;dominant-baseline:central}
@@ -1199,10 +1199,13 @@ async function renderRedlineCircuitMaps(root=document){
    if(original.localName!=="svg"||source.querySelector("parsererror"))throw new Error("invalid SVG");
    const viewBox=original.getAttribute("viewBox")||"0 0 600 400";
    const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
-   svg.setAttribute("viewBox",viewBox);svg.setAttribute("role","img");svg.setAttribute("aria-label",box.getAttribute("aria-label")||"Circuit map");
+   svg.setAttribute("role","img");svg.setAttribute("aria-label",box.getAttribute("aria-label")||"Circuit map");
    svg.setAttribute("preserveAspectRatio","xMidYMid meet");
-   const vb=viewBox.trim().split(/[ ,]+/).map(Number),w=vb[2]||600,h=vb[3]||400;
-   const bg=document.createElementNS(svg.namespaceURI,"rect");bg.setAttribute("x",vb[0]||0);bg.setAttribute("y",vb[1]||0);bg.setAttribute("width",w);bg.setAttribute("height",h);bg.setAttribute("fill","#000");svg.appendChild(bg);
+   const vb=viewBox.trim().split(/[ ,]+/).map(Number),x0=vb[0]||0,y0=vb[1]||0,w=vb[2]||600,h=vb[3]||400;
+   // Add breathing room around the geometry so corner badges never touch the phone viewport edges.
+   const pad=Math.max(w,h)*.075,viewX=x0-pad,viewY=y0-pad,viewW=w+pad*2,viewH=h+pad*2;
+   svg.setAttribute("viewBox",`${viewX} ${viewY} ${viewW} ${viewH}`);
+   const bg=document.createElementNS(svg.namespaceURI,"rect");bg.setAttribute("x",viewX);bg.setAttribute("y",viewY);bg.setAttribute("width",viewW);bg.setAttribute("height",viewH);bg.setAttribute("fill","#000");svg.appendChild(bg);
    const geometry=Array.from(original.querySelectorAll("path,polyline,polygon,line,circle,ellipse")).filter(el=>el!==bg);
    geometry.forEach(el=>{
     const clone=document.importNode(el,true);
