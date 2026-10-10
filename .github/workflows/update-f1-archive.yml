@@ -1,0 +1,91 @@
+name: Refresh permanent F1 archive
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 8 * * 1"
+  push:
+    paths:
+      - ".github/workflows/update-f1-archive.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: redline-f1-archive
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Fetch historical seasons from Jolpica-F1
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python - <<'PY'
+          import json, os, time, urllib.error, urllib.request
+          from datetime import datetime, timezone
+
+          base = "https://api.jolpi.ca/ergast/f1"
+          os.makedirs("archive", exist_ok=True)
+          current_year = datetime.now(timezone.utc).year
+          endpoints = ("races", "results", "qualifying", "driverstandings", "constructorstandings")
+
+          def get_json(url):
+              last = None
+              for attempt in range(5):
+                  try:
+                      req = urllib.request.Request(url, headers={"Accept": "application/json", "User-Agent": "Redline-F1-Archive/1.0"})
+                      with urllib.request.urlopen(req, timeout=25) as response:
+                          data = json.load(response)
+                      if "MRData" not in data:
+                          raise ValueError("Unexpected Jolpica-F1 response")
+                      return data["MRData"]
+                  except Exception as exc:
+                      last = exc
+                      time.sleep(1.5 * (attempt + 1))
+              raise RuntimeError(f"Could not fetch {url}: {last}")
+
+          for year in range(2023, current_year + 1):
+              path = f"archive/{year}.json"
+              responses = {}
+              for endpoint in endpoints:
+                  key = f"/{year}/{endpoint}/"
+                  try:
+                      responses[key] = get_json(f"{base}/{year}/{endpoint}/?limit=1000")
+                      time.sleep(0.3)
+                  except Exception as exc:
+                      print(f"Warning: {year} {endpoint}: {exc}")
+              if not responses:
+                  print(f"No data fetched for {year}; leaving any existing archive unchanged.")
+                  continue
+              payload = {
+                  "year": year,
+                  "updatedAt": datetime.now(timezone.utc).isoformat(),
+                  "source": "Jolpica-F1",
+                  "responses": responses
+              }
+              tmp = path + ".tmp"
+              with open(tmp, "w", encoding="utf-8") as handle:
+                  json.dump(payload, handle, ensure_ascii=False, separators=(",", ":"))
+              os.replace(tmp, path)
+              print(f"Wrote {path}: {len(responses)} endpoint snapshots")
+
+          PY
+
+      - name: Commit updated archive
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add archive/*.json
+          if git diff --cached --quiet; then
+            echo "Archive is already up to date."
+          else
+            git commit -m "Refresh permanent F1 historical archive"
+            git push
+          fi
