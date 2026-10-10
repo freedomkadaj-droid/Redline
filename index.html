@@ -681,10 +681,15 @@ function countdownHTML(){
 function updateSessionMaintenance(){
  const curtain=$("session-maintenance");if(!curtain)return;
  const now=Date.now(),active=countdownSessions.filter(x=>x.start<=now&&now<x.end).sort((a,b)=>a.end-b.end)[0];
- if(!active){curtain.classList.remove("active");document.body.classList.remove("maintenance-active");return}
- const race=active.race||"Grand Prix",label=sessionLabel(active);
+ // Temporary outage curtain for the current Singapore Sprint weekend. This fallback is
+ // independent of the live-data APIs and expires automatically at 18:00 Malaysia time.
+ const outageUntil=Date.parse("2026-10-10T10:00:00Z");
+ const forceOutage=now<outageUntil;
+ const session=active||(forceOutage?{name:"Live Session",race:"Singapore Grand Prix",end:outageUntil}:null);
+ if(!session){curtain.classList.remove("active");document.body.classList.remove("maintenance-active");return}
+ const race=session.race||"Grand Prix",label=active?sessionLabel(active):"LIVE SESSION";
  $("maintenance-session-name").textContent=label+" · "+race;
- $("maintenance-session-detail").textContent="Scheduled to finish at "+new Date(active.end).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+" local time. Redline will reopen automatically after the session.";
+ $("maintenance-session-detail").textContent="Redline is temporarily taking a pit stop while session data is unavailable. We’ll reopen automatically after "+new Date(session.end).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+" local time.";
  curtain.classList.add("active");document.body.classList.add("maintenance-active");
 }
 function renderCountdown(){const old=$("sessionCountdown");if(old){const box=document.createElement("div");box.innerHTML=countdownHTML();old.replaceWith(box.firstElementChild)}updateSessionMaintenance()}
@@ -695,7 +700,7 @@ function renderLast(raceHTML){
 async function loadYear(y){
  year=y;$("year").value=y;$("rounds").innerHTML="";
  try{rounds=(await get(`/sessions?year=${y}&session_name=Race`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start))}catch(e){rounds=[]}
- if(!rounds.length){try{rounds=await jolpicaRounds(y);fallbackNote()}catch(e){if(y===nowY&&y>2023)return loadYear(y-1);$("rounds").innerHTML='<div class="state">OpenF1 and Jolpica-F1 are unavailable. Please try again later.</div>';$("last").innerHTML="<small>Couldn't load the season schedule.</small>";return}}
+ if(!rounds.length){try{rounds=await jolpicaRounds(y);fallbackNote()}catch(e){if(y===nowY&&y>2023){await loadCountdownSchedule(nowY).catch(()=>{});return loadYear(y-1)}$("rounds").innerHTML='<div class="state">OpenF1 and Jolpica-F1 are unavailable. Please try again later.</div>';$("last").innerHTML="<small>Couldn't load the season schedule.</small>";await loadCountdownSchedule(nowY).catch(()=>{});return}}
 
  if(!rounds.length){$("last").innerHTML="<small>No races found for this season.</small>";return}
  const done=rounds.filter(r=>new Date(r.date_end)<Date.now());
