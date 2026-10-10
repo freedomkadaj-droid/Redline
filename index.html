@@ -1000,8 +1000,9 @@ async function loadNews(force,silent=false){
    const newKeys=new Set(newlyFound.map(newsArticleKey));
    if(newlyFound.length)newsState.pending=prepare([...newsState.pending,...newlyFound]);
    const visibleFresh=newlyFound.length?fresh.filter(a=>!newKeys.has(newsArticleKey(a))):fresh;
-   // A failed/empty feed must never erase its last known-good articles.
-   newsState.articles=prepare([...visibleFresh,...newsState.articles.filter(a=>!okIds.has(a.sourceId))]);
+   // Background checks keep the current list intact so stories don't disappear while someone is reading.
+   const retained=silent?newsState.articles:newsState.articles.filter(a=>!okIds.has(a.sourceId));
+   newsState.articles=prepare([...visibleFresh,...retained]);
    newsState.updatedAt=Date.now();newsState.fromCache=false;saveNews();
   }
   newsState.loaded=true;newsState.shown=pgSize();
@@ -1056,12 +1057,13 @@ function drawNews(){
  requestAnimationFrame(markClamped)}
 
 // ---- wiring ----
-$("nrefresh").onclick=()=>loadNews(true);
-$("nnew").onclick=()=>{
+const applyPendingNews=()=>{
  if(!newsState.pending.length)return;
  const scrollTop=$("newsList").scrollTop;
  newsState.articles=prepare([...newsState.pending,...newsState.articles]);newsState.pending=[];newsState.shown=pgSize();saveNews();drawNews();$("newsList").scrollTop=scrollTop;
 };
+$("nrefresh").onclick=()=>{applyPendingNews();loadNews(true)};
+$("nnew").onclick=applyPendingNews;
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{newsState.view=b.dataset.view;newsState.shown=pgSize();try{localStorage.setItem("redline-news-view",newsState.view)}catch(e){}drawNews()});
 $("nchips").addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-src]");if(!b)return;newsState.filter=b.dataset.src;newsState.shown=pgSize();drawNews()});
 $("newsList").addEventListener("click",e=>{
