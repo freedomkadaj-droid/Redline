@@ -1081,7 +1081,7 @@ function drawNews(){
   const cards=chosen.map(s=>{const m=metadata[s.id]||{category:"Motorsport",desc:"Latest stories and updates are available directly from this publisher.",monogram:s.name.slice(0,2).toUpperCase()};
    return '<li><article class="publisher-card" style="--sc:'+esc(color(s))+'"><div class="publisher-top"><div class="publisher-monogram" aria-hidden="true">'+esc(m.monogram)+'</div><div><div class="publisher-name">'+esc(s.name)+'</div><div class="publisher-category">'+esc(m.category)+'</div></div></div><p class="publisher-desc">'+esc(m.desc)+'</p><a class="publisher-link" href="'+esc(s.homepage)+'" target="_blank" rel="noopener noreferrer"><span>Read at original source</span><span aria-hidden="true">↗</span></a></article></li>';
   }).join("");
-  const view=newsState.view==="rows"?"rows":"cards";
+  const view=newsState.view==="rows"?"rows":"cards";document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===view)));
   box.setAttribute("aria-busy","false");
   box.innerHTML='<div class="news-directory"><div class="news-directory-intro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg><p><strong>Go straight to the source.</strong> Browse trusted motorsport publishers below. Redline links to their websites rather than reproducing their headlines, article text or images.</p></div>'+(cards?'<ul class="nlist '+view+'">'+cards+'</ul>':'<div class="news-directory-empty">No publishers match this category.</div>')+'</div>';
   stat.textContent=chosen.length+" publishers";return;
