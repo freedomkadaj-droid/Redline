@@ -366,9 +366,14 @@ const hits=[];const setNet=t=>{const e=document.getElementById("net");if(e)e.tex
 async function throttle(){for(;;){const now=Date.now();while(hits.length&&now-hits[0]>60000)hits.shift();
  if(hits.length<26){hits.push(now);setNet("");return}
  setNet("Waiting a moment for OpenF1's free rate limit…");await sleep(hits[0]+60050-now)}}
-async function fetchRetry(p){for(let i=0;i<4;i++){await throttle();let r;try{r=await fetch(API+p)}catch(_){throw new Error("Can't reach OpenF1. Open this file in your own browser (not the Claude preview) and check your internet")}
-  if(r.status===429){await sleep(1500*(i+1));continue} if(r.status===404)return[];
-  if(!r.ok)throw new Error("OpenF1 returned "+r.status);const j=await r.json();if(p.startsWith("/drivers")&&Array.isArray(j))j.forEach(d=>{if(d.full_name)nameBook[d.driver_number]=d});return j} throw new Error("OpenF1 is busy, try again soon")}
+async function fetchRetry(p){for(let i=0;i<4;i++){await throttle();let r;try{r=await fetch(API+p)}catch(_){throw new Error("Can't reach OpenF1. Check your internet connection and try again.")}
+  if(r.status===429){await sleep(1500*(i+1));continue}
+  if(r.status===404)throw new Error("OpenF1 endpoint not found (404)");
+  if(!r.ok)throw new Error("OpenF1 returned "+r.status);
+  let j;try{j=await r.json()}catch(_){throw new Error("OpenF1 returned invalid JSON")}
+  if(!Array.isArray(j))throw new Error("OpenF1 returned an unexpected data format");
+  if(p.startsWith("/drivers"))j.forEach(d=>{if(d.full_name)nameBook[d.driver_number]=d});return j}
+ throw new Error("OpenF1 is busy, try again soon")}
 function get(p){if(cache.has(p))return cache.get(p);const q=chain.then(()=>fetchRetry(p));
   chain=q.catch(()=>{}).then(()=>sleep(450));cache.set(p,q);q.catch(()=>cache.delete(p));return q}
 const jolpicaCache=new Map();
@@ -818,16 +823,33 @@ async function loadNews(force){
  if(newsState.busy)return;
  if(!force&&newsState.updatedAt&&!newsState.fromCache&&Date.now()-newsState.updatedAt<NEWS_CONFIG.freshMs){drawNews();return}
  newsState.busy=true;drawNews();
- const srcs=NEWS_SOURCES.filter(s=>s.enabled&&NEWS_ADAPTERS[s.type]);
- const res=await settleLimited(srcs.map(s=>()=>NEWS_ADAPTERS[s.type](s,newsState.via[s.id])),NEWS_CONFIG.concurrency);
- const fresh=[],okIds=new Set();
- res.forEach((r,i)=>{const s=srcs[i];
-  if(r.status==="fulfilled"){fresh.push(...r.value.items);okIds.add(s.id);newsState.via[s.id]=r.value.via;newsState.sources[s.id]={ok:true,count:r.value.items.length}}
-  else newsState.sources[s.id]={ok:false,error:r.reason?.message||"Failed",details:r.reason?.details||[]}});
- if(okIds.size){   // articles from sources that failed this time are kept, so one bad source never empties the feed
-  newsState.articles=prepare([...fresh,...newsState.articles.filter(a=>!okIds.has(a.sourceId))]);
-  newsState.updatedAt=Date.now();newsState.fromCache=false;saveNews()}
- newsState.loaded=true;newsState.busy=false;newsState.shown=pgSize();drawNews()}
+ try{
+  const srcs=NEWS_SOURCES.filter(s=>s.enabled&&NEWS_ADAPTERS[s.type]);
+  const res=await settleLimited(srcs.map(src=>()=>NEWS_ADAPTERS[src.type](src,newsState.via[src.id])),NEWS_CONFIG.concurrency);
+  const fresh=[],okIds=new Set();
+  res.forEach((r,i)=>{const src=srcs[i];
+   if(r.status==="fulfilled"&&Array.isArray(r.value?.items)&&r.value.items.length){
+    fresh.push(...r.value.items);okIds.add(src.id);newsState.via[src.id]=r.value.via;
+    newsState.sources[src.id]={ok:true,count:r.value.items.length};
+   }else{
+    const reason=r.status==="rejected"?r.reason:null;
+    newsState.sources[src.id]={ok:false,error:reason?.message||(r.status==="fulfilled"?"Feed returned no usable articles":"Failed"),details:reason?.details||[]};
+   }
+  });
+  if(okIds.size){
+   // A failed/empty feed must never erase its last known-good articles.
+   newsState.articles=prepare([...fresh,...newsState.articles.filter(a=>!okIds.has(a.sourceId))]);
+   newsState.updatedAt=Date.now();newsState.fromCache=false;saveNews();
+  }
+  newsState.loaded=true;newsState.shown=pgSize();
+ }catch(e){
+  // Keep the last known-good feed visible even if refresh preparation fails.
+  newsState.loaded=true;
+ }finally{
+  newsState.busy=false;
+  try{drawNews()}catch(e){const box=$("newsList");if(box)box.innerHTML='<div class="state">News refresh failed. Your saved articles are kept; please try again.</div>'}
+ }
+}
 
 // ---- rendering ----
 const PH='<svg class="ph-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><use href="#rl-mark"/></svg>';
