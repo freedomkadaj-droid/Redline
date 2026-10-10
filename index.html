@@ -441,32 +441,6 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
  .sc-unit small{font-size:8px;margin-top:2px}
 }
 
-/* AI-assisted publisher policy checker */
-.source-checker{margin:12px 18px;border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
-.source-checker summary{display:flex;align-items:center;gap:9px;list-style:none;cursor:pointer;padding:13px 14px;font-size:13px;font-weight:600}
-.source-checker summary::-webkit-details-marker{display:none}
-.source-checker summary:after{content:"+";margin-left:auto;color:var(--mute);font-size:18px;font-weight:400}
-.source-checker[open] summary:after{content:"−"}
-.source-checker-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--soft);color:var(--red);font-size:15px}
-.source-checker-desc{padding:0 14px 12px;color:var(--mute);font-size:12px;line-height:1.55}
-.source-checker-form{display:flex;gap:8px;padding:0 14px 14px}
-.source-checker-form input{min-width:0;flex:1;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);padding:10px 11px;font:inherit;font-size:12px}
-.source-checker-form button{flex:0 0 auto;border:0;border-radius:8px;background:var(--red);color:#fff;font:inherit;font-size:12px;font-weight:600;padding:0 13px;cursor:pointer}
-.source-checker-form button:disabled{opacity:.55;cursor:wait}
-.source-checker-setup{padding:0 14px 13px;color:var(--mute);font-size:11px}
-.source-checker-setup a{color:var(--red);text-decoration:none}
-.source-checker-result{margin:0 14px 14px;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--soft);font-size:12px;line-height:1.55;overflow-wrap:anywhere}
-.source-checker-result[hidden]{display:none}
-.source-checker-result h3{font-size:13px;margin:0 0 5px}
-.source-checker-result p{margin:5px 0}
-.source-checker-result ul{padding-left:18px;margin:6px 0}
-.source-checker-result a{color:var(--red);overflow-wrap:anywhere}
-.source-checker-result .sc-status{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:5px}
-.source-checker-result .sc-status.permitted{color:#2fa879}
-.source-checker-result .sc-status.restricted{color:var(--red)}
-.source-checker-result .sc-status.review{color:#d6a447}
-@media(max-width:520px){.source-checker-form{flex-direction:column}.source-checker-form button{padding:10px}.source-checker{margin-left:12px;margin-right:12px}}
-
 </style>
 </head>
 <body>
@@ -513,16 +487,6 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
   <div class="tools"><select id="lsess" aria-label="Session"></select><select id="ldrv" aria-label="Driver"></select><select id="clap" aria-label="Lap" hidden></select></div>
   <div class="scroll" id="lapList"><div class="state">Loading…</div></div><div id="carView" hidden></div></section>
  <section class="panel pane" id="v-news"><h2>Latest F1 News</h2><p class="news-policy-note">Headlines and publication times only. Each story links to its publisher; Redline uses its own logo artwork instead of republishing article images or summaries. Publisher terms still apply.</p>
-  <details class="source-checker" id="sourceChecker">
-   <summary><span class="source-checker-icon" aria-hidden="true">✦</span><span>News Source Checker</span></summary>
-   <p class="source-checker-desc">Review a publisher's official terms for rules relevant to showing headlines and linking to original stories. AI-assisted screening only — not legal advice.</p>
-   <form class="source-checker-form" id="sourceCheckerForm">
-    <input id="sourceTermsUrl" type="url" inputmode="url" placeholder="Paste official terms / copyright policy URL" aria-label="Publisher terms or copyright policy URL" required>
-    <button id="sourceCheckerSubmit" type="submit">Review terms</button>
-   </form>
-   <p class="source-checker-setup" id="sourceCheckerSetup">The AI endpoint needs one-time setup before reviews can run. <a href="https://github.com/redlinef1/redlinef1.github.io/blob/main/SOURCE_CHECKER_SETUP.md" target="_blank" rel="noopener">Setup guide</a></p>
-   <div class="source-checker-result" id="sourceCheckerResult" role="status" aria-live="polite" hidden></div>
-  </details>
   <div class="tools"><div class="seg" role="group" aria-label="News layout">
    <button type="button" data-view="cards" aria-pressed="true"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>Cards</button>
    <button type="button" data-view="rows" aria-pressed="false"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="2" width="14" height="3" rx="1.2"/><rect x="1" y="6.5" width="14" height="3" rx="1.2"/><rect x="1" y="11" width="14" height="3" rx="1.2"/></svg>List</button></div>
@@ -1570,55 +1534,6 @@ setTheme(root.dataset.theme==="light"?"light":"dark");tb.onclick=()=>setTheme(ro
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}),{once:true});
 }
-
-/* News Source Checker — endpoint is hosted separately so no AI key is exposed in this public page. */
-const SOURCE_CHECKER_API = "";
-(function initSourceChecker(){
- const form=$("sourceCheckerForm"),input=$("sourceTermsUrl"),submit=$("sourceCheckerSubmit"),result=$("sourceCheckerResult"),setup=$("sourceCheckerSetup");
- if(!form||!input||!submit||!result)return;
- const statusMeta={
-  likely_permitted:{label:"Likely permitted",cls:"permitted"},
-  restrictions_found:{label:"Restrictions found",cls:"restricted"},
-  needs_review:{label:"Needs review",cls:"review"}
- };
- const safeLink=url=>{try{const u=new URL(url);return ["http:","https:"].includes(u.protocol)?u.href:""}catch(e){return ""}};
- form.addEventListener("submit",async ev=>{
-  ev.preventDefault();
-  const url=safeLink(input.value.trim());
-  if(!url){result.hidden=false;result.textContent="Please enter a valid public terms or copyright-policy URL.";return}
-  result.hidden=false;result.textContent="";
-  if(!SOURCE_CHECKER_API){
-   const p=document.createElement("p");p.textContent="The checker interface is ready, but the secure AI endpoint has not been connected yet. Follow the setup guide to deploy the Worker and connect its URL.";result.append(p);
-   if(setup)setup.hidden=false;
-   return;
-  }
-  submit.disabled=true;submit.textContent="Reviewing…";
-  const loading=document.createElement("p");loading.textContent="Reading the publisher policy and checking relevant wording…";result.append(loading);
-  try{
-   const response=await fetch(SOURCE_CHECKER_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});
-   const data=await response.json();
-   if(!response.ok)throw new Error(data.error||"The review could not be completed.");
-   const review=data.review||{},meta=statusMeta[review.status]||statusMeta.needs_review;
-   result.textContent="";
-   const badge=document.createElement("div");badge.className="sc-status "+meta.cls;badge.textContent=meta.label;result.append(badge);
-   const title=document.createElement("h3");title.textContent="Policy review";result.append(title);
-   const summary=document.createElement("p");summary.textContent=review.summary||"No summary was returned.";result.append(summary);
-   if(Array.isArray(review.findings)&&review.findings.length){
-    const list=document.createElement("ul");
-    review.findings.slice(0,4).forEach(f=>{const li=document.createElement("li");li.textContent=(f.label?f.label+": ":"")+(f.detail||"");list.append(li)});result.append(list);
-   }
-   if(Array.isArray(review.evidence)&&review.evidence.length){
-    const evidenceTitle=document.createElement("p");evidenceTitle.textContent="Relevant wording found";result.append(evidenceTitle);
-    const list=document.createElement("ul");review.evidence.slice(0,3).forEach(q=>{const li=document.createElement("li");li.textContent="“"+String(q).slice(0,240)+"”";list.append(li)});result.append(list);
-   }
-   if(review.caveats){const caveat=document.createElement("p");caveat.textContent="Limitations: "+review.caveats;result.append(caveat)}
-   const source=document.createElement("p");source.textContent="Policy reviewed: ";const link=document.createElement("a");link.href=data.sourceUrl||url;link.target="_blank";link.rel="noopener noreferrer";link.textContent="Open original policy";source.append(link);result.append(source);
-   const checked=document.createElement("p");checked.textContent="Checked "+(data.checkedAt?new Date(data.checkedAt).toLocaleString():"just now")+". AI screening only; verify the source terms yourself.";result.append(checked);
-  }catch(err){result.textContent=err.message||"The review could not be completed. Please try again."}
-  finally{submit.disabled=false;submit.textContent="Review terms"}
- });
- if(SOURCE_CHECKER_API&&setup)setup.hidden=true;
-})(); 
 
 hydrateNews();loadYear(nowY);loadNews();
 </script>
