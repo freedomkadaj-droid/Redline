@@ -45,6 +45,25 @@ h1.brand-name{font:italic 700 clamp(32px,5.2vw,54px)/.95 'Chakra Petch','Space G
 .last .lr{display:flex;align-items:center;gap:14px;min-width:0}.last .lt{min-width:0}
 .rnd{font:700 15px 'Space Grotesk';letter-spacing:.06em;background:var(--red);color:#fff;border-radius:8px;padding:5px 10px}
 .last b{font:600 18px/1.25 'Space Grotesk';display:block}.last small{color:var(--mute);font-size:13px}
+/* Desktop: compact the header countdown and align it with the brand lockup */
+@media(min-width:821px){
+ header{align-items:center;gap:16px}
+ .last{flex:0 1 570px;max-width:570px;padding:9px 12px;gap:8px 12px}
+ .last .lr{flex:0 1 175px;gap:10px}
+ .last .lr .rnd{font-size:12px;padding:4px 7px}
+ .last .lt b{font-size:15px}
+ .last .lt small{font-size:11px}
+ .session-countdown{flex:1 1 250px;padding-left:12px;gap:4px}
+ .sc-top{gap:6px}
+ .sc-kicker{font-size:9px}
+ .sc-status{font-size:8px;padding:2px 6px}
+ .sc-session{font-size:14px}
+ .sc-gp,.sc-time{font-size:10px}
+ .sc-clock{max-width:225px;gap:4px}
+ .sc-unit{padding:4px 2px;border-radius:6px}
+ .sc-unit b{font-size:16px}
+ .sc-unit small{font-size:7px;margin-top:2px}
+}
 /* Responsive next-session countdown in the existing header card */
 .last{align-items:stretch;gap:12px 18px}.last .lr{flex:1 1 220px}
 .lnx{flex:0 1 auto;min-width:0;padding-left:18px}
