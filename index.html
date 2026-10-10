@@ -304,6 +304,15 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 .news-directory .nlist.rows .publisher-desc{margin:0}
 .news-directory .nlist.rows .publisher-link{padding:8px 0;border-top:0;justify-content:flex-end}
 .news-directory-empty{padding:26px;text-align:center;color:var(--mute);font-size:13px}
+.news-policy-note{margin:-5px 0 14px;color:var(--mute);font-size:12px;line-height:1.55}
+.nlist.cards .nheadline{min-height:124px}
+.nlist.cards .nheadline .nbody{padding:14px 15px}
+.nlist.cards .nheadline .nt{font-size:15px;line-height:1.45;-webkit-line-clamp:3}
+.nlist.rows .nheadline .nbody{padding:2px 0}
+.nlist.rows .nheadline .nt{font-size:15px}
+.nheadline .nmeta{margin-bottom:9px}
+.nheadline .nacts{padding-top:12px}
+.nheadline .nread{font-size:11px}
 @media(max-width:620px){.news-directory{padding:12px}.news-directory .nlist.cards{grid-template-columns:1fr;gap:10px}.publisher-card{min-height:0}.news-directory .nlist.rows .publisher-card{grid-template-columns:minmax(0,1fr);gap:10px}.news-directory .nlist.rows .publisher-link{justify-content:space-between;padding-top:10px;border-top:1px solid var(--line)}}
 .nmeta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;color:var(--mute);font-size:12.5px;margin-bottom:4px}
 .nsource{font:700 11px 'Space Grotesk';letter-spacing:.08em;text-transform:uppercase;color:var(--on,#fff);background:var(--sc,var(--chip));padding:2px 9px;border-radius:99px}
@@ -446,7 +455,7 @@ footer{color:var(--mute);font-size:14px}
  <section class="panel pane" id="v-tele" hidden><h2>Telemetry</h2>
   <div class="tools"><select id="lsess" aria-label="Session"></select><select id="ldrv" aria-label="Driver"></select><select id="clap" aria-label="Lap" hidden></select></div>
   <div class="scroll" id="lapList"><div class="state">Loading…</div></div><div id="carView" hidden></div></section>
- <section class="panel pane" id="v-news"><h2>Motorsport News Sources</h2>
+ <section class="panel pane" id="v-news"><h2>Latest F1 News</h2><p class="news-policy-note">Headlines and publication times only. Each story links to its publisher; Redline does not display article images or summaries. Publisher terms still apply.</p>
   <div class="tools"><div class="seg" role="group" aria-label="News layout">
    <button type="button" data-view="cards" aria-pressed="true"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>Cards</button>
    <button type="button" data-view="rows" aria-pressed="false"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="2" width="14" height="3" rx="1.2"/><rect x="1" y="6.5" width="14" height="3" rx="1.2"/><rect x="1" y="11" width="14" height="3" rx="1.2"/></svg>List</button></div>
@@ -874,20 +883,20 @@ $("wsess").onchange=loadWeather;
 const NEWS_CONFIG={
  proxyUrl:"",          // e.g. "https://your-worker.workers.dev/?url="  (the feed URL is appended, encoded)
  publicRelays:true,    // set to false to use only direct requests and your own proxy
- timeoutMs:10000,maxArticles:150,pageSize:12,concurrency:3,freshMs:5*60*1000,cacheKey:"redline-news-v4"};
-const NEWS_SOURCES=[
- {id:"f1",name:"Formula 1",label:"Formula 1",color:"#E10600",type:"link",homepage:"https://www.formula1.com/en/latest",enabled:false},
- {id:"sky",name:"Sky Sports",label:"Sky Sports",color:"#17C3D6",type:"link",homepage:"https://www.skysports.com/f1",enabled:false},
- {id:"bbc",name:"BBC Sport",label:"BBC Sport",color:"#E0359A",type:"link",homepage:"https://www.bbc.com/sport/formula1",enabled:false},
- {id:"autosport",name:"Autosport",label:"Autosport",color:"#F58220",type:"link",homepage:"https://www.autosport.com/f1/news/",enabled:false},
- {id:"motorsport",name:"Motorsport.com",label:"Motorsport.com",color:"#3B6CFF",type:"link",homepage:"https://www.motorsport.com/f1/news/",enabled:false},
- {id:"racefans",name:"RaceFans",label:"RaceFans",color:"#19B37A",type:"link",homepage:"https://www.racefans.net/",enabled:false},
- {id:"planetf1",name:"PlanetF1",label:"PlanetF1",color:"#9B5CFF",type:"link",homepage:"https://www.planetf1.com/",enabled:false},
- {id:"racingnews365",name:"RacingNews365",label:"RacingNews365",color:"#F2C230",type:"link",homepage:"https://racingnews365.com/",enabled:false},
- {id:"guardian",name:"The Guardian",label:"The Guardian",color:"#7C8CA3",type:"link",homepage:"https://www.theguardian.com/sport/formulaone",enabled:false},
- {id:"racer",name:"RACER",label:"RACER",color:"#E3B341",type:"link",homepage:"https://racer.com/category/formula-1/",enabled:false},
- {id:"therace",name:"The Race",label:"The Race",color:"#C5A3FF",type:"link",homepage:"https://www.the-race.com/category/formula-1/",enabled:false},
- {id:"motorsportweek",name:"Motorsport Week",label:"Motorsport Week",color:"#D71920",type:"link",homepage:"https://www.motorsportweek.com/series/single-seater/formula-1/",enabled:false}
+ timeoutMs:10000,maxArticles:72,pageSize:12,concurrency:2,freshMs:30*60*1000,cacheKey:"redline-news-v5"};
+const NEWS_SOURCES=[   // Show only short headlines with attribution and direct links; do not republish feed summaries or images.
+ {id:"f1",name:"Formula 1",label:"Formula 1 Official",color:"#E10600",type:"link",homepage:"https://www.formula1.com/en/latest",enabled:false},
+ {id:"sky",name:"Sky Sports",label:"Sky Sports F1",color:"#17C3D6",type:"rss",url:"https://www.skysports.com/rss/12433",homepage:"https://www.skysports.com/f1",enabled:true},
+ {id:"bbc",name:"BBC Sport",label:"BBC Sport",color:"#E0359A",type:"rss",url:"https://feeds.bbci.co.uk/sport/formula1/rss.xml",homepage:"https://www.bbc.com/sport/formula1",enabled:true},
+ {id:"autosport",name:"Autosport",label:"Autosport",color:"#F58220",type:"rss",url:"https://www.autosport.com/rss/f1/news/",homepage:"https://www.autosport.com/f1/news/",enabled:true},
+ {id:"motorsport",name:"Motorsport.com",label:"Motorsport.com",color:"#3B6CFF",type:"rss",url:"https://www.motorsport.com/rss/f1/news/",homepage:"https://www.motorsport.com/f1/news/",enabled:true},
+ {id:"racefans",name:"RaceFans",label:"RaceFans",color:"#19B37A",type:"rss",url:"https://www.racefans.net/feed/",homepage:"https://www.racefans.net/",enabled:true},
+ {id:"planetf1",name:"PlanetF1",label:"PlanetF1",color:"#9B5CFF",type:"rss",url:"https://www.planetf1.com/rss",homepage:"https://www.planetf1.com/",enabled:true},
+ {id:"racingnews365",name:"RacingNews365",label:"RacingNews365",color:"#F2C230",type:"rss",url:"https://racingnews365.com/feed/news.xml",homepage:"https://racingnews365.com/",enabled:true},
+ {id:"guardian",name:"The Guardian",label:"The Guardian",color:"#7C8CA3",type:"rss",url:"https://www.theguardian.com/sport/formulaone/rss",homepage:"https://www.theguardian.com/sport/formulaone",enabled:true},
+ {id:"racer",name:"RACER",label:"RACER",color:"#E3B341",type:"rss",url:"https://racer.com/category/formula-1/feed/",homepage:"https://racer.com/category/formula-1/",enabled:true},
+ {id:"therace",name:"The Race",label:"The Race",color:"#C5A3FF",type:"rss",url:"https://www.the-race.com/category/formula-1/feed/",homepage:"https://www.the-race.com/category/formula-1/",enabled:true},
+ {id:"motorsportweek",name:"Motorsport Week",label:"Motorsport Week",color:"#D71920",type:"rss",url:"https://www.motorsportweek.com/tag/formula-1/feed/",homepage:"https://www.motorsportweek.com/series/single-seater/formula-1/",enabled:true}
 ];
 // readable text colour for a coloured tag
 function onColor(h){const n=parseInt(String(h).slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return(0.2126*r+0.7152*g+0.0722*b)/255>.5?"#15151E":"#fff"}
@@ -924,9 +933,9 @@ function clip(t,n){t=String(t||"");if(t.length<=n)return t;const cut=t.slice(0,n
 // ---- normalise one raw item. `pre` = already plain text (articles read back from the saved cache) ----
 function coerceArticle(o,src,pre){
  if(!o||!src)return null;const T=pre?x=>String(x??"").trim():plain;
- const title=T(o.title).slice(0,300);if(!title)return null;
- return{id:"",title,source:src.name,sourceId:src.id,url:safeUrl(o.url||o.link,src.url),publishedAt:parseDate(o.publishedAt??o.date),
-  image:safeImg(o.image),description:clip(T(o.description),1000),tags:[]}}
+ const title=T(o.title).slice(0,240);if(!title)return null;
+ // Store/display headline metadata only; never retain publisher thumbnails or article summaries.
+ return{id:"",title,source:src.name,sourceId:src.id,url:safeUrl(o.url||o.link,src.url),publishedAt:parseDate(o.publishedAt??o.date),image:"",description:"",tags:[]}}
 
 // ---- duplicates: same URL first; else same source + identical normalised title published within 3 days of each other ----
 function dedupe(list){
@@ -973,12 +982,12 @@ const NEWS_ADAPTERS={
  async rss(src,preferred){
   const why=[];let truncated=null;
   for(const name of transportOrder(preferred)){const T=TRANSPORTS[name];
-   try{const items=(await T.run(src)).map(r=>coerceArticle(r,src)).filter(Boolean);
+   try{const items=(await T.run(src)).map(r=>coerceArticle(r,src)).filter(Boolean).slice(0,6);
     if(!items.length){why.push(name+": no articles found");continue}
     if(T.cap&&items.length>=T.cap){if(!truncated||items.length>truncated.items.length)truncated={items,via:name};why.push(name+": limited to "+T.cap+" articles");continue}
     return{items,via:name}}
    catch(e){why.push(name+": "+(e.name==="AbortError"?"timed out":e.message||"failed"))}}
-  if(truncated)return truncated;     // better a capped list than nothing
+  if(truncated)return truncated;
   throw Object.assign(new Error("Couldn't reach "+src.name),{details:why})}};
 
 // ---- state + saved copy (so the tab shows something instantly and survives a failed refresh) ----
@@ -986,10 +995,10 @@ const newsState={articles:[],pending:[],sources:{},via:{},updatedAt:null,fromCac
 const pgSize=()=>NEWS_CONFIG.pageSize*(newsState.view==="rows"?2:1);   // the compact list fits twice as many
 const newsSrc=id=>NEWS_SOURCES.find(s=>s.id===id);
 function hydrateNews(){
- try{const c=JSON.parse(localStorage.getItem(NEWS_CONFIG.cacheKey));if(!c||!Array.isArray(c.articles))return;
-  const list=c.articles.map(a=>coerceArticle(a,newsSrc(a&&a.sourceId),true)).filter(Boolean);if(!list.length)return;
-  Object.assign(newsState,{articles:prepare(list),pending:prepare(Array.isArray(c.pending)?c.pending.map(a=>coerceArticle(a,newsSrc(a&&a.sourceId),true)).filter(Boolean):[]),updatedAt:+c.at||null,fromCache:true,via:c.via&&typeof c.via==="object"?c.via:{},loaded:true});drawNews()}catch(e){}}
-function saveNews(){try{localStorage.setItem(NEWS_CONFIG.cacheKey,JSON.stringify({at:newsState.updatedAt,via:newsState.via,articles:newsState.articles,pending:newsState.pending}))}catch(e){}}
+ // Article headlines are fetched fresh for this page view; do not persist publisher content in browser storage.
+ try{localStorage.removeItem("redline-news-v3");localStorage.removeItem("redline-news-v4");localStorage.removeItem(NEWS_CONFIG.cacheKey)}catch(e){}
+}
+function saveNews(){ /* Deliberately do not persist publisher headlines or feed content. */ }
 
 async function settleLimited(fns,limit){     // run feed requests a few at a time so relays aren't hit with a burst
  const out=new Array(fns.length);let i=0;
@@ -1043,11 +1052,9 @@ function itemHtml(a,now,i){
  const has=a.publishedAt!=null,rel=has?relTime(a.publishedAt,now):"",abs=has?fmtAbs(a.publishedAt):"";
  const when=has?`<time datetime="${new Date(a.publishedAt).toISOString()}" title="${esc(abs)}" data-ts="${a.publishedAt}">${esc(rel||abs)}</time>${rel?`<span class="nabs">${esc(abs)}</span>`:""}`:"";
  const href=a.url?`href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"`:"",NEW='<span class="sr"> (opens in a new tab)</span>',tag=a.url?"a":"span";
- const pic=`<${tag} class="nimg${a.image?"":" ph"}" ${a.url?href+' tabindex="-1" aria-hidden="true"':""}>${a.image?`<img src="${esc(a.image)}" width="160" height="96" alt="" loading="lazy" decoding="async">`:PH}</${tag}>`;
  const title=a.url?`<a ${href}>${esc(a.title)}${NEW}</a>`:esc(a.title);
- const desc=a.description?`<p class="ndesc" id="nd${i}">${esc(a.description)}</p>`:"";
- const acts=a.description||a.url?`<div class="nacts">${a.description?`<button type="button" class="nexp" hidden aria-expanded="false" aria-controls="nd${i}">Show more</button>`:""}${a.url?`<a class="nread" ${href}>Read full article ↗${NEW}</a>`:""}</div>`:"";
- return `<li style="${srcStyle(a.sourceId)}"><article class="ncard">${pic}<div class="nbody"><div class="nmeta"><span class="nsource">${esc(a.source)}</span>${when}</div><h3 class="nt">${title}</h3>${desc}${acts}</div></article></li>`}
+ const acts=a.url?`<div class="nacts"><a class="nread" ${href}>Read at publisher ↗${NEW}</a></div>`:"";
+ return `<li style="${srcStyle(a.sourceId)}"><article class="ncard nheadline"><div class="nbody"><div class="nmeta"><span class="nsource">${esc(a.source)}</span>${when}</div><h3 class="nt">${title}</h3>${acts}</div></article></li>`}
 // Show the "Show more" link only where the text is actually cut off (depends on screen width, so re-checked on resize)
 function markClamped(){document.querySelectorAll("#newsList .ndesc:not(.open)").forEach(p=>{const b=p.parentNode.querySelector(".nexp");if(b)b.hidden=!(p.scrollHeight>p.clientHeight+1)})}
 let clampTimer=null;window.addEventListener("resize",()=>{clearTimeout(clampTimer);clampTimer=setTimeout(markClamped,150)});
@@ -1058,34 +1065,7 @@ function drawChips(){
  $("nchips").innerHTML=chip("","All sources",S.articles.length,false)+NEWS_SOURCES.filter(s=>s.enabled).map(s=>chip(s.id,s.label||s.name,counts[s.id]||0,S.sources[s.id]&&S.sources[s.id].ok===false&&!counts[s.id])).join("")}
 function drawNews(){
  const S=newsState,box=$("newsList"),note=$("nnote"),stat=$("nsrc"),newBtn=$("nnew");
- if(!NEWS_SOURCES.some(s=>s.enabled)){
-  const chips=$("nchips");if(chips)chips.hidden=false;note.hidden=true;newBtn.hidden=true;
-  const metadata={
-   f1:{category:"F1 Coverage",desc:"Official championship updates, race-weekend information and series announcements.",monogram:"F1"},
-   sky:{category:"F1 Coverage",desc:"Race reports, paddock coverage and broadcast-team analysis.",monogram:"SKY"},
-   bbc:{category:"F1 Coverage",desc:"Motorsport reporting, race summaries and broader sports coverage.",monogram:"BBC"},
-   autosport:{category:"Race Reporting",desc:"Grand Prix reporting, qualifying and race analysis from the paddock.",monogram:"AS"},
-   motorsport:{category:"Race Reporting",desc:"International racing coverage, results reporting and technical stories.",monogram:"M"},
-   racefans:{category:"Analysis",desc:"Formula 1 news, race-weekend context and detailed analysis.",monogram:"RF"},
-   planetf1:{category:"Analysis",desc:"Formula 1 commentary, features and fan-focused analysis.",monogram:"P1"},
-   racingnews365:{category:"Race Reporting",desc:"Formula 1 updates, interviews and race-weekend coverage.",monogram:"R365"},
-   guardian:{category:"Race Reporting",desc:"Motorsport reporting and Formula 1 coverage from the sports desk.",monogram:"G"},
-   racer:{category:"Multi-Series",desc:"Coverage spanning Formula racing, endurance, IndyCar and other series.",monogram:"R"},
-   therace:{category:"Analysis",desc:"Long-form motorsport analysis, interviews and technical explainers.",monogram:"TR"},
-   motorsportweek:{category:"Race Reporting",desc:"Race-weekend news and updates from across the Formula 1 calendar.",monogram:"MW"}
-  };
-  const categories=["All sources","F1 Coverage","Race Reporting","Analysis","Multi-Series"];
-  chips.innerHTML=categories.map(cat=>'<button class="chip" data-category="'+esc(cat==="All sources"?"":cat)+'" style="--sc:var(--red)" aria-pressed="'+(newsState.filter===(cat==="All sources"?"":cat))+'">'+esc(cat)+'</button>').join("");
-  const chosen=NEWS_SOURCES.filter(s=>{const m=metadata[s.id]||{};return !newsState.filter||m.category===newsState.filter});
-  const color=s=>s.color||"var(--red)";
-  const cards=chosen.map(s=>{const m=metadata[s.id]||{category:"Motorsport",desc:"Latest stories and updates are available directly from this publisher.",monogram:s.name.slice(0,2).toUpperCase()};
-   return '<li><article class="publisher-card" style="--sc:'+esc(color(s))+'"><div class="publisher-top"><div class="publisher-monogram" aria-hidden="true">'+esc(m.monogram)+'</div><div><div class="publisher-name">'+esc(s.name)+'</div><div class="publisher-category">'+esc(m.category)+'</div></div></div><p class="publisher-desc">'+esc(m.desc)+'</p><a class="publisher-link" href="'+esc(s.homepage)+'" target="_blank" rel="noopener noreferrer"><span>Read at original source</span><span aria-hidden="true">↗</span></a></article></li>';
-  }).join("");
-  const view=newsState.view==="rows"?"rows":"cards";document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===view)));
-  box.setAttribute("aria-busy","false");
-  box.innerHTML='<div class="news-directory"><div class="news-directory-intro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg><p><strong>Go straight to the source.</strong> Browse trusted motorsport publishers below. Redline links to their websites rather than reproducing their headlines, article text or images.</p></div>'+(cards?'<ul class="nlist '+view+'">'+cards+'</ul>':'<div class="news-directory-empty">No publishers match this category.</div>')+'</div>';
-  stat.textContent=chosen.length+" publishers";return;
- }
+
  const failed=Object.entries(S.sources).filter(([,v])=>!v.ok),at=S.updatedAt?new Date(S.updatedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
  newBtn.hidden=!S.pending.length;newBtn.textContent=S.pending.length?"↑ "+S.pending.length+" new article"+(S.pending.length===1?"":"s"):"↑ New articles";
  box.setAttribute("aria-busy",S.busy?"true":"false");drawChips();document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
@@ -1124,8 +1104,8 @@ $("newsList").addEventListener("click",e=>{
 $("nnote").addEventListener("click",e=>{if(e.target.closest&&e.target.closest("[data-act=retry]"))loadNews(true)});
 $("newsList").addEventListener("error",e=>{const el=e.target;if(el&&el.tagName==="IMG"){const w=el.closest(".nimg");if(w){w.classList.add("ph");w.innerHTML=PH}else el.remove()}},true);
 setInterval(()=>{document.querySelectorAll("#newsList time[data-ts]").forEach(t=>{const ms=+t.dataset.ts,r=relTime(ms);t.textContent=r||fmtAbs(ms)})},60000);
-// Refresh feeds every 3 minutes while the page is visible; hidden tabs wait until the next visible interval.
-setInterval(()=>{if(document.visibilityState==="visible")loadNews(true,true)},3*60*1000);
+// Refresh less frequently to reduce repeat feed requests.
+setInterval(()=>{if(document.visibilityState==="visible")loadNews(true,true)},30*60*1000);
 
 // ---------- Car data ----------
 let carTok=0;function drawTele(){return curSub==="car"?loadCar(true):drawLaps()}
