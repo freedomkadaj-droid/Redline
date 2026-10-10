@@ -282,7 +282,29 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 .links{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
 .foot{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:flex-end;padding-top:6px}.credit{margin-left:auto;text-align:right}#prog:not(:empty)::before,#net:not(:empty)::before{content:" · "}.credit a{color:var(--red);text-decoration:none}.credit a:hover{text-decoration:underline}
 .nlist{list-style:none;padding:0;margin:0}.nlist li{border-bottom:1px solid var(--line)}.nlist li:last-child{border:0}
- .news-directory{padding:18px}.news-directory p{font-size:13px;color:var(--mute);line-height:1.6;margin-bottom:14px}.news-directory ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}.news-directory li{border:1px solid var(--line);border-radius:10px;background:var(--soft)}.news-directory a{display:block;padding:11px 13px;color:var(--txt);text-decoration:none;font-weight:600}.news-directory a:hover{color:var(--red);border-color:var(--red)}
+ .news-directory{padding:18px}
+.news-directory-intro{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;margin-bottom:16px;border:1px solid var(--line);border-left:3px solid var(--red);border-radius:12px;background:var(--soft)}
+.news-directory-intro svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--red)}
+.news-directory-intro p{font-size:13px;color:var(--mute);line-height:1.6}
+.news-directory .nlist{list-style:none;padding:0;margin:0}
+.news-directory .nlist.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:14px}
+.news-directory .nlist.rows{display:grid;grid-template-columns:1fr;gap:8px}
+.publisher-card{display:flex;flex-direction:column;gap:14px;width:100%;min-height:184px;padding:16px;border:1px solid var(--line);border-top:3px solid var(--sc,var(--red));border-radius:13px;background:var(--soft);transition:border-color .15s,transform .15s,background .15s}
+.publisher-card:hover{border-color:var(--sc,var(--red));background:var(--hover);transform:translateY(-1px)}
+.publisher-top{display:flex;align-items:center;gap:11px}
+.publisher-monogram{width:42px;height:42px;display:grid;place-items:center;flex:none;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--sc,var(--red));font:700 13px 'Space Grotesk';letter-spacing:-.04em}
+.publisher-name{font:700 16px/1.2 'Space Grotesk';overflow-wrap:anywhere}
+.publisher-category{margin-top:5px;color:var(--sc,var(--red));font:600 10px 'Space Grotesk';letter-spacing:.1em;text-transform:uppercase}
+.publisher-desc{font-size:13px;line-height:1.55;color:var(--mute);flex:1}
+.publisher-link{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:11px;border-top:1px solid var(--line);color:var(--txt);font:600 12px 'Space Grotesk';letter-spacing:.03em;text-decoration:none}
+.publisher-link span:last-child{font-size:17px;color:var(--sc,var(--red));transition:transform .15s}
+.publisher-link:hover{color:var(--red)}
+.publisher-link:hover span:last-child{transform:translate(2px,-2px)}
+.news-directory .nlist.rows .publisher-card{min-height:0;display:grid;grid-template-columns:minmax(180px,.8fr) minmax(0,1.3fr) minmax(130px,.7fr);align-items:center;gap:16px;padding:12px 16px}
+.news-directory .nlist.rows .publisher-desc{margin:0}
+.news-directory .nlist.rows .publisher-link{padding:8px 0;border-top:0;justify-content:flex-end}
+.news-directory-empty{padding:26px;text-align:center;color:var(--mute);font-size:13px}
+@media(max-width:620px){.news-directory{padding:12px}.news-directory .nlist.cards{grid-template-columns:1fr;gap:10px}.publisher-card{min-height:0}.news-directory .nlist.rows .publisher-card{grid-template-columns:minmax(0,1fr);gap:10px}.news-directory .nlist.rows .publisher-link{justify-content:space-between;padding-top:10px;border-top:1px solid var(--line)}}
 .nmeta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;color:var(--mute);font-size:12.5px;margin-bottom:4px}
 .nsource{font:700 11px 'Space Grotesk';letter-spacing:.08em;text-transform:uppercase;color:var(--on,#fff);background:var(--sc,var(--chip));padding:2px 9px;border-radius:99px}
 .nabs::before{content:"· "}
@@ -428,7 +450,7 @@ footer{color:var(--mute);font-size:14px}
   <div class="tools"><div class="seg" role="group" aria-label="News layout">
    <button type="button" data-view="cards" aria-pressed="true"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>Cards</button>
    <button type="button" data-view="rows" aria-pressed="false"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="2" width="14" height="3" rx="1.2"/><rect x="1" y="6.5" width="14" height="3" rx="1.2"/><rect x="1" y="11" width="14" height="3" rx="1.2"/></svg>List</button></div>
-  <button id="nnew" hidden>↑ New articles</button><button id="nrefresh">Refresh</button><small id="nsrc" role="status" aria-live="polite"></small></div>
+  <button id="nnew" hidden>↑ New articles</button><button id="nrefresh">Refresh sources</button><small id="nsrc" role="status" aria-live="polite"></small></div>
   <div class="nchips" id="nchips" role="group" aria-label="Filter by source"></div>
   <div class="nnote" id="nnote" role="status" hidden></div>
   <div id="newsList" class="scroll" aria-live="off" aria-busy="false"><div class="state">Loading news…</div></div></section>
@@ -1037,8 +1059,32 @@ function drawChips(){
 function drawNews(){
  const S=newsState,box=$("newsList"),note=$("nnote"),stat=$("nsrc"),newBtn=$("nnew");
  if(!NEWS_SOURCES.some(s=>s.enabled)){
-  const tools=document.querySelector("#v-news .tools"),chips=$("nchips");if(tools)tools.hidden=true;if(chips)chips.hidden=true;note.hidden=true;stat.textContent="Publisher links";newBtn.hidden=true;
-  box.innerHTML='<div class="news-directory"><p>To respect publishers’ content and feed terms, Redline links directly to their websites instead of copying or republishing headlines, article text, or images. Select a publisher to read the latest stories on its own site.</p><ul>'+NEWS_SOURCES.map(s=>'<li><a href="'+esc(s.homepage)+'" target="_blank" rel="noopener noreferrer">'+esc(s.name)+' ↗</a></li>').join("")+'</ul></div>';return;
+  const chips=$("nchips");if(chips)chips.hidden=false;note.hidden=true;newBtn.hidden=true;
+  const metadata={
+   f1:{category:"F1 Coverage",desc:"Official championship updates, race-weekend information and series announcements.",monogram:"F1"},
+   sky:{category:"F1 Coverage",desc:"Race reports, paddock coverage and broadcast-team analysis.",monogram:"SKY"},
+   bbc:{category:"F1 Coverage",desc:"Motorsport reporting, race summaries and broader sports coverage.",monogram:"BBC"},
+   autosport:{category:"Race Reporting",desc:"Grand Prix reporting, qualifying and race analysis from the paddock.",monogram:"AS"},
+   motorsport:{category:"Race Reporting",desc:"International racing coverage, results reporting and technical stories.",monogram:"M"},
+   racefans:{category:"Analysis",desc:"Formula 1 news, race-weekend context and detailed analysis.",monogram:"RF"},
+   planetf1:{category:"Analysis",desc:"Formula 1 commentary, features and fan-focused analysis.",monogram:"P1"},
+   racingnews365:{category:"Race Reporting",desc:"Formula 1 updates, interviews and race-weekend coverage.",monogram:"R365"},
+   guardian:{category:"Race Reporting",desc:"Motorsport reporting and Formula 1 coverage from the sports desk.",monogram:"G"},
+   racer:{category:"Multi-Series",desc:"Coverage spanning Formula racing, endurance, IndyCar and other series.",monogram:"R"},
+   therace:{category:"Analysis",desc:"Long-form motorsport analysis, interviews and technical explainers.",monogram:"TR"},
+   motorsportweek:{category:"Race Reporting",desc:"Race-weekend news and updates from across the Formula 1 calendar.",monogram:"MW"}
+  };
+  const categories=["All sources","F1 Coverage","Race Reporting","Analysis","Multi-Series"];
+  chips.innerHTML=categories.map(cat=>'<button class="chip" data-category="'+esc(cat==="All sources"?"":cat)+'" style="--sc:var(--red)" aria-pressed="'+(newsState.filter===(cat==="All sources"?"":cat))+'">'+esc(cat)+'</button>').join("");
+  const chosen=NEWS_SOURCES.filter(s=>{const m=metadata[s.id]||{};return !newsState.filter||m.category===newsState.filter});
+  const color=s=>s.color||"var(--red)";
+  const cards=chosen.map(s=>{const m=metadata[s.id]||{category:"Motorsport",desc:"Latest stories and updates are available directly from this publisher.",monogram:s.name.slice(0,2).toUpperCase()};
+   return '<li><article class="publisher-card" style="--sc:'+esc(color(s))+'"><div class="publisher-top"><div class="publisher-monogram" aria-hidden="true">'+esc(m.monogram)+'</div><div><div class="publisher-name">'+esc(s.name)+'</div><div class="publisher-category">'+esc(m.category)+'</div></div></div><p class="publisher-desc">'+esc(m.desc)+'</p><a class="publisher-link" href="'+esc(s.homepage)+'" target="_blank" rel="noopener noreferrer"><span>Read at original source</span><span aria-hidden="true">↗</span></a></article></li>';
+  }).join("");
+  const view=newsState.view==="rows"?"rows":"cards";
+  box.setAttribute("aria-busy","false");
+  box.innerHTML='<div class="news-directory"><div class="news-directory-intro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg><p><strong>Go straight to the source.</strong> Browse trusted motorsport publishers below. Redline links to their websites rather than reproducing their headlines, article text or images.</p></div>'+(cards?'<ul class="nlist '+view+'">'+cards+'</ul>':'<div class="news-directory-empty">No publishers match this category.</div>')+'</div>';
+  stat.textContent=chosen.length+" publishers";return;
  }
  const failed=Object.entries(S.sources).filter(([,v])=>!v.ok),at=S.updatedAt?new Date(S.updatedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
  newBtn.hidden=!S.pending.length;newBtn.textContent=S.pending.length?"↑ "+S.pending.length+" new article"+(S.pending.length===1?"":"s"):"↑ New articles";
@@ -1066,10 +1112,10 @@ const applyPendingNews=()=>{
  const scrollTop=$("newsList").scrollTop;
  newsState.articles=prepare([...newsState.pending,...newsState.articles]);newsState.pending=[];newsState.shown=pgSize();saveNews();drawNews();$("newsList").scrollTop=scrollTop;
 };
-$("nrefresh").onclick=()=>{applyPendingNews();loadNews(true)};
+$("nrefresh").onclick=()=>{if(!NEWS_SOURCES.some(s=>s.enabled)){newsState.filter="";drawNews();return}applyPendingNews();loadNews(true)};
 $("nnew").onclick=applyPendingNews;
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{newsState.view=b.dataset.view;newsState.shown=pgSize();try{localStorage.setItem("redline-news-view",newsState.view)}catch(e){}drawNews()});
-$("nchips").addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-src]");if(!b)return;newsState.filter=b.dataset.src;newsState.shown=pgSize();drawNews()});
+$("nchips").addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("button");if(!b)return;if(b.hasAttribute("data-category")){newsState.filter=b.dataset.category||"";drawNews();return}if(!b.hasAttribute("data-src"))return;newsState.filter=b.dataset.src;newsState.shown=pgSize();drawNews()});
 $("newsList").addEventListener("click",e=>{
  const x=e.target.closest&&e.target.closest(".nexp");
  if(x){const p=document.getElementById(x.getAttribute("aria-controls"));if(p){const o=p.classList.toggle("open");x.textContent=o?"Show less":"Show more";x.setAttribute("aria-expanded",String(o))}return}
