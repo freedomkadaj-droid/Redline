@@ -1204,7 +1204,7 @@ async function renderRedlineCircuitMaps(root=document){
    const geometry=Array.from(original.querySelectorAll("path,polyline,polygon,line,circle,ellipse")).filter(el=>el!==bg);
    geometry.forEach(el=>{
     const clone=document.importNode(el,true);
-    clone.removeAttribute("style");clone.setAttribute("fill","none");clone.setAttribute("stroke","#f5f5f7");clone.setAttribute("stroke-width",String(Math.max(w,h)*.006));clone.setAttribute("stroke-linecap","round");clone.setAttribute("stroke-linejoin","round");clone.removeAttribute("class");
+    clone.removeAttribute("style");clone.setAttribute("fill","none");clone.setAttribute("stroke","#f5f5f7");clone.setAttribute("stroke-width",String(Math.max(w,h)*.0025));clone.setAttribute("stroke-linecap","round");clone.setAttribute("stroke-linejoin","round");clone.removeAttribute("class");
     svg.appendChild(clone);
    });
    box.replaceChildren(svg);
