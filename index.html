@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0A0A0D">
 <meta name="apple-mobile-web-app-title" content="Redline">
-<meta name="description" content="Redline is your ultimate F1 companion. Follow every race, rivalry, and moment with season coverage, driver stats, and race history.">
+<meta name="description" content="Redline is an independent motorsport data project with race schedules, results, driver statistics and historical data.">
 <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg?v=3">
 <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=3">
 <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=3">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem("redline-theme")==="light"?"light":"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
-<title>Redline · Your Ultimate F1 Companion</title>
+<title>Redline · Motorsport Data &amp; Race History</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Chakra+Petch:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
 <style>
 /* Optional wallpaper: set --bg-image: url("wallpaper.jpg"); */
@@ -151,7 +151,7 @@ select{background:var(--card2);color:var(--txt);border:1px solid var(--line);bor
 .tick{display:block;width:4px;height:34px;border-radius:3px}
 .av{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;background:var(--hover);font:600 12px 'Space Grotesk';position:relative;overflow:hidden}
 .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:6px}
-.av.logo{background:#1b1b24}.av.logo::before{content:"";width:14px;height:14px;border-radius:4px;background:var(--tc)}.av.logo img{background:#1b1b24}.av.logo.team-icon{border:1px solid color-mix(in srgb,var(--tc) 76%,white);border-radius:9px;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--tc) 22%,transparent),0 0 8px color-mix(in srgb,var(--tc) 18%,transparent)}
+.av.logo{background:#1b1b24}.av.logo::before{content:"";width:14px;height:14px;border-radius:4px;background:var(--tc)}.av.logo .team-mark{position:relative;z-index:1;font:700 11px "Space Grotesk",sans-serif;letter-spacing:-.04em;color:#fff;text-align:center}.av.logo.team-icon{border:1px solid color-mix(in srgb,var(--tc) 76%,white);border-radius:9px;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--tc) 22%,transparent),0 0 8px color-mix(in srgb,var(--tc) 18%,transparent)}
 /* Driver-number artwork, limited to the driver standings avatars */
 .av.driver-no{background:linear-gradient(135deg,var(--tc) 0 25%,#111117 25% 75%,var(--tc) 75%);border:1px solid color-mix(in srgb,var(--tc) 72%,white);color:#fff;border-radius:9px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.08)}
 .av.driver-no::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 7px,rgba(255,255,255,.12) 7px 9px);clip-path:polygon(0 0,100% 0,100% 34%,0 66%)}
@@ -282,6 +282,7 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 .links{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
 .foot{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:flex-end;padding-top:6px}.credit{margin-left:auto;text-align:right}#prog:not(:empty)::before,#net:not(:empty)::before{content:" · "}.credit a{color:var(--red);text-decoration:none}.credit a:hover{text-decoration:underline}
 .nlist{list-style:none;padding:0;margin:0}.nlist li{border-bottom:1px solid var(--line)}.nlist li:last-child{border:0}
+ .news-directory{padding:18px}.news-directory p{font-size:13px;color:var(--mute);line-height:1.6;margin-bottom:14px}.news-directory ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}.news-directory li{border:1px solid var(--line);border-radius:10px;background:var(--soft)}.news-directory a{display:block;padding:11px 13px;color:var(--txt);text-decoration:none;font-weight:600}.news-directory a:hover{color:var(--red);border-color:var(--red)}
 .nmeta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;color:var(--mute);font-size:12.5px;margin-bottom:4px}
 .nsource{font:700 11px 'Space Grotesk';letter-spacing:.08em;text-transform:uppercase;color:var(--on,#fff);background:var(--sc,var(--chip));padding:2px 9px;border-radius:99px}
 .nabs::before{content:"· "}
@@ -378,6 +379,7 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 }
 [hidden]{display:none!important}
 footer{color:var(--mute);font-size:14px}
+ .legal-disclaimer{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:11px;line-height:1.6;color:var(--mute);max-width:100%;text-align:left}
 </style>
 </head>
 <body>
@@ -387,7 +389,7 @@ footer{color:var(--mute);font-size:14px}
  <header>
   <div class="brand">
    <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="14" fill="#0B0B10"/><rect x=".75" y=".75" width="62.5" height="62.5" rx="13.3" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.5"/><g transform="translate(6.8 0) skewX(-12)"><path fill="#F4F4F6" fill-rule="evenodd" d="M16 14L38 14L48 19L50 26L50 29L47 35L41 38L24 38L24 50L16 50ZM24 21L36 21L42 24L42 28L36 31L24 31Z"/><path fill="#FF1E00" d="M30 38L40 38L51 50L40.5 50Z"/></g></svg>
-   <div class="brand-text"><h1 class="brand-name">REDLINE</h1><p class="tag">Everything F1. All in One Place.</p></div>
+   <div class="brand-text"><h1 class="brand-name">REDLINE</h1><p class="tag">Race Data. Rivalries. Every Detail.</p></div>
   </div>
   <div class="last" id="last"><small>Loading season…</small></div>
  </header>
@@ -422,7 +424,7 @@ footer{color:var(--mute);font-size:14px}
  <section class="panel pane" id="v-tele" hidden><h2>Telemetry</h2>
   <div class="tools"><select id="lsess" aria-label="Session"></select><select id="ldrv" aria-label="Driver"></select><select id="clap" aria-label="Lap" hidden></select></div>
   <div class="scroll" id="lapList"><div class="state">Loading…</div></div><div id="carView" hidden></div></section>
- <section class="panel pane" id="v-news"><h2>Latest F1 news</h2>
+ <section class="panel pane" id="v-news"><h2>Motorsport News Sources</h2>
   <div class="tools"><div class="seg" role="group" aria-label="News layout">
    <button type="button" data-view="cards" aria-pressed="true"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>Cards</button>
    <button type="button" data-view="rows" aria-pressed="false"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="2" width="14" height="3" rx="1.2"/><rect x="1" y="6.5" width="14" height="3" rx="1.2"/><rect x="1" y="11" width="14" height="3" rx="1.2"/></svg>List</button></div>
@@ -444,6 +446,7 @@ footer{color:var(--mute);font-size:14px}
   <a class="lnk" href="https://f1tv.formula1.com" target="_blank" rel="noopener">F1 TV</a>
  </div>
  <footer class="foot"><span>Data from OpenF1<span id="prog"></span><span id="net"></span></span><span class="credit">Powered by <a href="https://openf1.org" target="_blank" rel="noopener">OpenF1</a> &amp; <a href="https://jolpi.ca" target="_blank" rel="noopener">Jolpica-F1</a></span></footer>
+  <p class="legal-disclaimer">This website is unofficial and is not associated in any way with the Formula 1 companies. F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trade marks of Formula One Licensing B.V.</p>
 </div>
 
 <script>
@@ -517,14 +520,11 @@ const fail=(id,e)=>{const titles={liveList:"Live timing is temporarily unavailab
 
 // Avatars: image sits over initials, so if the image fails the initials stay visible.
 const initials=n=>(n||"?").split(/\s+/).map(w=>w[0]).join("").slice(0,3).toUpperCase();
-const av=(src,name,col,logo)=>!logo?`<span class="tick" style="background:#${esc(col||'fff')}"></span>`:`<span class="av logo" style="--tc:#${esc(col||'8B8B98')}">${src?`<img src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()">`:""}</span>`;
+const av=(src,name,col,logo)=>!logo?`<span class="tick" style="background:#${esc(col||"fff")}"></span>`:`<span class="av logo" style="--tc:#${esc(col||"8B8B98")}"><span class="team-mark">${esc(initials(name))}</span></span>`;
 function driverNoBadge(number,col){const n=String(number??"").trim();return `<span class="av driver-no" style="--tc:#${esc(col||"8B8B98")}" aria-label="Driver number ${esc(n)}"><span class="driver-no-text" style="font-size:${n.length>2?14:20}px">${esc(n||"—")}</span></span>`}
 function teamIconColor(team,col){if(col)return col;const n=(team||"").toLowerCase();const m=[["ferrari","E8002D"],["mclaren","FF8000"],["red bull","3671C6"],["mercedes","00D2BE"],["aston","229971"],["williams","00A3E0"],["alpine","0093CC"],["haas","B6BABD"],["racing bulls","6692FF"],["rb","6692FF"],["sauber","52E252"],["audi","F50537"],["cadillac","FFFFFF"]].find(x=>n.includes(x[0]));return m?m[1]:"8B8B98"}
-function logoUrl(team,year){const n=(team||"").toLowerCase();
- const m=[["red bull","redbullracing"],["racing bulls","racingbulls"],["rb","racingbulls"],["alphatauri","racingbulls"],["aston","astonmartin"],["haas","haasf1team"],["sauber","kicksauber"],["audi","audi"],["williams","williams"],["mclaren","mclaren"],["ferrari","ferrari"],["mercedes","mercedes"],["alpine","alpine"],["cadillac","cadillac"]].find(x=>n.includes(x[0]));
- return m?`https://media.formula1.com/image/upload/c_lfill,w_96/q_auto/v1740000001/common/f1/${year}/${m[1]}/${year}${m[1]}logowhite.webp`:""}
-
-function row(pos,pic,name,sub,val,hot,unit="pts"){return `<div class="row${hot?" hot":""}"><div class="pos">${pos}</div>${pic}
+function logoUrl(){return ""} // Do not embed official team logos; use text initials instead.
+ function row(pos,pic,name,sub,val,hot,unit="pts"){return `<div class="row${hot?" hot":""}"><div class="pos">${pos}</div>${pic}
  <div class="who"><b>${esc(name)}</b><small>${esc(sub)}</small></div><div class="pts">${esc(val)}<small>${unit}</small></div></div>`}
 const fmtTime=t=>{if(typeof t!=="number")return"";const m=Math.floor(t/60);return m+":"+(t-m*60).toFixed(3).padStart(6,"0")};
 
@@ -852,20 +852,20 @@ $("wsess").onchange=loadWeather;
 const NEWS_CONFIG={
  proxyUrl:"",          // e.g. "https://your-worker.workers.dev/?url="  (the feed URL is appended, encoded)
  publicRelays:true,    // set to false to use only direct requests and your own proxy
- timeoutMs:10000,maxArticles:150,pageSize:12,concurrency:3,freshMs:5*60*1000,cacheKey:"redline-news-v3"};
-const NEWS_SOURCES=[   // `color` = the tag/accent colour readers learn to associate with that publisher
- {id:"f1",name:"Formula 1",label:"Formula 1 Official",color:"#E10600",type:"rss",url:"https://www.formula1.com/en/latest/all.xml",homepage:"https://www.formula1.com/en/latest",enabled:true},
- {id:"sky",name:"Sky Sports",label:"Sky Sports F1",color:"#17C3D6",type:"rss",url:"https://www.skysports.com/rss/12433",homepage:"https://www.skysports.com/f1",enabled:true},
- {id:"bbc",name:"BBC Sport",label:"BBC Sport",color:"#E0359A",type:"rss",url:"https://feeds.bbci.co.uk/sport/formula1/rss.xml",homepage:"https://www.bbc.com/sport/formula1",enabled:true},
- {id:"autosport",name:"Autosport",label:"Autosport",color:"#F58220",type:"rss",url:"https://www.autosport.com/rss/f1/news/",homepage:"https://www.autosport.com/f1/news/",enabled:true},
- {id:"motorsport",name:"Motorsport.com",label:"Motorsport.com",color:"#3B6CFF",type:"rss",url:"https://www.motorsport.com/rss/f1/news/",homepage:"https://www.motorsport.com/f1/news/",enabled:true},
- {id:"racefans",name:"RaceFans",label:"RaceFans",color:"#19B37A",type:"rss",url:"https://www.racefans.net/feed/",homepage:"https://www.racefans.net/",enabled:true},
- {id:"planetf1",name:"PlanetF1",label:"PlanetF1",color:"#9B5CFF",type:"rss",url:"https://www.planetf1.com/rss",homepage:"https://www.planetf1.com/",enabled:true},
- {id:"racingnews365",name:"RacingNews365",label:"RacingNews365",color:"#F2C230",type:"rss",url:"https://racingnews365.com/feed/news.xml",homepage:"https://racingnews365.com/",enabled:true},
- {id:"guardian",name:"The Guardian",label:"The Guardian",color:"#7C8CA3",type:"rss",url:"https://www.theguardian.com/sport/formulaone/rss",homepage:"https://www.theguardian.com/sport/formulaone",enabled:true},
- {id:"racer",name:"RACER",label:"RACER",color:"#E3B341",type:"rss",url:"https://racer.com/feed/",homepage:"https://racer.com/category/formula-1/",enabled:true},
- {id:"therace",name:"The Race",label:"The Race",color:"#C5A3FF",type:"rss",url:"https://www.the-race.com/category/formula-1/feed/",homepage:"https://www.the-race.com/category/formula-1/",enabled:true},
- {id:"motorsportweek",name:"Motorsport Week",label:"Motorsport Week",color:"#D71920",type:"rss",url:"https://www.motorsportweek.com/feed/",homepage:"https://www.motorsportweek.com/series/single-seater/formula-1/",enabled:true}
+ timeoutMs:10000,maxArticles:150,pageSize:12,concurrency:3,freshMs:5*60*1000,cacheKey:"redline-news-v4"};
+const NEWS_SOURCES=[
+ {id:"f1",name:"Formula 1",label:"Formula 1",color:"#E10600",type:"link",homepage:"https://www.formula1.com/en/latest",enabled:false},
+ {id:"sky",name:"Sky Sports",label:"Sky Sports",color:"#17C3D6",type:"link",homepage:"https://www.skysports.com/f1",enabled:false},
+ {id:"bbc",name:"BBC Sport",label:"BBC Sport",color:"#E0359A",type:"link",homepage:"https://www.bbc.com/sport/formula1",enabled:false},
+ {id:"autosport",name:"Autosport",label:"Autosport",color:"#F58220",type:"link",homepage:"https://www.autosport.com/f1/news/",enabled:false},
+ {id:"motorsport",name:"Motorsport.com",label:"Motorsport.com",color:"#3B6CFF",type:"link",homepage:"https://www.motorsport.com/f1/news/",enabled:false},
+ {id:"racefans",name:"RaceFans",label:"RaceFans",color:"#19B37A",type:"link",homepage:"https://www.racefans.net/",enabled:false},
+ {id:"planetf1",name:"PlanetF1",label:"PlanetF1",color:"#9B5CFF",type:"link",homepage:"https://www.planetf1.com/",enabled:false},
+ {id:"racingnews365",name:"RacingNews365",label:"RacingNews365",color:"#F2C230",type:"link",homepage:"https://racingnews365.com/",enabled:false},
+ {id:"guardian",name:"The Guardian",label:"The Guardian",color:"#7C8CA3",type:"link",homepage:"https://www.theguardian.com/sport/formulaone",enabled:false},
+ {id:"racer",name:"RACER",label:"RACER",color:"#E3B341",type:"link",homepage:"https://racer.com/category/formula-1/",enabled:false},
+ {id:"therace",name:"The Race",label:"The Race",color:"#C5A3FF",type:"link",homepage:"https://www.the-race.com/category/formula-1/",enabled:false},
+ {id:"motorsportweek",name:"Motorsport Week",label:"Motorsport Week",color:"#D71920",type:"link",homepage:"https://www.motorsportweek.com/series/single-seater/formula-1/",enabled:false}
 ];
 // readable text colour for a coloured tag
 function onColor(h){const n=parseInt(String(h).slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return(0.2126*r+0.7152*g+0.0722*b)/255>.5?"#15151E":"#fff"}
@@ -1035,6 +1035,10 @@ function drawChips(){
  const chip=(id,label,n,bad)=>`<button class="chip" data-src="${esc(id)}" style="${id?srcStyle(id):"--sc:var(--red)"}" aria-pressed="${S.filter===id}"${bad?' title="Couldn\'t load this source"':""}>${id?"<i></i>":""}${esc(label)}${bad?" ⚠":` <span class="cnt">${n}</span>`}</button>`;
  $("nchips").innerHTML=chip("","All sources",S.articles.length,false)+NEWS_SOURCES.filter(s=>s.enabled).map(s=>chip(s.id,s.label||s.name,counts[s.id]||0,S.sources[s.id]&&S.sources[s.id].ok===false&&!counts[s.id])).join("")}
 function drawNews(){
+  if(!NEWS_SOURCES.some(s=>s.enabled)){
+   const tools=document.querySelector("#v-news .tools"),chips=$("nchips");if(tools)tools.hidden=true;if(chips)chips.hidden=true;note.hidden=true;stat.textContent="Publisher links";newBtn.hidden=true;
+   box.innerHTML='<div class="news-directory"><p>To respect publishers’ content and feed terms, Redline links directly to their websites instead of copying or republishing headlines, article text, or images. Select a publisher to read the latest stories on its own site.</p><ul>'+NEWS_SOURCES.map(s=>'<li><a href="'+esc(s.homepage)+'" target="_blank" rel="noopener noreferrer">'+esc(s.name)+' ↗</a></li>').join("")+'</ul></div>';return;
+  }
  const S=newsState,box=$("newsList"),note=$("nnote"),stat=$("nsrc"),newBtn=$("nnew");
  const failed=Object.entries(S.sources).filter(([,v])=>!v.ok),at=S.updatedAt?new Date(S.updatedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
  newBtn.hidden=!S.pending.length;newBtn.textContent=S.pending.length?"↑ "+S.pending.length+" new article"+(S.pending.length===1?"":"s"):"↑ New articles";
