@@ -375,7 +375,7 @@ async function fetchRetry(p){for(let i=0;i<4;i++){await throttle();let r;try{r=a
   if(p.startsWith("/drivers"))j.forEach(d=>{if(d.full_name)nameBook[d.driver_number]=d});return j}
  throw new Error("OpenF1 is busy, try again soon")}
 function get(p){if(cache.has(p))return cache.get(p);const q=chain.then(()=>fetchRetry(p));
-  chain=q.catch(()=>{}).then(()=>sleep(450));cache.set(p,q);q.catch(()=>cache.delete(p));return q}
+  chain=q.catch(()=>{}).then(()=>sleep(450));cache.set(p,q);q.then(v=>{if(Array.isArray(v)&&v.length===0&&cache.get(p)===q)cache.delete(p)}).catch(()=>{if(cache.get(p)===q)cache.delete(p)});return q}
 const jolpicaCache=new Map();
 async function jget(path){if(jolpicaCache.has(path))return jolpicaCache.get(path);const task=(async()=>{let last;for(let i=0;i<2;i++){try{const url=JOLPICA+path+(path.includes("?")?"&":"?")+"limit=100";const res=await fetch(url,{headers:{Accept:"application/json"}});if(!res.ok)throw new Error("Jolpica-F1 returned "+res.status);const data=await res.json();if(!data?.MRData)throw new Error("Unexpected Jolpica-F1 response");return data.MRData}catch(e){last=e;if(i===0)await sleep(500)}}throw last||new Error("Jolpica-F1 is unavailable")})();jolpicaCache.set(path,task);task.catch(()=>jolpicaCache.delete(path));return task}
 const jdate=session=>session?.date?new Date(session.date+"T"+(session.time||"12:00:00Z")):null;
