@@ -442,7 +442,7 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 }
 
 
-/* F1 Briefing: original, schedule-led race-weekend guide */
+/* Race Centre: original, schedule-led race-weekend guide */
 .briefing-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;padding:22px 20px 18px;border-bottom:1px solid var(--line);background:linear-gradient(120deg,rgba(255,30,0,.10),transparent 62%)}
 .briefing-head>div{min-width:0}.briefing-kicker{font:600 10px 'Space Grotesk';letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:7px}
 .briefing-head h2{font:700 clamp(26px,4vw,34px)/1.1 'Space Grotesk';letter-spacing:-.035em;color:var(--txt);text-transform:none;border:0;padding:0;margin:0}
@@ -479,7 +479,7 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
  </header>
  <button class="pickbtn" id="pick" aria-haspopup="dialog">Choose Grand Prix</button>
   <nav id="tabs" role="tablist">
-  <button role="tab" aria-selected="true" data-v="news">F1 Briefing</button>
+  <button role="tab" aria-selected="true" data-v="news">Race Centre</button>
   <button role="tab" aria-selected="false" data-v="stats">Driver Stats</button>
   <button role="tab" aria-selected="false" data-v="cal">Calendar</button>
   <button role="tab" aria-selected="false" data-v="standings">Standings</button>
@@ -510,7 +510,7 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
   <div class="scroll" id="lapList"><div class="state">Loading…</div></div><div id="carView" hidden></div></section>
  <section class="panel pane" id="v-news">
   <div class="briefing-head">
-   <div><p class="briefing-kicker">REDLINE / WEEKEND INTELLIGENCE</p><h2>F1 Briefing</h2><p class="briefing-intro">A quick guide to what's coming up and what has already happened this race weekend.</p></div>
+   <div><p class="briefing-kicker">REDLINE / WEEKEND INTELLIGENCE</p><h2>Race Centre</h2><p class="briefing-intro">A quick guide to what's coming up and what has already happened this race weekend.</p></div>
    <button type="button" class="briefing-refresh" id="briefingRefresh">Refresh schedule ↻</button>
   </div>
   <p class="briefing-note" id="briefingNote" role="status" aria-live="polite">Loading the latest available session schedule…</p>
@@ -926,7 +926,7 @@ async function loadWeather(){
 }
 $("wsess").onchange=loadWeather;
 
-// ---------- F1 Briefing: schedule-led, original Redline information ----------
+// ---------- Race Centre: schedule-led, original Redline information ----------
 function briefingDate(ms){
  if(!Number.isFinite(ms))return "Time unavailable";
  return new Date(ms).toLocaleString(undefined,{weekday:"short",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});
