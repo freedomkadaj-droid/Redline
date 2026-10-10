@@ -1291,18 +1291,16 @@ function circuitGuideHTML(x){
  const assetBase=`https://raw.githubusercontent.com/f1db/f1-circuits-svg/main/circuits`;
  const mapUrl=`${assetBase}/detailed/white-outline/${slug}-${layout}.svg`;
  const fallbackUrl=`${assetBase}/minimal/white-outline/${slug}-${layout}.svg`;
- // Track Atlas renders numbered corner markers directly on the track map.
- // Keep the existing F1DB outline as a fallback for circuits/layouts not covered there.
- const atlasAliases={spielberg:"red-bull-ring","austin":"circuit-of-the-americas","marina-bay":"singapore",lusail:"losail","mexico-city":"mexico-city","yas-marina":"yas-marina",catalunya:"barcelona",madring:"madring"};
- const atlasSlug=atlasAliases[slug]||slug;
- // Track Atlas does not yet publish Madring or Sepang. Use their distinct numbered SVG maps directly instead of letting both fall through to a missing Atlas asset.
- const specialMaps={madring:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Madring%20Formula%201%20Circuit.svg",sepang:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sepang.svg"};
- const atlasUrl=specialMaps[slug]||`https://raw.githubusercontent.com/tobi/track-atlas/main/tracks/${atlasSlug}/raw/render/${atlasSlug}.svg`;
- const mapLink=`https://github.com/tobi/track-atlas/tree/main/tracks`;
+  // Use the F1 Circuits SVG catalogue for standard layouts, with dedicated numbered maps for Madrid and Sepang.
+  // Track Atlas is intentionally not used as a circuit-map source.
+  const specialMaps={madring:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Madring%20Formula%201%20Circuit.svg",sepang:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sepang.svg"};
+  const primaryMapUrl=specialMaps[slug]||mapUrl;
+  const firstFallbackUrl=specialMaps[slug]?mapUrl:fallbackUrl;
+  const mapLink="https://github.com/julesr0y/f1-circuits-svg";
  return `<section class="circuit-guide" aria-label="${esc(title)} circuit guide">
   <div class="circuit-guide-head"><div><div class="circuit-guide-title">${esc(title)}</div><div class="circuit-guide-sub">${esc([locality,country].filter(Boolean).join(" · ")||"Formula 1 circuit")} · Track layout</div></div><span class="badge">Circuit guide</span></div>
-  <div class="circuit-guide-map"><img src="${atlasUrl}" alt="${esc(title)} circuit map with numbered corners" loading="lazy" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${mapUrl}'}else if(this.dataset.fallback==='1'){this.dataset.fallback='2';this.src='${fallbackUrl}'}else{this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span class=&quot;circuit-guide-sub&quot;>Circuit outline unavailable for this layout</span>')}"></div>
-  <div class="circuit-guide-sub">🏁 Map includes numbered corners where available · Track Atlas / OpenStreetMap contributors</div>
+  <div class="circuit-guide-map"><img src="${primaryMapUrl}" alt="${esc(title)} circuit map" loading="lazy" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${firstFallbackUrl}'}else if(this.dataset.fallback==='1'){this.dataset.fallback='2';this.src='${fallbackUrl}'}else{this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span class=&quot;circuit-guide-sub&quot;>Circuit outline unavailable for this layout</span>')}"></div>
+  <div class="circuit-guide-sub">🏁 Circuit layout · F1 Circuits SVG catalogue; dedicated numbered map for Madrid and Sepang</div>
   <div class="circuit-guide-stats">${stats.map(q=>`<div class="circuit-stat"><b>${q[0]}</b><span>${q[1]}</span></div>`).join("")}</div>
   <div class="circuit-guide-title" style="font-size:13px">Sector breakdown</div>
   <div class="circuit-sectorbar" role="img" aria-label="Sector 1 red, Sector 2 blue, Sector 3 yellow"><span></span><span></span><span></span></div>
