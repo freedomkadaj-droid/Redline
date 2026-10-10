@@ -677,10 +677,15 @@ async function loadStandings(){
   if(!teamsLoaded)$("teams").innerHTML='<div class="state">Constructor standings are unavailable from both data providers.</div>';
  }
 }
+async function jolpicaSeasonNumbers(y){
+ const counts={};
+ try{const data=await jget(`/${y}/results/`);(data.RaceTable?.Races||[]).forEach(r=>(r.Results||[]).forEach(v=>{const id=v.Driver?.driverId,n=String(v.number??"").trim();if(!id||!n||!/^\d+$/.test(n))return;counts[id]??={};counts[id][n]=(counts[id][n]||0)+1}))}catch(e){}
+ return Object.fromEntries(Object.entries(counts).map(([id,nums])=>[id,Object.entries(nums).sort((a,b)=>b[1]-a[1]||Number(a[0])-Number(b[0]))[0]?.[0]||"—"]));
+}
 async function loadJolpicaStandings(){
  const t=tok,y=year,r=cur.jolpicaRound;
- try{const [a,b]=await Promise.all([jget(`/${y}/${r}/driverstandings/`),jget(`/${y}/${r}/constructorstandings/`)]);if(!ok(t))return;const ds=a.StandingsTable?.StandingsLists?.[0]?.DriverStandings||[],ts=b.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings||[];
- $("drivers").innerHTML=ds.map(v=>{const d=v.Driver||{},team=v.Constructors?.[0]?.name||"";return row(v.position,driverNoBadge(d.permanentNumber||d.code,teamIconColor(team)),[d.givenName,d.familyName].filter(Boolean).join(" ")||d.driverId||"Driver",team,v.points,isFavD(d))}).join("")||'<div class="state">No historical driver standings for this round.</div>';
+ try{const [a,b,numbers]=await Promise.all([jget(`/${y}/${r}/driverstandings/`),jget(`/${y}/${r}/constructorstandings/`),jolpicaSeasonNumbers(y)]);if(!ok(t))return;const ds=a.StandingsTable?.StandingsLists?.[0]?.DriverStandings||[],ts=b.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings||[];
+ $("drivers").innerHTML=ds.map(v=>{const d=v.Driver||{},team=v.Constructors?.[0]?.name||"",number=d.permanentNumber||numbers[d.driverId]||"—";return row(v.position,driverNoBadge(number,teamIconColor(team)),[d.givenName,d.familyName].filter(Boolean).join(" ")||d.driverId||"Driver",team,v.points,isFavD(d))}).join("")||'<div class="state">No historical driver standings for this round.</div>';
  $("teams").innerHTML=ts.map(v=>{const c=v.Constructor||{},col=teamIconColor(c.name);return row(v.position,av(logoUrl(c.name,y),c.name,col,true).replace('class="av logo"','class="av logo team-icon"'),c.name||"Team","",v.points,isFavT(c.name))}).join("")||'<div class="state">No historical constructor standings for this round.</div>';
  }catch(e){if(ok(t)){fail("drivers",e);fail("teams",e)}}
 }
@@ -688,7 +693,7 @@ async function loadJolpicaResult(){
  const t=tok,y=year,r=cur.jolpicaRound;
  try{
   const data=await jget(`/${y}/${r}/results/`);if(!ok(t))return;const res=data.RaceTable?.Races?.[0]?.Results||[];
-  $("result").innerHTML=res.map(v=>{const d=v.Driver||{},c=v.Constructor||{},name=[d.givenName,d.familyName].filter(Boolean).join(" ")||d.driverId||"Driver",gap=v.Time?.time||v.status||"";return row(v.position||"-",driverNoBadge(d.permanentNumber||v.number,teamIconColor(c.name)),name,(c.name||"")+(v.points?` · +${v.points} pts`:""),gap,false,"")}).join("")||'<div class="state">No completed race result is available from Jolpica-F1 yet.</div>';
+  $("result").innerHTML=res.map(v=>{const d=v.Driver||{},c=v.Constructor||{},name=[d.givenName,d.familyName].filter(Boolean).join(" ")||d.driverId||"Driver",gap=v.Time?.time||v.status||"";return row(v.position||"-",driverNoBadge(d.permanentNumber||v.number||"—",teamIconColor(c.name)),name,(c.name||"")+(v.points?` · +${v.points} pts`:""),gap,false,"")}).join("")||'<div class="state">No completed race result is available from Jolpica-F1 yet.</div>';
  }catch(e){if(ok(t))fail("result",e)}
 }
 async function loadResult(){
