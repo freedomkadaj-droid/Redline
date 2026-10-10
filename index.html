@@ -575,11 +575,30 @@ const ok=t=>t===tok,drvOf=async key=>{try{return await get(`/drivers?session_key
 async function loadStandings(){
  if(cur?._source==="jolpica")return loadJolpicaStandings();
  const t=tok,key=cur.session_key,drv=await drvOf(key),by=Object.fromEntries(drv.map(d=>[d.driver_number,d]));
- try{const st=(await get(`/championship_drivers?session_key=${key}`)).sort((a,b)=>a.position_current-b.position_current);if(!ok(t))return;
-  $("drivers").innerHTML=st.map(s=>{const d=who(by,s.driver_number);return row(s.position_current,driverNoBadge(s.driver_number,d.team_colour),d.full_name||"Driver #"+s.driver_number,d.team_name||(Number(s.driver_number)===22?"Racing Bulls":""),s.points_current,isFavD(d))}).join("")||'<div class="state">No standings yet.</div>'}catch(e){if(ok(t)){try{await useJolpicaForCurrentRace();return loadJolpicaStandings()}catch(j){fail("drivers",j)}}}
- try{const st=(await get(`/championship_teams?session_key=${key}`)).sort((a,b)=>a.position_current-b.position_current);if(!ok(t))return;
+ let driversLoaded=false,teamsLoaded=false;
+ try{
+  const st=(await get(`/championship_drivers?session_key=${key}`)).sort((a,b)=>a.position_current-b.position_current);if(!ok(t))return;
+  if(st.length){
+   $("drivers").innerHTML=st.map(s=>{const d=who(by,s.driver_number);return row(s.position_current,driverNoBadge(s.driver_number,d.team_colour),d.full_name||"Driver #"+s.driver_number,d.team_name||(Number(s.driver_number)===22?"Racing Bulls":""),s.points_current,isFavD(d))}).join("");
+   driversLoaded=true;
+  }
+ }catch(e){}
+ try{
+  const st=(await get(`/championship_teams?session_key=${key}`)).sort((a,b)=>a.position_current-b.position_current);if(!ok(t))return;
   const col=Object.fromEntries(drv.map(d=>[d.team_name,d.team_colour]));
-  $("teams").innerHTML=st.map(s=>{const tc=teamIconColor(s.team_name,col[s.team_name]);return row(s.position_current,av(logoUrl(s.team_name,year),s.team_name,tc,true).replace('class="av logo"','class="av logo team-icon"'),s.team_name,"",s.points_current,isFavT(s.team_name))}).join("")||'<div class="state">No standings yet.</div>'}catch(e){if(ok(t)){try{await useJolpicaForCurrentRace();return loadJolpicaStandings()}catch(j){fail("teams",j)}}}
+  if(st.length){
+   $("teams").innerHTML=st.map(s=>{const tc=teamIconColor(s.team_name,col[s.team_name]);return row(s.position_current,av(logoUrl(s.team_name,year),s.team_name,tc,true).replace('class="av logo"','class="av logo team-icon"'),s.team_name,"",s.points_current,isFavT(s.team_name))}).join("");
+   teamsLoaded=true;
+  }
+ }catch(e){}
+ if(driversLoaded&&teamsLoaded)return;
+ try{
+  await useJolpicaForCurrentRace();if(!ok(t))return;await loadJolpicaStandings();
+ }catch(e){
+  if(!ok(t))return;
+  if(!driversLoaded)fail("drivers",e);
+  if(!teamsLoaded)$("teams").innerHTML='<div class="state">Constructor standings are unavailable from both data providers.</div>';
+ }
 }
 async function loadJolpicaStandings(){
  const t=tok,y=year,r=cur.jolpicaRound;
@@ -590,17 +609,27 @@ async function loadJolpicaStandings(){
 }
 async function loadJolpicaResult(){
  const t=tok,y=year,r=cur.jolpicaRound;
- try{const data=await jget(`/${y}/${r}/results/`);if(!ok(t))return;const res=data.RaceTable?.Races?.[0]?.Results||[];
- $("result").innerHTML=res.map(v=>{const d=v.Driver||{},c=v.Constructor||{},name=[d.givenName,d.familyName].filter(Boolean).join(" ")||d.driverId||"Driver",gap=v.Time?.time||v.status||"";return row(v.position||"-",driverNoBadge(d.permanentNumber||v.number,teamIconColor(c.name)),name,(c.name||"")+(v.points?` · +${v.points} pts`:""),gap,false,"")}).join("")||'<div class="state">No completed race result is available from Jolpica-F1 yet.</div>';
- }catch(e){if(ok(t)){try{await useJolpicaForCurrentRace();return loadJolpicaResult()}catch(j){fail("result",j)}}}
+ try{
+  const data=await jget(`/${y}/${r}/results/`);if(!ok(t))return;const res=data.RaceTable?.Races?.[0]?.Results||[];
+  $("result").innerHTML=res.map(v=>{const d=v.Driver||{},c=v.Constructor||{},name=[d.givenName,d.familyName].filter(Boolean).join(" ")||d.driverId||"Driver",gap=v.Time?.time||v.status||"";return row(v.position||"-",driverNoBadge(d.permanentNumber||v.number,teamIconColor(c.name)),name,(c.name||"")+(v.points?` · +${v.points} pts`:""),gap,false,"")}).join("")||'<div class="state">No completed race result is available from Jolpica-F1 yet.</div>';
+ }catch(e){if(ok(t))fail("result",e)}
 }
 async function loadResult(){
  if(cur?._source==="jolpica")return loadJolpicaResult();
  const t=tok,key=cur.session_key,drv=await drvOf(key),by=Object.fromEntries(drv.map(d=>[d.driver_number,d]));
- try{const res=(await get(`/session_result?session_key=${key}`)).sort((a,b)=>(a.position??99)-(b.position??99));if(!ok(t))return;
-  $("result").innerHTML=res.map(r=>{const d=who(by,r.driver_number);const out=r.dsq?"DSQ":r.dns?"DNS":r.dnf?"DNF":null;
-   const gap=out||(r.position===1?fmtTime(r.duration):typeof r.gap_to_leader==="number"?"+"+r.gap_to_leader.toFixed(3):String(r.gap_to_leader??""));
-   return row(r.position??"-",av(0,d.full_name,d.team_colour),d.full_name||"Driver #"+r.driver_number,(d.team_name||"")+(r.points?` · +${r.points} pts`:""),gap,isFavD(d),"")}).join("")||'<div class="state">No result data.</div>'}catch(e){ok(t)&&fail("result",e)}
+ try{
+  const res=(await get(`/session_result?session_key=${key}`)).sort((a,b)=>(a.position??99)-(b.position??99));if(!ok(t))return;
+  if(res.length){
+   $("result").innerHTML=res.map(r=>{const d=who(by,r.driver_number);const out=r.dsq?"DSQ":r.dns?"DNS":r.dnf?"DNF":null;
+    const gap=out||(r.position===1?fmtTime(r.duration):typeof r.gap_to_leader==="number"?"+"+r.gap_to_leader.toFixed(3):String(r.gap_to_leader??""));
+    return row(r.position??"-",av(0,d.full_name,d.team_colour),d.full_name||"Driver #"+r.driver_number,(d.team_name||"")+(r.points?` · +${r.points} pts`:""),gap,isFavD(d),"")}).join("");
+   return;
+  }
+  throw new Error("OpenF1 returned no race result");
+ }catch(e){
+  if(!ok(t))return;
+  try{await useJolpicaForCurrentRace();if(!ok(t))return;await loadJolpicaResult()}catch(j){if(ok(t))fail("result",j)}
+ }
 }
 async function loadControl(){
  if(cur?._source==="jolpica"){$("control").innerHTML=noJolpicaLive;return}
@@ -614,7 +643,7 @@ let rclips=[],rby={};
 async function loadSessions(race){const t0=tok;
  if(race?._source==="jolpica"){$("rsess").innerHTML='<option value="">Live session data unavailable</option>';$("lsess").innerHTML=$("rsess").innerHTML;$("wsess").innerHTML=$("rsess").innerHTML;$("radioList").innerHTML=noJolpicaLive;$("lapList").innerHTML=noJolpicaLive;$("weatherView").innerHTML=noJolpicaLive;$("ldrv").innerHTML='<option value="">Unavailable</option>';return}
  try{const ss=(await get(`/sessions?meeting_key=${race.meeting_key}`)).filter(s=>new Date(s.date_start)<Date.now()).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
-  if(!ok(t0))return;$("rsess").innerHTML=ss.map(s=>`<option value="${s.session_key}">${esc(race.country_name)} · ${esc(s.session_name)}</option>`).join("");
+  if(!ok(t0))return;if(!ss.length)throw new Error("OpenF1 returned no completed sessions for this race");$("rsess").innerHTML=ss.map(s=>`<option value="${s.session_key}">${esc(race.country_name)} · ${esc(s.session_name)}</option>`).join("");
   $("rsess").value=race.session_key;$("lsess").innerHTML=$("rsess").innerHTML;$("lsess").value=race.session_key;$("wsess").innerHTML=$("rsess").innerHTML;$("wsess").value=race.session_key;lapsFor=null;await loadRadio();await loadLaps();await loadWeather()}catch(e){try{await useJolpicaForCurrentRace();$("radioList").innerHTML=noJolpicaLive;$("lapList").innerHTML=noJolpicaLive;$("weatherView").innerHTML=noJolpicaLive;$("control").innerHTML=noJolpicaLive;await loadStandings();await loadResult()}catch(j){fail("radioList",j)}}
 }
 let radioFor=null,radioContext={key:null,control:[],positions:[],intervals:[],stints:[]};
