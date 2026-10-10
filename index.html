@@ -441,6 +441,26 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
  .sc-unit small{font-size:8px;margin-top:2px}
 }
 
+
+/* F1 Briefing: original, schedule-led race-weekend guide */
+.briefing-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;padding:22px 20px 18px;border-bottom:1px solid var(--line);background:linear-gradient(120deg,rgba(255,30,0,.10),transparent 62%)}
+.briefing-head>div{min-width:0}.briefing-kicker{font:600 10px 'Space Grotesk';letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:7px}
+.briefing-head h2{font:700 clamp(26px,4vw,34px)/1.1 'Space Grotesk';letter-spacing:-.035em;color:var(--txt);text-transform:none;border:0;padding:0;margin:0}
+.briefing-intro{color:var(--mute);font-size:13px;margin-top:8px;max-width:590px}
+.briefing-refresh{flex:none;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);padding:10px 13px;font:600 12px 'Space Grotesk';cursor:pointer}
+.briefing-refresh:hover{border-color:var(--red)}.briefing-refresh:disabled{opacity:.6;cursor:wait}
+.briefing-note{padding:10px 20px;border-bottom:1px solid var(--line);color:var(--mute);font-size:11px}
+.briefing-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;padding:14px}
+.briefing-card{min-width:0;padding:16px;border:1px solid var(--line);border-radius:13px;background:var(--soft)}
+.briefing-card h3{font:600 18px/1.2 'Space Grotesk';margin-bottom:12px;color:var(--txt)}.briefing-wide{grid-column:1/-1}
+.briefing-content{font-size:13px;color:var(--mute);line-height:1.6}.briefing-lead{font:600 20px/1.3 'Space Grotesk';color:var(--txt);margin:8px 0}.briefing-statusline{display:flex;align-items:center;gap:7px;font:600 9px 'Space Grotesk';letter-spacing:.12em;color:var(--mute)}
+.briefing-live-dot{width:8px;height:8px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.12)}.briefing-live-dot.upcoming{background:var(--red);box-shadow:0 0 0 4px rgba(255,30,0,.10)}
+.briefing-session{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.briefing-session:last-child{border-bottom:0}.briefing-session-main{min-width:0}.briefing-session b{display:block;color:var(--txt);font:600 13px 'Space Grotesk'}.briefing-session small{display:block;color:var(--mute);font-size:11px;margin-top:3px;overflow-wrap:anywhere}
+.briefing-tag{flex:none;font:600 9px 'Space Grotesk';letter-spacing:.06em;text-transform:uppercase;color:var(--mute);border:1px solid var(--line);border-radius:99px;padding:4px 7px}.briefing-tag.done{color:var(--mute)}.briefing-tag.live{color:#16a34a;border-color:rgba(22,163,74,.4)}
+.briefing-footer{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:17px 20px;border-top:1px solid var(--line)}.briefing-footer b{font:600 13px 'Space Grotesk';color:var(--txt)}.briefing-footer p{font-size:11px;color:var(--mute);margin-top:4px;max-width:350px}.briefing-links{display:flex;flex-wrap:wrap;gap:7px}.briefing-links a{display:inline-flex;padding:8px 10px;border:1px solid var(--line);border-radius:8px;color:var(--txt);text-decoration:none;font-size:11px;font-weight:600}.briefing-links a:hover{border-color:var(--red);color:var(--red)}
+.briefing-disclaimer{padding:0 20px 16px;color:var(--mute);font-size:10px;line-height:1.5}
+@media(max-width:650px){.briefing-head{align-items:stretch;flex-direction:column;padding:18px 14px 14px;gap:13px}.briefing-refresh{align-self:flex-start}.briefing-note{padding:10px 14px}.briefing-grid{grid-template-columns:1fr;padding:10px}.briefing-wide{grid-column:auto}.briefing-card{padding:13px}.briefing-footer{flex-direction:column;padding:15px 14px;gap:12px}.briefing-disclaimer{padding:0 14px 14px}.briefing-session{align-items:flex-start}.briefing-tag{margin-top:2px}}
+
 </style>
 </head>
 <body>
@@ -457,7 +477,7 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
  </header>
  <button class="pickbtn" id="pick" aria-haspopup="dialog">Choose Grand Prix</button>
   <nav id="tabs" role="tablist">
-  <button role="tab" aria-selected="true" data-v="news">News</button>
+  <button role="tab" aria-selected="true" data-v="news">F1 Briefing</button>
   <button role="tab" aria-selected="false" data-v="stats">Driver Stats</button>
   <button role="tab" aria-selected="false" data-v="cal">Calendar</button>
   <button role="tab" aria-selected="false" data-v="standings">Standings</button>
@@ -486,14 +506,23 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
  <section class="panel pane" id="v-tele" hidden><h2>Telemetry</h2>
   <div class="tools"><select id="lsess" aria-label="Session"></select><select id="ldrv" aria-label="Driver"></select><select id="clap" aria-label="Lap" hidden></select></div>
   <div class="scroll" id="lapList"><div class="state">Loading…</div></div><div id="carView" hidden></div></section>
- <section class="panel pane" id="v-news"><h2>Latest F1 News</h2><p class="news-policy-note">Headlines and publication times only. Each story links to its publisher; Redline uses its own logo artwork instead of republishing article images or summaries. Publisher terms still apply.</p>
-  <div class="tools"><div class="seg" role="group" aria-label="News layout">
-   <button type="button" data-view="cards" aria-pressed="true"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>Cards</button>
-   <button type="button" data-view="rows" aria-pressed="false"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="2" width="14" height="3" rx="1.2"/><rect x="1" y="6.5" width="14" height="3" rx="1.2"/><rect x="1" y="11" width="14" height="3" rx="1.2"/></svg>List</button></div>
-  <button id="nnew" hidden>↑ New articles</button><button id="nrefresh">Refresh sources</button><small id="nsrc" role="status" aria-live="polite"></small></div>
-  <div class="nchips" id="nchips" role="group" aria-label="Filter by source"></div>
-  <div class="nnote" id="nnote" role="status" hidden></div>
-  <div id="newsList" class="scroll" aria-live="off" aria-busy="false"><div class="state">Loading news…</div></div></section>
+ <section class="panel pane" id="v-news">
+  <div class="briefing-head">
+   <div><p class="briefing-kicker">REDLINE / WEEKEND INTELLIGENCE</p><h2>F1 Briefing</h2><p class="briefing-intro">A quick guide to what's coming up and what has already happened this race weekend.</p></div>
+   <button type="button" class="briefing-refresh" id="briefingRefresh">Refresh schedule ↻</button>
+  </div>
+  <p class="briefing-note" id="briefingNote" role="status" aria-live="polite">Loading the latest available session schedule…</p>
+  <div class="briefing-grid">
+   <section class="briefing-card"><p class="briefing-kicker">THE SITUATION</p><h3>Weekend status</h3><div id="briefingSummary" class="briefing-content"><div class="state">Checking the schedule…</div></div></section>
+   <section class="briefing-card"><p class="briefing-kicker">COMING UP</p><h3>Upcoming sessions</h3><div id="briefingUpcoming" class="briefing-content"><div class="state">Loading sessions…</div></div></section>
+   <section class="briefing-card briefing-wide"><p class="briefing-kicker">CATCH UP</p><h3>Recently completed sessions</h3><div id="briefingCompleted" class="briefing-content"><div class="state">Loading sessions…</div></div></section>
+  </div>
+  <div class="briefing-footer">
+   <div><b>Want the official details?</b><p>Follow the primary source for published schedules, results and announcements.</p></div>
+   <div class="briefing-links"><a href="https://www.formula1.com/en/racing" target="_blank" rel="noopener noreferrer">F1 schedule ↗</a><a href="https://www.formula1.com/en/results" target="_blank" rel="noopener noreferrer">F1 results ↗</a><a href="https://www.formula1.com/en/timing/f1-live" target="_blank" rel="noopener noreferrer">F1 Live Timing ↗</a><a href="https://www.fia.com/media-center/press_release" target="_blank" rel="noopener noreferrer">FIA announcements ↗</a></div>
+  </div>
+  <p class="briefing-disclaimer">This first version uses session schedule data, not republished news articles. Session times are shown in your device's local timezone; check the official source for final confirmation.</p>
+ </section>
  
  <section class="panel pane" id="v-cal" hidden><h2>Race weekends</h2><div id="calList"><div class="state">Loading…</div></div></section>
  </main></div>
@@ -640,7 +669,7 @@ async function loadCountdownSchedule(y){
    items.push(...fallback.filter(x=>!keys.has(`${x.name.toLowerCase()}|${Math.round(x.start/60000)}`)));
   }catch(e){}
  }
- countdownSessions=items.filter(Boolean).sort((a,b)=>a.start-b.start);renderLast();
+ countdownSessions=items.filter(Boolean).sort((a,b)=>a.start-b.start);renderLast();if(typeof renderBriefing==="function")renderBriefing();
  if(countdownTimer)clearInterval(countdownTimer);countdownTimer=setInterval(renderCountdown,1000);
  if(countdownRefreshTimer)clearInterval(countdownRefreshTimer);countdownRefreshTimer=setInterval(()=>loadCountdownSchedule(nowY).catch(()=>{}),30*60*1000);
 }
@@ -711,7 +740,7 @@ function ensure(){
   else if(sub==="weather"){if(weatherFor!==$("wsess").value)loadWeather()}
   else if(lapsFor!==$("lsess").value||!lapData.order)loadLaps();else drawTele()}
  if(sub==="cal"&&calFor!==year)loadCal();
- if(sub==="news")loadNews();
+ if(sub==="news")renderBriefing();
 }
 const ok=t=>t===tok,drvOf=async key=>{try{return await get(`/drivers?session_key=${key}`)}catch(e){return[]}};
 async function loadStandings(){
@@ -894,255 +923,50 @@ async function loadWeather(){
 }
 $("wsess").onchange=loadWeather;
 
-// ======================================================================
-// NEWS FEED
-// ----------------------------------------------------------------------
-// Pipeline:  sources -> adapter (fetch + parse) -> coerceArticle (normalise + sanitise)
-//            -> dedupe -> sort -> state -> render.   Rendering never touches raw feed data.
-//
-// Normalised article:
-//   { id, title, source, sourceId, url, publishedAt (ms | null), image, description, tags[] }
-//   Only `title` is required. `tags` is empty today and reserved for future categories.
-//
-// ADDING A SOURCE: append an object to NEWS_SOURCES. Nothing else needs to change.
-//   { id:"example", name:"Example Site", label:"Example (chip text)", color:"#8B5CF6", type:"rss", url:"<a real RSS/Atom feed URL>", homepage:"<site url>", enabled:true }
-// A new `type` (e.g. "json") is a new function in NEWS_ADAPTERS that returns { items, via }.
-//
-// GITHUB PAGES / CORS: this page is static, so a browser can only read a feed directly if that site sends
-// CORS headers. Most publishers don't. The fallbacks below use free public relays, which are third-party,
-// rate-limited and can disappear. The reliable fix is your own tiny proxy (e.g. a free Cloudflare Worker):
-// put its address in NEWS_CONFIG.proxyUrl and it is tried first. No other code changes are needed.
-// ======================================================================
-const NEWS_CONFIG={
- proxyUrl:"",          // e.g. "https://your-worker.workers.dev/?url="  (the feed URL is appended, encoded)
- publicRelays:true,    // set to false to use only direct requests and your own proxy
- timeoutMs:6500,maxArticles:72,pageSize:12,concurrency:6,freshMs:5*60*1000,cacheKey:"redline-news-v6"};
-const NEWS_SOURCES=[   // Show only short headlines with attribution and direct links; do not republish feed summaries or images.
- // Lower-caution candidates first. Publisher terms and permissions still need to be checked for Redline's exact use.
- {id:"formula1news",name:"Formula1News.co.uk",label:"Formula1News.co.uk",color:"#E10600",type:"rss",url:"https://formula1news.co.uk/feed/",homepage:"https://formula1news.co.uk/",enabled:true},
- {id:"racefans",name:"RaceFans",label:"RaceFans",color:"#19B37A",type:"rss",url:"https://www.racefans.net/feed/",homepage:"https://www.racefans.net/",enabled:true},
- {id:"motorsportweek",name:"Motorsport Week",label:"Motorsport Week",color:"#D71920",type:"rss",url:"https://www.motorsportweek.com/tag/formula-1/feed/",homepage:"https://www.motorsportweek.com/series/single-seater/formula-1/",enabled:true},
- {id:"therace",name:"The Race",label:"The Race",color:"#C5A3FF",type:"rss",url:"https://www.the-race.com/category/formula-1/feed/",homepage:"https://www.the-race.com/category/formula-1/",enabled:true},
- {id:"sky",name:"Sky Sports",label:"Sky Sports F1",color:"#17C3D6",type:"rss",url:"https://www.skysports.com/rss/12433",homepage:"https://www.skysports.com/f1",enabled:true},
- {id:"bbc",name:"BBC Sport",label:"BBC Sport",color:"#E0359A",type:"rss",url:"https://feeds.bbci.co.uk/sport/formula1/rss.xml",homepage:"https://www.bbc.com/sport/formula1",enabled:true},
- // Disabled sources with higher permission/copyright uncertainty remain available for reference, but are not fetched.
- {id:"f1",name:"Formula 1",label:"Formula 1 Official",color:"#E10600",type:"link",homepage:"https://www.formula1.com/en/latest",enabled:false},
- {id:"autosport",name:"Autosport",label:"Autosport",color:"#F58220",type:"rss",url:"https://www.autosport.com/rss/f1/news/",homepage:"https://www.autosport.com/f1/news/",enabled:false},
- {id:"motorsport",name:"Motorsport.com",label:"Motorsport.com",color:"#3B6CFF",type:"rss",url:"https://www.motorsport.com/rss/f1/news/",homepage:"https://www.motorsport.com/f1/news/",enabled:false},
- {id:"planetf1",name:"PlanetF1",label:"PlanetF1",color:"#9B5CFF",type:"rss",url:"https://www.planetf1.com/rss",homepage:"https://www.planetf1.com/",enabled:false},
- {id:"racingnews365",name:"RacingNews365",label:"RacingNews365",color:"#F2C230",type:"rss",url:"https://racingnews365.com/feed/news.xml",homepage:"https://racingnews365.com/",enabled:false},
- {id:"guardian",name:"The Guardian",label:"The Guardian",color:"#7C8CA3",type:"rss",url:"https://www.theguardian.com/sport/formulaone/rss",homepage:"https://www.theguardian.com/sport/formulaone",enabled:false},
- {id:"racer",name:"RACER",label:"RACER",color:"#E3B341",type:"rss",url:"https://racer.com/category/formula-1/feed/",homepage:"https://racer.com/category/formula-1/",enabled:false},
-];
-// readable text colour for a coloured tag
-function onColor(h){const n=parseInt(String(h).slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return(0.2126*r+0.7152*g+0.0722*b)/255>.5?"#15151E":"#fff"}
-function srcStyle(id){const c=(newsSrc(id)||{}).color||"#8B8B98";return`--sc:${c};--on:${onColor(c)}`}
-
-// ---- helpers (pure) ----
-const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],p2=n=>String(n).padStart(2,"0");
-const safeUrl=(u,base)=>{try{const x=new URL(String(u||"").trim(),base);return /^https?:$/.test(x.protocol)?x.href:""}catch(e){return""}};
-const safeImg=u=>{const x=safeUrl(u);return x.startsWith("https:")?x:""};   // https only: http images are blocked on https pages
-const htmlDoc=h=>new DOMParser().parseFromString(String(h||""),"text/html"); // inert document: scripts and handlers never run
-const plain=h=>(htmlDoc(h).body?.textContent||"").replace(/\s+/g," ").trim();
-function parseDate(v){
- if(typeof v==="number")return Number.isFinite(v)&&Math.abs(v)<8.64e15?v:null;
- const s=String(v??"").trim();if(!s)return null;
- const m=s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):?(\d{2})?$/);          // no zone given (rss2json): treat as GMT
- if(m)return Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0));
- const Z={BST:"+0100",CEST:"+0200",CET:"+0100",EDT:"-0400",EST:"-0500",CDT:"-0500",CST:"-0600",MDT:"-0600",MST:"-0700",PDT:"-0700",PST:"-0800",UTC:"+0000",UT:"+0000"};
- const t=Date.parse(s.replace(/\s(BST|CEST|CET|EDT|EST|CDT|CST|MDT|MST|PDT|PST|UTC|UT)$/i,(m,z)=>" "+Z[z.toUpperCase()]));return Number.isFinite(t)?t:null}
-const fmtAbs=ms=>{const d=new Date(ms);return `${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())} GMT`};
-function relTime(ms,now=Date.now()){
- const s=Math.round((now-ms)/1000);if(s<60)return"Just now";
- const m=Math.floor(s/60);if(m<60)return m+(m===1?" minute ago":" minutes ago");
- const h=Math.floor(m/60);if(h<24)return h+(h===1?" hour ago":" hours ago");
- const a=new Date(ms),b=new Date(now),days=Math.round((new Date(b.getFullYear(),b.getMonth(),b.getDate())-new Date(a.getFullYear(),a.getMonth(),a.getDate()))/864e5);
- return days<=1?"Yesterday":days<7?days+" days ago":""}                                 // "" = too old, show the date only
-function urlKey(u){try{const x=new URL(u);
- const q=[...x.searchParams].filter(([k])=>!/^(utm_|fbclid$|gclid$|ref$)/i.test(k)).sort(([a],[b])=>a<b?-1:a>b?1:0).map(([k,v])=>k+"="+v).join("&");
- return x.hostname.replace(/^www\./i,"").toLowerCase()+x.pathname.replace(/\/+$/,"")+(q?"?"+q:"")}catch(e){return""}}
-const titleKey=t=>t.toLowerCase().normalize("NFKD").replace(/[^\p{L}\p{N}]+/gu," ").trim();
-
-// Trim long text at a sentence end if possible, otherwise at a word, so it never stops mid-word.
-function clip(t,n){t=String(t||"");if(t.length<=n)return t;const cut=t.slice(0,n),k=Math.max(cut.lastIndexOf(". "),cut.lastIndexOf("! "),cut.lastIndexOf("? "));
- return k>n*.6?cut.slice(0,k+1):cut.slice(0,cut.lastIndexOf(" ")).replace(/[,;:\s]+$/,"")+"…"}
-// ---- normalise one raw item. `pre` = already plain text (articles read back from the saved cache) ----
-function coerceArticle(o,src,pre){
- if(!o||!src)return null;const T=pre?x=>String(x??"").trim():plain;
- const title=T(o.title).slice(0,240);if(!title)return null;
- // Store/display headline metadata only; never retain publisher thumbnails or article summaries.
- return{id:"",title,source:src.name,sourceId:src.id,url:safeUrl(o.url||o.link,src.url),publishedAt:parseDate(o.publishedAt??o.date),image:"",description:"",tags:[]}}
-
-// ---- duplicates: same URL first; else same source + identical normalised title published within 3 days of each other ----
-function dedupe(list){
- const byUrl=new Map(),byTitle=new Map(),out=[];
- for(const a of list){
-  const uk=a.url?urlKey(a.url):"",tk=a.sourceId+"|"+titleKey(a.title);
-  let d=uk?byUrl.get(uk):null;
-  if(!d){const c=byTitle.get(tk);if(c&&(a.publishedAt==null||c.publishedAt==null||Math.abs(a.publishedAt-c.publishedAt)<3*864e5))d=c}
-  if(d){for(const k of["image","description","url"])if(!d[k]&&a[k])d[k]=a[k];if(d.publishedAt==null&&a.publishedAt!=null)d.publishedAt=a.publishedAt;continue}
-  out.push(a);if(uk)byUrl.set(uk,a);if(!byTitle.has(tk))byTitle.set(tk,a)}
- return out}
-const prepare=list=>dedupe(list).map((a,i)=>({a,i})).sort((x,y)=>(y.a.publishedAt??-Infinity)-(x.a.publishedAt??-Infinity)||x.i-y.i).map(x=>x.a).slice(0,NEWS_CONFIG.maxArticles);
-
-// ---- RSS 2.0 / Atom parser ----
-function parseFeedXml(text){
- const d=new DOMParser().parseFromString(text,"text/xml");
- if(d.getElementsByTagName("parsererror").length)throw new Error("not valid XML");
- const nodes=[...d.getElementsByTagName("item")],entries=nodes.length?nodes:[...d.getElementsByTagName("entry")];
- return entries.map(n=>{
-  const g=t=>n.getElementsByTagName(t)[0],tx=t=>g(t)?.textContent||"";
-  let link=tx("link");if(!link.trim()){const l=[...n.getElementsByTagName("link")].find(x=>!x.getAttribute("rel")||x.getAttribute("rel")==="alternate");link=l?.getAttribute("href")||""}
-  const html=tx("content:encoded")||tx("description")||tx("summary")||tx("content");
-  const media=g("media:content")||g("media:thumbnail")||[...n.getElementsByTagName("enclosure")].find(x=>/^image\//.test(x.getAttribute("type")||""));
-  return{title:tx("title"),link,date:tx("pubDate")||tx("dc:date")||tx("published")||tx("updated"),description:html,
-   image:media?.getAttribute("url")||htmlDoc(html).querySelector("img")?.getAttribute("src")||""}})}
-
-// ---- transports: each returns raw items [{title,link,date,description,image}] ----
-async function fetchText(url){
- const ac=new AbortController(),t=setTimeout(()=>ac.abort(),NEWS_CONFIG.timeoutMs);
- try{const r=await fetch(url,{signal:ac.signal});if(!r.ok)throw new Error("HTTP "+r.status);return await r.text()}finally{clearTimeout(t)}}
-const TRANSPORTS={
- direct:{run:s=>fetchText(s.url).then(parseFeedXml)},
- proxy:{run:s=>fetchText(NEWS_CONFIG.proxyUrl+encodeURIComponent(s.url)).then(parseFeedXml)},
- rss2json:{cap:10,run:async s=>{const j=JSON.parse(await fetchText("https://api.rss2json.com/v1/api.json?rss_url="+encodeURIComponent(s.url)));
-   if(j.status!=="ok"||!Array.isArray(j.items))throw new Error("relay returned an error");
-   return j.items.map(i=>({title:i.title,link:i.link,date:i.pubDate,description:i.content||i.description,image:i.thumbnail||i.enclosure?.link}))}},
- allorigins:{run:s=>fetchText("https://api.allorigins.win/raw?url="+encodeURIComponent(s.url)).then(parseFeedXml)}};
-function transportOrder(preferred){
- let o=[];if(NEWS_CONFIG.proxyUrl)o.push("proxy");o.push("direct");if(NEWS_CONFIG.publicRelays)o.push("allorigins","rss2json");   // rss2json last: free tier returns max 10 items
- return preferred&&o.includes(preferred)&&!TRANSPORTS[preferred].cap?[preferred,...o.filter(x=>x!==preferred)]:o}
-
-// ---- adapters, one per source `type` ----
-const NEWS_ADAPTERS={
- async rss(src,preferred){
-  const why=[];let truncated=null;
-  for(const name of transportOrder(preferred)){const T=TRANSPORTS[name];
-   try{const items=(await T.run(src)).map(r=>coerceArticle(r,src)).filter(Boolean).slice(0,6);
-    if(!items.length){why.push(name+": no articles found");continue}
-    if(T.cap&&items.length>=T.cap){if(!truncated||items.length>truncated.items.length)truncated={items,via:name};why.push(name+": limited to "+T.cap+" articles");continue}
-    return{items,via:name}}
-   catch(e){why.push(name+": "+(e.name==="AbortError"?"timed out":e.message||"failed"))}}
-  if(truncated)return truncated;
-  throw Object.assign(new Error("Couldn't reach "+src.name),{details:why})}};
-
-// ---- state + saved copy (so the tab shows something instantly and survives a failed refresh) ----
-const newsState={articles:[],pending:[],sources:{},via:{},updatedAt:null,fromCache:false,busy:false,loaded:false,filter:"",shown:NEWS_CONFIG.pageSize,view:(()=>{try{return localStorage.getItem("redline-news-view")==="rows"?"rows":"cards"}catch(e){return"cards"}})()};
-const pgSize=()=>NEWS_CONFIG.pageSize*(newsState.view==="rows"?2:1);   // the compact list fits twice as many
-const newsSrc=id=>NEWS_SOURCES.find(s=>s.id===id);
-function hydrateNews(){
- // Article headlines are fetched fresh for this page view; do not persist publisher content in browser storage.
- try{localStorage.removeItem("redline-news-v3");localStorage.removeItem("redline-news-v4");localStorage.removeItem("redline-news-v5");localStorage.removeItem(NEWS_CONFIG.cacheKey)}catch(e){}
+// ---------- F1 Briefing: schedule-led, original Redline information ----------
+function briefingDate(ms){
+ if(!Number.isFinite(ms))return "Time unavailable";
+ return new Date(ms).toLocaleString(undefined,{weekday:"short",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});
 }
-function saveNews(){ /* Deliberately do not persist publisher headlines or feed content. */ }
-
-async function settleLimited(fns,limit){     // run feed requests a few at a time so relays aren't hit with a burst
- const out=new Array(fns.length);let i=0;
- await Promise.all(Array.from({length:Math.min(limit,fns.length)},async()=>{while(i<fns.length){const k=i++;
-  try{out[k]={status:"fulfilled",value:await fns[k]()}}catch(e){out[k]={status:"rejected",reason:e}}}}));
- return out}
-const newsArticleKey=a=>a?(a.url?urlKey(a.url):titleKey(a.title)):"";
-async function loadNews(force,silent=false){
- if(newsState.busy)return;
- if(!force&&newsState.updatedAt&&!newsState.fromCache&&Date.now()-newsState.updatedAt<NEWS_CONFIG.freshMs){drawNews();return}
- newsState.busy=true;drawNews();
- try{
-  const srcs=NEWS_SOURCES.filter(s=>s.enabled&&NEWS_ADAPTERS[s.type]);
-  const res=await settleLimited(srcs.map(src=>()=>NEWS_ADAPTERS[src.type](src,newsState.via[src.id])),NEWS_CONFIG.concurrency);
-  const fresh=[],okIds=new Set();
-  res.forEach((r,i)=>{const src=srcs[i];
-   if(r.status==="fulfilled"&&Array.isArray(r.value?.items)&&r.value.items.length){
-    fresh.push(...r.value.items);okIds.add(src.id);newsState.via[src.id]=r.value.via;
-    newsState.sources[src.id]={ok:true,count:r.value.items.length};
-   }else{
-    const reason=r.status==="rejected"?r.reason:null;
-    newsState.sources[src.id]={ok:false,error:reason?.message||(r.status==="fulfilled"?"Feed returned no usable articles":"Failed"),details:reason?.details||[]};
-   }
-  });
-  if(okIds.size){
-   // During background checks, keep new stories out of the current list until the reader asks to see them.
-   const known=new Set(newsState.articles.map(newsArticleKey).filter(Boolean));
-   const freshPrepared=prepare(fresh);
-   const newlyFound=silent&&newsState.articles.length?freshPrepared.filter(a=>{const k=newsArticleKey(a);return k&&!known.has(k)}):[];
-   const newKeys=new Set(newlyFound.map(newsArticleKey));
-   if(newlyFound.length)newsState.pending=prepare([...newsState.pending,...newlyFound]);
-   const visibleFresh=newlyFound.length?fresh.filter(a=>!newKeys.has(newsArticleKey(a))):fresh;
-   // Background checks keep the current list intact so stories don't disappear while someone is reading.
-   const retained=silent?newsState.articles:newsState.articles.filter(a=>!okIds.has(a.sourceId));
-   newsState.articles=prepare([...visibleFresh,...retained]);
-   newsState.updatedAt=Date.now();newsState.fromCache=false;saveNews();
-  }
-  newsState.loaded=true;newsState.shown=pgSize();
- }catch(e){
-  // Keep the last known-good feed visible even if refresh preparation fails.
-  newsState.loaded=true;
- }finally{
-  newsState.busy=false;
-  try{drawNews()}catch(e){const box=$("newsList");if(box)box.innerHTML='<div class="state">News refresh failed. Your saved articles are kept; please try again.</div>'}
+function briefingSessionCard(s,status){
+ const time=briefingDate(s.start),race=s.race||"Grand Prix",label=sessionLabel(s);
+ return `<div class="briefing-session"><div class="briefing-session-main"><b>${esc(label)}</b><small>${esc(race)} · ${esc(time)}</small></div><span class="briefing-tag ${status==="Completed"?"done":status==="In progress"?"live":""}">${esc(status)}</span></div>`;
+}
+function renderBriefing(){
+ const summary=$("briefingSummary"),upcomingBox=$("briefingUpcoming"),completedBox=$("briefingCompleted"),note=$("briefingNote");
+ if(!summary||!upcomingBox||!completedBox||!note)return;
+ const now=Date.now(),sessions=(countdownSessions||[]).filter(s=>Number.isFinite(s.start)&&Number.isFinite(s.end)).sort((a,b)=>a.start-b.start);
+ const active=sessions.find(s=>s.start<=now&&s.end>now);
+ const upcoming=sessions.filter(s=>s.start>now).slice(0,5);
+ const completed=sessions.filter(s=>s.end<=now).sort((a,b)=>b.end-a.end).slice(0,5);
+ if(!sessions.length){
+  summary.innerHTML='<p class="briefing-lead">No verified session schedule is available right now.</p><p>Try refreshing in a moment, or use the official schedule links below.</p>';
+  upcomingBox.innerHTML='<div class="state">Upcoming sessions could not be confirmed.</div>';
+  completedBox.innerHTML='<div class="state">No completed sessions are available in the current schedule data.</div>';
+  note.textContent="Schedule unavailable · no third-party news feeds are used in this tab.";
+  return;
  }
+ const next=upcoming[0];
+ if(active){
+  summary.innerHTML=`<div class="briefing-statusline"><span class="briefing-live-dot"></span><span>SESSION IN PROGRESS</span></div><p class="briefing-lead">${esc(sessionLabel(active))}</p><p>${esc(active.race||"Grand Prix")} is currently scheduled to be on track. ${next?"Next up is "+esc(sessionLabel(next))+".":"No later session appears in the loaded schedule."}</p>`;
+ }else if(next){
+  summary.innerHTML=`<div class="briefing-statusline"><span class="briefing-live-dot upcoming"></span><span>BETWEEN SESSIONS</span></div><p class="briefing-lead">Next up: ${esc(sessionLabel(next))}</p><p>${esc(next.race||"Grand Prix")} · ${esc(briefingDate(next.start))}.</p><p>Times are displayed in your device's local timezone.</p>`;
+ }else{
+  const last=completed[0];
+  summary.innerHTML=`<div class="briefing-statusline"><span class="briefing-live-dot upcoming"></span><span>WEEKEND RECAP</span></div><p class="briefing-lead">No upcoming sessions found</p><p>${last?"The latest session in the loaded schedule was "+esc(sessionLabel(last))+" at "+esc(briefingDate(last.start))+".":"The current schedule has no upcoming session."} Check the official schedule for changes.</p>`;
+ }
+ upcomingBox.innerHTML=upcoming.length?upcoming.map(s=>briefingSessionCard(s,"Upcoming")).join(""):'<div class="state">No further sessions in the currently loaded schedule.</div>';
+ completedBox.innerHTML=completed.length?completed.map(s=>briefingSessionCard(s,"Completed")).join(""):'<div class="state">No completed sessions are available in the currently loaded schedule.</div>';
+ note.textContent="Schedule data only · Last checked "+new Date().toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+" · Times shown in local time.";
 }
-
-// ---- rendering ----
-const PH='<svg class="ph-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><use href="#rl-mark"/></svg>';
-function itemHtml(a,now,i){
- const has=a.publishedAt!=null,rel=has?relTime(a.publishedAt,now):"",abs=has?fmtAbs(a.publishedAt):"";
- const when=has?`<time datetime="${new Date(a.publishedAt).toISOString()}" title="${esc(abs)}" data-ts="${a.publishedAt}">${esc(rel||abs)}</time>${rel?`<span class="nabs">${esc(abs)}</span>`:""}`:"";
- const href=a.url?`href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"`:"",NEW='<span class="sr"> (opens in a new tab)</span>',tag=a.url?"a":"span";
- const title=a.url?`<a ${href}>${esc(a.title)}${NEW}</a>`:esc(a.title);
- const acts=a.url?`<div class="nacts"><a class="nread" ${href}>Read at publisher ↗${NEW}</a></div>`:"";
- return `<li style="${srcStyle(a.sourceId)}"><article class="ncard nheadline"><div class="nimg ph" aria-hidden="true">${PH}</div><div class="nbody"><div class="nmeta"><span class="nsource">${esc(a.source)}</span>${when}</div><h3 class="nt">${title}</h3>${acts}</div></article></li>`}
-// Show the "Show more" link only where the text is actually cut off (depends on screen width, so re-checked on resize)
-function markClamped(){document.querySelectorAll("#newsList .ndesc:not(.open)").forEach(p=>{const b=p.parentNode.querySelector(".nexp");if(b)b.hidden=!(p.scrollHeight>p.clientHeight+1)})}
-let clampTimer=null;window.addEventListener("resize",()=>{clearTimeout(clampTimer);clampTimer=setTimeout(markClamped,150)});
-if(document.fonts&&document.fonts.ready)document.fonts.ready.then(markClamped);
-function drawChips(){
- const S=newsState,counts={};S.articles.forEach(a=>counts[a.sourceId]=(counts[a.sourceId]||0)+1);
- const chip=(id,label,n,bad)=>`<button class="chip" data-src="${esc(id)}" style="${id?srcStyle(id):"--sc:var(--red)"}" aria-pressed="${S.filter===id}"${bad?' title="Couldn\'t load this source"':""}>${id?"<i></i>":""}${esc(label)}${bad?" ⚠":` <span class="cnt">${n}</span>`}</button>`;
- $("nchips").innerHTML=chip("","All sources",S.articles.length,false)+NEWS_SOURCES.filter(s=>s.enabled).map(s=>chip(s.id,s.label||s.name,counts[s.id]||0,S.sources[s.id]&&S.sources[s.id].ok===false&&!counts[s.id])).join("")}
-function drawNews(){
- const S=newsState,box=$("newsList"),note=$("nnote"),stat=$("nsrc"),newBtn=$("nnew");
-
- const failed=Object.entries(S.sources).filter(([,v])=>!v.ok),at=S.updatedAt?new Date(S.updatedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
- newBtn.hidden=!S.pending.length;newBtn.textContent=S.pending.length?"↑ "+S.pending.length+" new article"+(S.pending.length===1?"":"s"):"↑ New articles";
- box.setAttribute("aria-busy",S.busy?"true":"false");drawChips();document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
- const msgs=[];
- if(S.articles.length&&S.busy&&S.fromCache)msgs.push(`Showing saved articles from ${esc(at)} while updating…`);
- else if(S.articles.length&&failed.length)msgs.push(`Couldn't load ${esc(failed.map(([id])=>newsSrc(id)?.name||id).join(", "))}. Showing everything else${at?" (updated "+esc(at)+")":""}. <button class="lnk" data-act="retry">Try again</button>`);
- note.innerHTML=msgs.join("<br>");note.hidden=!msgs.length;
- if(!S.loaded&&S.busy){box.innerHTML='<div class="state" role="status">Loading news…</div>';stat.textContent="";return}
- const list=S.articles.filter(a=>!S.filter||a.sourceId===S.filter),shown=list.slice(0,S.shown);
- stat.textContent=S.busy?"Updating…":S.articles.length?`${list.length} article${list.length===1?"":"s"}${at?" · updated "+at:""}`:"";
- if(!S.articles.length){
-  const bad=failed.length&&failed.length===Object.keys(S.sources).length,home=newsSrc("f1")?.homepage||"https://www.formula1.com/en/latest";
-  box.innerHTML=bad?`<div class="state"><p>We couldn't load the news right now.</p><p><button class="lnk" data-act="retry">Try again</button> <a class="lnk" href="${esc(home)}" target="_blank" rel="noopener noreferrer">Read it on formula1.com</a></p>
-   <details><summary>Technical details</summary>${failed.map(([id,v])=>`<div><b>${esc(newsSrc(id)?.name||id)}</b>: ${esc(v.error)}${v.details.map(d=>`<br><small>${esc(d)}</small>`).join("")}</div>`).join("")}</details></div>`
-   :'<div class="state"><p>No articles are available right now.</p><p><button class="lnk" data-act="retry">Refresh</button></p></div>';return}
- if(!list.length){const n=newsSrc(S.filter);box.innerHTML=`<div class="state"><p>No articles from ${esc(n?n.name:"this source")} right now.</p><p><button class="lnk" data-act="clear">Show all sources</button></p></div>`;return}
- const now=Date.now();
- box.dataset.view=S.view;box.innerHTML=`<ul class="nlist ${S.view}">${shown.map((a,i)=>itemHtml(a,now,i)).join("")}</ul>`+`<div class="nmore"><span class="ncount">${list.length>shown.length?`Showing ${shown.length} of ${list.length} articles`:list.length>pgSize()?`All ${list.length} articles shown`:`${list.length} article${list.length===1?"":"s"}, which is everything these feeds list right now`}</span>${list.length>shown.length?` <button class="lnk" data-act="more">Show ${Math.min(pgSize(),list.length-shown.length)} more</button>`:""}</div>`;
- requestAnimationFrame(markClamped)}
-
-// ---- wiring ----
-const applyPendingNews=()=>{
- if(!newsState.pending.length)return;
- const scrollTop=$("newsList").scrollTop;
- newsState.articles=prepare([...newsState.pending,...newsState.articles]);newsState.pending=[];newsState.shown=pgSize();saveNews();drawNews();$("newsList").scrollTop=scrollTop;
+const briefingRefresh=$("briefingRefresh");
+if(briefingRefresh)briefingRefresh.onclick=async()=>{
+ briefingRefresh.disabled=true;briefingRefresh.textContent="Refreshing…";
+ $("briefingNote").textContent="Checking the latest available schedule…";
+ try{await loadCountdownSchedule(nowY);renderBriefing()}
+ catch(e){$("briefingNote").textContent="Couldn't refresh the schedule. Existing information may be out of date.";renderBriefing()}
+ finally{briefingRefresh.disabled=false;briefingRefresh.textContent="Refresh schedule ↻"}
 };
-$("nrefresh").onclick=()=>{if(!NEWS_SOURCES.some(s=>s.enabled)){newsState.filter="";drawNews();return}applyPendingNews();loadNews(true)};
-$("nnew").onclick=applyPendingNews;
-document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{newsState.view=b.dataset.view;newsState.shown=pgSize();try{localStorage.setItem("redline-news-view",newsState.view)}catch(e){}drawNews()});
-$("nchips").addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("button");if(!b)return;if(b.hasAttribute("data-category")){newsState.filter=b.dataset.category||"";drawNews();return}if(!b.hasAttribute("data-src"))return;newsState.filter=b.dataset.src;newsState.shown=pgSize();drawNews()});
-$("newsList").addEventListener("click",e=>{
- const x=e.target.closest&&e.target.closest(".nexp");
- if(x){const p=document.getElementById(x.getAttribute("aria-controls"));if(p){const o=p.classList.toggle("open");x.textContent=o?"Show less":"Show more";x.setAttribute("aria-expanded",String(o))}return}
- const b=e.target.closest&&e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
- if(a==="retry")loadNews(true);else if(a==="clear"){newsState.filter="";newsState.shown=pgSize();drawNews()}else if(a==="more"){newsState.shown+=pgSize();drawNews()}});
-$("nnote").addEventListener("click",e=>{if(e.target.closest&&e.target.closest("[data-act=retry]"))loadNews(true)});
-$("newsList").addEventListener("error",e=>{const el=e.target;if(el&&el.tagName==="IMG"){const w=el.closest(".nimg");if(w){w.classList.add("ph");w.innerHTML=PH}else el.remove()}},true);
-setInterval(()=>{document.querySelectorAll("#newsList time[data-ts]").forEach(t=>{const ms=+t.dataset.ts,r=relTime(ms);t.textContent=r||fmtAbs(ms)})},60000);
-// Refresh every five minutes while the page is visible; avoid background requests in hidden tabs.
-setInterval(()=>{if(document.visibilityState==="visible")loadNews(true,true)},5*60*1000);
-
 // ---------- Car data ----------
 let carTok=0;function drawTele(){return curSub==="car"?loadCar(true):drawLaps()}
 async function loadCar(repop){
@@ -1538,7 +1362,7 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){
  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}),{once:true});
 }
 
-hydrateNews();loadYear(nowY);loadNews();
+loadYear(nowY);renderBriefing();
 </script>
 </body>
 </html>
