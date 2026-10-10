@@ -1253,8 +1253,8 @@ function statsMerge(year,standingData,raceData,qualData,prior){
  const by={};(prior?.drivers||[]).forEach(d=>{by[d.id]={...d}});
  const standings=standingData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings||[];
  standings.forEach((v,i)=>{const id=statsDriverId(v);if(!id)return;const d=by[id]||{id};d.name=statsName(v);d.code=v.Driver?.code||"";d.number=v.Driver?.permanentNumber||"";d.team=statsTeam(v);d.points=statsNum(v.points);d.wins=statsNum(v.wins);d.position=statsNum(v.position)||i+1;d.championshipAvailable=true;by[id]=d});
+ Object.values(by).forEach(d=>{d.podiums=0;d.poles=0;d.fastest=0;d.finishSum=0;d.finishCount=0;d.roundPoints={}});
  if(raceData){
-  Object.values(by).forEach(d=>{d.podiums=0;d.poles=0;d.fastest=0;d.finishSum=0;d.finishCount=0;d.roundPoints={}});
   const races=raceData.RaceTable?.Races||[];
   races.forEach(r=>{(r.Results||[]).forEach(v=>{const id=statsDriverId(v);if(!by[id])by[id]={id,name:statsName(v),team:statsTeam(v),points:null,wins:null,position:null,podiums:0,poles:0,fastest:0,finishSum:0,finishCount:0,roundPoints:{}};const d=by[id],pos=statsNum(v.position);if(pos&&pos<=3)d.podiums++;if(pos){d.finishSum+=pos;d.finishCount++}const round=Number(r.round);d.roundPoints[round]=(d.roundPoints[round]||0)+(statsNum(v.points)||0);if(v.FastestLap?.rank==="1"||Number(v.FastestLap?.rank)===1)d.fastest++})});
  }
@@ -1321,8 +1321,8 @@ function renderDriverStats(){
 async function loadDriverStats(force=false){
  const y=Number($("statsYear")?.value||statsState.year||nowY);statsState.year=y;
  const cached=statsReadCache(y);
- if(cached){statsState.data=cached;renderDriverStats()}
- else if(!statsState.data){$("statsContent").innerHTML='<div class="state">Loading driver statistics…</div>'}
+ if(cached){statsState.data=cached;statsState.offline=false;renderDriverStats()}
+ else {if(statsState.data?.year!==y)statsState.data=null;if(!statsState.data)$("statsContent").innerHTML='<div class="state">Loading driver statistics…</div>'}
  if(statsState.loading&&!force)return;
  statsState.loading=true;
  try{
@@ -1348,7 +1348,7 @@ async function loadDriverStats(force=false){
 function initDriverStats(){
  const sel=$("statsYear");if(!sel)return;
  if(!sel.options.length){for(let y=nowY;y>=2023;y--)sel.insertAdjacentHTML("beforeend",`<option value="${y}">${y}</option>`)}
- sel.value=String(statsState.year);sel.onchange=()=>{statsState.a=null;statsState.b=null;loadDriverStats(true)};
+ sel.value=String(statsState.year);sel.onchange=()=>{statsState.a=null;statsState.b=null;statsState.data=null;statsState.offline=false;loadDriverStats(true)};
  document.querySelectorAll("[data-stats-view]").forEach(btn=>btn.onclick=()=>{statsState.view=btn.dataset.statsView;document.querySelectorAll("[data-stats-view]").forEach(x=>x.setAttribute("aria-selected",String(x===btn)));renderDriverStats()});
 }
 initDriverStats();
