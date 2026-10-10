@@ -531,14 +531,14 @@ let rounds=[],year,tok=0,current=null,t;
 const nowY=new Date().getFullYear();
 for(let y=nowY;y>=2023;y--)$("year").insertAdjacentHTML("beforeend",`<option>${y}</option>`);
 $("year").onchange=()=>loadYear(+$("year").value);
-const SUBS={race:[["result","Result"],["fp1","FP1"],["control","Race control"],["radio","Team radio"],["weather","Weather"]],tele:[["laps","Lap times"],["car","Car data"]]};
+const SUBS={race:[["result","Result"],["control","Race control"],["radio","Team radio"],["weather","Weather"]],tele:[["laps","Lap times"],["car","Car data"]]};
 const memo={};let curSub="news";
 function show(top,sub){
  sub=sub||memo[top]||(SUBS[top]?SUBS[top][0][0]:top);memo[top]=sub;curSub=sub;
  document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x.dataset.v===top));
- const navItems=top==="race"?[["result","Result"],["fp1","FP1"],...(cur?.weekendSessions?.some(s=>/sprint\s*(qualifying|shootout)/i.test(s.session_name||""))?[["sprintqualifying","Sprint Quali"]]:[]),["control","Race control"],["radio","Team radio"],["weather","Weather"]]: (SUBS[top]||[]); $("sub").innerHTML=navItems.map(([k,l])=>`<button data-s="${k}" aria-selected="${k===sub}">${l}</button>`).join("");$("sub").hidden=!navItems.length;
+ $("sub").innerHTML=(SUBS[top]||[]).map(([k,l])=>`<button data-s="${k}" aria-selected="${k===sub}">${l}</button>`).join("");$("sub").hidden=!SUBS[top];
  $("sub").querySelectorAll("button").forEach(b=>b.onclick=()=>show(top,b.dataset.s));
- const pane=(sub==="laps"||sub==="car")?"tele":(sub==="fp1"||sub==="sprintqualifying")?"result":sub; if(pane==="result")$("resTitle").textContent=sub==="fp1"?`${cur?.country_name||"Grand Prix"} · Free Practice 1`:sub==="sprintqualifying"?`${cur?.country_name||"Grand Prix"} · Sprint Qualifying`:`${cur?.country_name||"Grand Prix"} Grand Prix result`;
+ const pane=(sub==="laps"||sub==="car")?"tele":sub;
  document.querySelectorAll(".pane").forEach(p=>p.hidden=p.id!=="v-"+pane);
  stopLive();if(sub==="live")startLive();
  if(pane==="tele"){$("lapList").hidden=sub!=="laps";$("carView").hidden=sub!=="car";$("clap").hidden=sub!=="car";
@@ -617,7 +617,6 @@ async function loadYear(y){
 }
 
 let cur=null,loaded={};
-async function loadWeekendSessionList(race){const selected=race;try{let ss=[];if(race?._source!=="jolpica")ss=await get(`/sessions?meeting_key=${race.meeting_key}`);else if(race.jolpicaRace)ss=jolpicaSessionList(race.jolpicaRace).map(q=>({session_name:q.name,date_start:q.date.toISOString(),session_key:"jolpica"}));if(cur!==selected)return;selected.weekendSessions=ss.filter(s=>Number.isFinite(+new Date(s.date_start))).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));if(cur===selected){const sub=["result","fp1","sprintqualifying","control","radio","weather"].includes(curSub)?curSub:"result";show("race",sub==="sprintqualifying"&&!selected.weekendSessions.some(s=>/sprint\s*(qualifying|shootout)/i.test(s.session_name||""))?"result":sub);}}catch(e){if(cur===selected){selected.weekendSessions=[];show("race",["result","fp1","control","radio","weather"].includes(curSub)?curSub:"result");}}}
 const closeSheet=()=>document.body.classList.remove("sheet");
 $("pick").onclick=()=>document.body.classList.add("sheet");$("scrim").onclick=closeSheet;
 function loadRound(i){
@@ -625,7 +624,7 @@ function loadRound(i){
  $("rsess").innerHTML="";$("lsess").innerHTML="";$("ldrv").innerHTML="";$("wsess").innerHTML="";weatherFor=null;
  document.querySelectorAll(".gp").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.i===i));
  $("pick").innerHTML=`<span>R${i+1} · ${esc(race.location||race.country_name)}</span><span>Change ▾</span>`;
- renderLast();$("last").title="Everything on this page is shown as it stood after this race";race.weekendSessions=[];loadWeekendSessionList(race);
+ renderLast();$("last").title="Everything on this page is shown as it stood after this race";
  $("resTitle").textContent=`${race.country_name} Grand Prix result`;
  ["drivers","teams","result","control","radioList","lapList","weatherView"].forEach(id=>$(id).innerHTML='<div class="state">Loading…</div>');
  ensure();prefetchAll();
@@ -638,7 +637,6 @@ async function prefetchAll(){
 }
 function ensure(){
  const sub=curSub;if(sub==="stats"){loadDriverStats();return;}if(!cur)return;
- if(sub==="fp1"||sub==="sprintqualifying"){if(!loaded[sub]){loaded[sub]=1;loadSessionRecap(sub)}return;}
  if(sub==="standings"&&!loaded.st){loaded.st=1;loadStandings()}
  if(sub==="result"&&!loaded.res){loaded.res=1;loadResult()}
  if(sub==="control"&&!loaded.ctl){loaded.ctl=1;loadControl()}
@@ -685,34 +683,6 @@ async function loadJolpicaStandings(){
  $("drivers").innerHTML=ds.map(v=>{const d=v.Driver||{},team=v.Constructors?.[0]?.name||"";return row(v.position,driverNoBadge(d.permanentNumber||d.code,teamIconColor(team)),[d.givenName,d.familyName].filter(Boolean).join(" ")||d.driverId||"Driver",team,v.points,isFavD(d))}).join("")||'<div class="state">No historical driver standings for this round.</div>';
  $("teams").innerHTML=ts.map(v=>{const c=v.Constructor||{},col=teamIconColor(c.name);return row(v.position,av(logoUrl(c.name,y),c.name,col,true).replace('class="av logo"','class="av logo team-icon"'),c.name||"Team","",v.points,isFavT(c.name))}).join("")||'<div class="state">No historical constructor standings for this round.</div>';
  }catch(e){if(ok(t)){fail("drivers",e);fail("teams",e)}}
-}
-async function loadSessionRecap(kind){
- const t0=tok,race=cur,label=kind==="fp1"?"Free Practice 1":"Sprint Qualifying",pattern=kind==="fp1"?/practice\s*1|fp1/i:/sprint\s*(qualifying|shootout)/i;
- $("resTitle").textContent=(race?.country_name||"Grand Prix")+" · "+label;
- $("result").innerHTML='<div class="state">Loading '+esc(label)+' classification…</div>';
- try{
-  if(!race)throw new Error("No Grand Prix selected");
-  let session=null;
-  if(race._source!=="jolpica"){
-   const sessions=race.weekendSessions||await get(`/sessions?meeting_key=${race.meeting_key}`);
-   if(!ok(t0))return;
-   session=sessions.filter(s=>pattern.test(s.session_name||"")&&Number.isFinite(+new Date(s.date_start))&&new Date(s.date_start).getTime()<Date.now()).sort((a,b)=>new Date(b.date_start)-new Date(a.date_start))[0]||null;
-   if(session){
-    const [res,drivers]=await Promise.all([get(`/session_result?session_key=${session.session_key}`),get(`/drivers?session_key=${session.session_key}`).catch(()=>[])]);
-    if(!ok(t0))return;
-    const by=Object.fromEntries(drivers.map(d=>[d.driver_number,d]));
-    const rows=(res||[]).sort((a,b)=>(a.position??99)-(b.position??99));
-    if(rows.length){$("result").innerHTML=rows.map(v=>{const d=who(by,v.driver_number),status=v.dsq?"DSQ":v.dns?"DNS":v.dnf?"DNF":"";const time=status||(v.position===1?fmtTime(v.duration):typeof v.gap_to_leader==="number"?"+"+v.gap_to_leader.toFixed(3):String(v.gap_to_leader??""));return row(v.position??"-",driverNoBadge(v.driver_number,d.team_colour),d.full_name||"Driver #"+v.driver_number,d.team_name||"",time,isFavD(d),"")}).join("");return;}
-   }
-  }
-  await useJolpicaForCurrentRace();if(!ok(t0))return;
-  const y=race.season||year,r=race.jolpicaRound;
-  const path=kind==="fp1"?`/${y}/${r}/practice/1/`:`/${y}/${r}/sprint/qualifying/`;
-  const data=await jget(path);if(!ok(t0))return;
-  const event=data.RaceTable?.Races?.[0]||data.PracticeTable?.Races?.[0]||data.QualifyingTable?.Races?.[0]||{};
-  const rows=kind==="fp1"?(event.Practice1Results||event.PracticeResults||[]):(event.SprintQualifyingResults||event.QualifyingResults||[]);
-  $("result").innerHTML=rows.map(v=>{const d=v.Driver||{},c=v.Constructor||{},name=[d.givenName,d.familyName].filter(Boolean).join(" ")||d.driverId||"Driver";const timing=kind==="fp1"?(v.Time?.time||v.time||v.status||""):(v.Q3||v.Q2||v.Q1||v.Time?.time||v.time||v.status||"");return row(v.position||"-",driverNoBadge(d.permanentNumber||v.number,teamIconColor(c.name)),name,c.name||"",timing,false,"")}).join("")||'<div class="state">'+(kind==="fp1"?"No FP1 classification is available for this Grand Prix yet.":"No Sprint Qualifying classification is available. This weekend may not use the Sprint format.")+'</div>';
- }catch(e){if(ok(t0))$("result").innerHTML='<div class="state">'+esc(label)+' results are not available yet. The session may still be upcoming, or the data provider has not published a classification.</div>'}
 }
 async function loadJolpicaResult(){
  const t=tok,y=year,r=cur.jolpicaRound;
