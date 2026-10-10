@@ -4,6 +4,11 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "17 8 * * 1"
+  push:
+    paths:
+      - "index.html"
+      - "sw.js"
+      - ".github/workflows/update-f1-archive.yml"
 
 permissions:
   contents: write
