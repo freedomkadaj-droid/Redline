@@ -431,6 +431,23 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
  .sc-unit b{font-size:18px}
  .sc-unit small{font-size:8px;margin-top:2px}
 }
+/* Full-site maintenance curtain during scheduled F1 sessions */
+#session-maintenance{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 50% 20%,rgba(255,30,0,.15),transparent 55%),#08080b;color:#f5f5f7;text-align:center;overflow:auto}
+#session-maintenance.active{display:flex}
+#session-maintenance .maintenance-card{width:min(100%,620px);padding:clamp(26px,6vw,54px);border:1px solid rgba(255,255,255,.13);border-radius:22px;background:rgba(17,17,22,.94);box-shadow:0 24px 100px rgba(0,0,0,.48)}
+#session-maintenance .maintenance-brand{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:34px;font-weight:900;letter-spacing:.2em;font-size:13px}
+#session-maintenance .maintenance-brand svg{width:34px;height:34px}
+#session-maintenance .maintenance-tag{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(255,30,0,.4);border-radius:999px;padding:7px 12px;color:#ff624f;font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+#session-maintenance .maintenance-dot{width:7px;height:7px;border-radius:50%;background:#ff1e00;box-shadow:0 0 14px #ff1e00;animation:maintenance-pulse 1.5s infinite}
+#session-maintenance h2{margin:22px 0 12px;font-size:clamp(30px,6vw,52px);line-height:1.02;letter-spacing:-.045em;font-weight:900}
+#session-maintenance h2 span{color:#ff3018}
+#session-maintenance p{max-width:440px;margin:0 auto;color:#aaaab5;font-size:14px;line-height:1.8}
+#session-maintenance .maintenance-session{margin:28px 0 10px;padding:16px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.035)}
+#session-maintenance .maintenance-session strong{display:block;font-size:15px;margin-bottom:5px}
+#session-maintenance .maintenance-session small{color:#aaaab5;font-size:12px}
+#session-maintenance .maintenance-foot{margin-top:30px;color:#747480;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+@keyframes maintenance-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){#session-maintenance .maintenance-dot{animation:none}}
 [hidden]{display:none!important}
 footer{color:var(--mute);font-size:14px}
  .legal-disclaimer{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:11px;line-height:1.6;color:var(--mute);max-width:100%;text-align:left}
@@ -438,7 +455,18 @@ footer{color:var(--mute);font-size:14px}
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="rl-mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0B0B10"/><rect x=".75" y=".75" width="62.5" height="62.5" rx="13.3" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.5"/><g transform="translate(6.8 0) skewX(-12)"><path fill="#F4F4F6" fill-rule="evenodd" d="M16 14L38 14L48 19L50 26L50 29L47 35L41 38L24 38L24 50L16 50ZM24 21L36 21L42 24L42 28L36 31L24 31Z"/><path fill="#FF1E00" d="M30 38L40 38L51 50L40.5 50Z"/></g></symbol></svg>
-<div class="kerb"></div><button id="themebtn" class="themebtn" aria-label="Switch to light mode"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></button>
+<div class="kerb"></div>
+<div id="session-maintenance" role="dialog" aria-modal="true" aria-labelledby="maintenance-title" aria-describedby="maintenance-description">
+ <div class="maintenance-card">
+  <div class="maintenance-brand"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0B0B10"/><g transform="translate(6.8 0) skewX(-12)"><path fill="#F4F4F6" fill-rule="evenodd" d="M16 14L38 14L48 19L50 26L50 29L47 35L41 38L24 38L24 50L16 50ZM24 21L36 21L42 24L42 28L36 31L24 31Z"/><path fill="#FF1E00" d="M30 38L40 38L51 50L40.5 50Z"/></g></svg> REDLINE</div>
+  <div class="maintenance-tag"><span class="maintenance-dot"></span> Live session in progress</div>
+  <h2 id="maintenance-title">We’ll be <span>right back.</span></h2>
+  <p id="maintenance-description">Redline is temporarily taking a pit stop while an F1 session is underway. Please come back after the session finishes for race data, results and analysis.</p>
+  <div class="maintenance-session"><strong id="maintenance-session-name">Formula 1 session</strong><small id="maintenance-session-detail">Data will return after the chequered flag.</small></div>
+  <div class="maintenance-foot">Race Data. Rivalries. Every Detail.</div>
+ </div>
+</div>
+<button id="themebtn" class="themebtn" aria-label="Switch to light mode"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></button>
 <div class="wrap">
  <header>
   <div class="brand">
@@ -631,7 +659,7 @@ async function loadCountdownSchedule(y){
    items.push(...fallback.filter(x=>!keys.has(`${x.name.toLowerCase()}|${Math.round(x.start/60000)}`)));
   }catch(e){}
  }
- countdownSessions=items.filter(Boolean).sort((a,b)=>a.start-b.start);renderLast();
+ countdownSessions=items.filter(Boolean).sort((a,b)=>a.start-b.start);renderLast();updateSessionMaintenance();
  if(countdownTimer)clearInterval(countdownTimer);countdownTimer=setInterval(renderCountdown,1000);
  if(countdownRefreshTimer)clearInterval(countdownRefreshTimer);countdownRefreshTimer=setInterval(()=>loadCountdownSchedule(nowY).catch(()=>{}),30*60*1000);
 }
@@ -650,7 +678,16 @@ function countdownHTML(){
  }
  return `<div class="session-countdown" id="sessionCountdown"><div class="sc-top"><span class="sc-kicker">${active?"SESSION IN PROGRESS":"NEXT SESSION"}</span>${status}</div><div class="sc-session">${esc(label)}</div><div class="sc-gp">${esc(race)}${chosen.location?" · "+esc(chosen.location):""}</div>${clock}<div class="sc-time"><strong>${active?"Started":d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</strong> · Your local time</div></div>`;
 }
-function renderCountdown(){const old=$("sessionCountdown");if(!old)return;const box=document.createElement("div");box.innerHTML=countdownHTML();old.replaceWith(box.firstElementChild)}
+function updateSessionMaintenance(){
+ const curtain=$("session-maintenance");if(!curtain)return;
+ const now=Date.now(),active=countdownSessions.filter(x=>x.start<=now&&now<x.end).sort((a,b)=>a.end-b.end)[0];
+ if(!active){curtain.classList.remove("active");document.body.classList.remove("maintenance-active");return}
+ const race=active.race||"Grand Prix",label=sessionLabel(active);
+ $("maintenance-session-name").textContent=label+" · "+race;
+ $("maintenance-session-detail").textContent="Scheduled to finish at "+new Date(active.end).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+" local time. Redline will reopen automatically after the session.";
+ curtain.classList.add("active");document.body.classList.add("maintenance-active");
+}
+function renderCountdown(){const old=$("sessionCountdown");if(old){const box=document.createElement("div");box.innerHTML=countdownHTML();old.replaceWith(box.firstElementChild)}updateSessionMaintenance()}
 function renderLast(raceHTML){
  const selected=raceHTML!==undefined?raceHTML:(cur?`<div class="lr"><span class="rnd">R${Math.max(1,rounds.indexOf(cur)+1)}</span><div class="lt"><b>${esc(cur.country_name||"Grand Prix")} Grand Prix</b><small>${esc(cur.circuit_short_name||"")} · ${new Date(cur.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}</small></div></div>`:"");
  $("last").innerHTML=selected+countdownHTML();
