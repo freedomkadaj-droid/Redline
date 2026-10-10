@@ -426,7 +426,7 @@ footer{color:var(--mute);font-size:14px}
   <div class="tools"><div class="seg" role="group" aria-label="News layout">
    <button type="button" data-view="cards" aria-pressed="true"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>Cards</button>
    <button type="button" data-view="rows" aria-pressed="false"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1" y="2" width="14" height="3" rx="1.2"/><rect x="1" y="6.5" width="14" height="3" rx="1.2"/><rect x="1" y="11" width="14" height="3" rx="1.2"/></svg>List</button></div>
-  <button id="nrefresh">Refresh</button><small id="nsrc" role="status" aria-live="polite"></small></div>
+  <button id="nnew" hidden>↑ New articles</button><button id="nrefresh">Refresh</button><small id="nsrc" role="status" aria-live="polite"></small></div>
   <div class="nchips" id="nchips" role="group" aria-label="Filter by source"></div>
   <div class="nnote" id="nnote" role="status" hidden></div>
   <div id="newsList" class="scroll" aria-live="off" aria-busy="false"><div class="state">Loading news…</div></div></section>
@@ -862,7 +862,10 @@ const NEWS_SOURCES=[   // `color` = the tag/accent colour readers learn to assoc
  {id:"racefans",name:"RaceFans",label:"RaceFans",color:"#19B37A",type:"rss",url:"https://www.racefans.net/feed/",homepage:"https://www.racefans.net/",enabled:true},
  {id:"planetf1",name:"PlanetF1",label:"PlanetF1",color:"#9B5CFF",type:"rss",url:"https://www.planetf1.com/rss",homepage:"https://www.planetf1.com/",enabled:true},
  {id:"racingnews365",name:"RacingNews365",label:"RacingNews365",color:"#F2C230",type:"rss",url:"https://racingnews365.com/feed/news.xml",homepage:"https://racingnews365.com/",enabled:true},
- {id:"guardian",name:"The Guardian",label:"The Guardian",color:"#7C8CA3",type:"rss",url:"https://www.theguardian.com/sport/formulaone/rss",homepage:"https://www.theguardian.com/sport/formulaone",enabled:true}
+ {id:"guardian",name:"The Guardian",label:"The Guardian",color:"#7C8CA3",type:"rss",url:"https://www.theguardian.com/sport/formulaone/rss",homepage:"https://www.theguardian.com/sport/formulaone",enabled:true},
+ {id:"racer",name:"RACER",label:"RACER",color:"#E3B341",type:"rss",url:"https://racer.com/category/formula-1/feed/",homepage:"https://racer.com/category/formula-1/",enabled:true},
+ {id:"therace",name:"The Race",label:"The Race",color:"#C5A3FF",type:"rss",url:"https://www.the-race.com/rss/",homepage:"https://www.the-race.com/",enabled:true},
+ {id:"motorsportweek",name:"Motorsport Week",label:"Motorsport Week",color:"#D71920",type:"rss",url:"https://www.motorsportweek.com/feed/",homepage:"https://www.motorsportweek.com/series/single-seater/",enabled:true}
 ];
 // readable text colour for a coloured tag
 function onColor(h){const n=parseInt(String(h).slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return(0.2126*r+0.7152*g+0.0722*b)/255>.5?"#15151E":"#fff"}
@@ -957,21 +960,22 @@ const NEWS_ADAPTERS={
   throw Object.assign(new Error("Couldn't reach "+src.name),{details:why})}};
 
 // ---- state + saved copy (so the tab shows something instantly and survives a failed refresh) ----
-const newsState={articles:[],sources:{},via:{},updatedAt:null,fromCache:false,busy:false,loaded:false,filter:"",shown:NEWS_CONFIG.pageSize,view:(()=>{try{return localStorage.getItem("redline-news-view")==="rows"?"rows":"cards"}catch(e){return"cards"}})()};
+const newsState={articles:[],pending:[],sources:{},via:{},updatedAt:null,fromCache:false,busy:false,loaded:false,filter:"",shown:NEWS_CONFIG.pageSize,view:(()=>{try{return localStorage.getItem("redline-news-view")==="rows"?"rows":"cards"}catch(e){return"cards"}})()};
 const pgSize=()=>NEWS_CONFIG.pageSize*(newsState.view==="rows"?2:1);   // the compact list fits twice as many
 const newsSrc=id=>NEWS_SOURCES.find(s=>s.id===id);
 function hydrateNews(){
  try{const c=JSON.parse(localStorage.getItem(NEWS_CONFIG.cacheKey));if(!c||!Array.isArray(c.articles))return;
   const list=c.articles.map(a=>coerceArticle(a,newsSrc(a&&a.sourceId),true)).filter(Boolean);if(!list.length)return;
-  Object.assign(newsState,{articles:prepare(list),updatedAt:+c.at||null,fromCache:true,via:c.via&&typeof c.via==="object"?c.via:{},loaded:true});drawNews()}catch(e){}}
-function saveNews(){try{localStorage.setItem(NEWS_CONFIG.cacheKey,JSON.stringify({at:newsState.updatedAt,via:newsState.via,articles:newsState.articles}))}catch(e){}}
+  Object.assign(newsState,{articles:prepare(list),pending:prepare(Array.isArray(c.pending)?c.pending.map(a=>coerceArticle(a,newsSrc(a&&a.sourceId),true)).filter(Boolean):[]),updatedAt:+c.at||null,fromCache:true,via:c.via&&typeof c.via==="object"?c.via:{},loaded:true});drawNews()}catch(e){}}
+function saveNews(){try{localStorage.setItem(NEWS_CONFIG.cacheKey,JSON.stringify({at:newsState.updatedAt,via:newsState.via,articles:newsState.articles,pending:newsState.pending}))}catch(e){}}
 
 async function settleLimited(fns,limit){     // run feed requests a few at a time so relays aren't hit with a burst
  const out=new Array(fns.length);let i=0;
  await Promise.all(Array.from({length:Math.min(limit,fns.length)},async()=>{while(i<fns.length){const k=i++;
   try{out[k]={status:"fulfilled",value:await fns[k]()}}catch(e){out[k]={status:"rejected",reason:e}}}}));
  return out}
-async function loadNews(force){
+const newsArticleKey=a=>a?(a.url?urlKey(a.url):titleKey(a.title)):"";
+async function loadNews(force,silent=false){
  if(newsState.busy)return;
  if(!force&&newsState.updatedAt&&!newsState.fromCache&&Date.now()-newsState.updatedAt<NEWS_CONFIG.freshMs){drawNews();return}
  newsState.busy=true;drawNews();
@@ -989,8 +993,15 @@ async function loadNews(force){
    }
   });
   if(okIds.size){
+   // During background checks, keep new stories out of the current list until the reader asks to see them.
+   const known=new Set(newsState.articles.map(newsArticleKey).filter(Boolean));
+   const freshPrepared=prepare(fresh);
+   const newlyFound=silent&&newsState.articles.length?freshPrepared.filter(a=>{const k=newsArticleKey(a);return k&&!known.has(k)}):[];
+   const newKeys=new Set(newlyFound.map(newsArticleKey));
+   if(newlyFound.length)newsState.pending=prepare([...newsState.pending,...newlyFound]);
+   const visibleFresh=newlyFound.length?fresh.filter(a=>!newKeys.has(newsArticleKey(a))):fresh;
    // A failed/empty feed must never erase its last known-good articles.
-   newsState.articles=prepare([...fresh,...newsState.articles.filter(a=>!okIds.has(a.sourceId))]);
+   newsState.articles=prepare([...visibleFresh,...newsState.articles.filter(a=>!okIds.has(a.sourceId))]);
    newsState.updatedAt=Date.now();newsState.fromCache=false;saveNews();
   }
   newsState.loaded=true;newsState.shown=pgSize();
@@ -1023,8 +1034,9 @@ function drawChips(){
  const chip=(id,label,n,bad)=>`<button class="chip" data-src="${esc(id)}" style="${id?srcStyle(id):"--sc:var(--red)"}" aria-pressed="${S.filter===id}"${bad?' title="Couldn\'t load this source"':""}>${id?"<i></i>":""}${esc(label)}${bad?" ⚠":` <span class="cnt">${n}</span>`}</button>`;
  $("nchips").innerHTML=chip("","All sources",S.articles.length,false)+NEWS_SOURCES.filter(s=>s.enabled).map(s=>chip(s.id,s.label||s.name,counts[s.id]||0,S.sources[s.id]&&S.sources[s.id].ok===false&&!counts[s.id])).join("")}
 function drawNews(){
- const S=newsState,box=$("newsList"),note=$("nnote"),stat=$("nsrc");
+ const S=newsState,box=$("newsList"),note=$("nnote"),stat=$("nsrc"),newBtn=$("nnew");
  const failed=Object.entries(S.sources).filter(([,v])=>!v.ok),at=S.updatedAt?new Date(S.updatedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
+ newBtn.hidden=!S.pending.length;newBtn.textContent=S.pending.length?"↑ "+S.pending.length+" new article"+(S.pending.length===1?"":"s"):"↑ New articles";
  box.setAttribute("aria-busy",S.busy?"true":"false");drawChips();document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
  const msgs=[];
  if(S.articles.length&&S.busy&&S.fromCache)msgs.push(`Showing saved articles from ${esc(at)} while updating…`);
@@ -1045,6 +1057,11 @@ function drawNews(){
 
 // ---- wiring ----
 $("nrefresh").onclick=()=>loadNews(true);
+$("nnew").onclick=()=>{
+ if(!newsState.pending.length)return;
+ const scrollTop=$("newsList").scrollTop;
+ newsState.articles=prepare([...newsState.pending,...newsState.articles]);newsState.pending=[];newsState.shown=pgSize();saveNews();drawNews();$("newsList").scrollTop=scrollTop;
+};
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{newsState.view=b.dataset.view;newsState.shown=pgSize();try{localStorage.setItem("redline-news-view",newsState.view)}catch(e){}drawNews()});
 $("nchips").addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-src]");if(!b)return;newsState.filter=b.dataset.src;newsState.shown=pgSize();drawNews()});
 $("newsList").addEventListener("click",e=>{
@@ -1055,6 +1072,8 @@ $("newsList").addEventListener("click",e=>{
 $("nnote").addEventListener("click",e=>{if(e.target.closest&&e.target.closest("[data-act=retry]"))loadNews(true)});
 $("newsList").addEventListener("error",e=>{const el=e.target;if(el&&el.tagName==="IMG"){const w=el.closest(".nimg");if(w){w.classList.add("ph");w.innerHTML=PH}else el.remove()}},true);
 setInterval(()=>{document.querySelectorAll("#newsList time[data-ts]").forEach(t=>{const ms=+t.dataset.ts,r=relTime(ms);t.textContent=r||fmtAbs(ms)})},60000);
+// Refresh feeds every 3 minutes while the page is visible; hidden tabs wait until the next visible interval.
+setInterval(()=>{if(document.visibilityState==="visible")loadNews(true,true)},3*60*1000);
 
 // ---------- Car data ----------
 let carTok=0;function drawTele(){return curSub==="car"?loadCar(true):drawLaps()}
