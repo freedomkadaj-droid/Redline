@@ -539,7 +539,7 @@ function show(top,sub){
  $("sub").innerHTML=(SUBS[top]||[]).map(([k,l])=>`<button data-s="${k}" aria-selected="${k===sub}">${l}</button>`).join("");$("sub").hidden=!SUBS[top];
  $("sub").querySelectorAll("button").forEach(b=>b.onclick=()=>show(top,b.dataset.s));
  const pane=(sub==="laps"||sub==="car")?"tele":(sub==="fp1"||sub==="sprintqualifying")?"result":sub;
-  if(pane==="result")$("resTitle").textContent=sub==="fp1"?"Singapore-independent · Free Practice 1":sub==="sprintqualifying"?"Sprint Qualifying result":`${cur?.country_name||"Grand Prix"} Grand Prix result`;
+  if(pane==="result")$("resTitle").textContent=sub==="fp1"?`${cur?.country_name||"Grand Prix"} · Free Practice 1`:sub==="sprintqualifying"?"Sprint Qualifying result":`${cur?.country_name||"Grand Prix"} Grand Prix result`;
  document.querySelectorAll(".pane").forEach(p=>p.hidden=p.id!=="v-"+pane);
  stopLive();if(sub==="live")startLive();
  if(pane==="tele"){$("lapList").hidden=sub!=="laps";$("carView").hidden=sub!=="car";$("clap").hidden=sub!=="car";
