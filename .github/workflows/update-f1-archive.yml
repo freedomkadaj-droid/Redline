@@ -30,13 +30,12 @@ jobs:
           PYTHONUNBUFFERED: "1"
         run: |
           python - <<'PY'
-          import json, os, time, urllib.error, urllib.request
+          import json, os, time, urllib.request
           from datetime import datetime, timezone
 
           base = "https://api.jolpi.ca/ergast/f1"
           os.makedirs("archive", exist_ok=True)
           current_year = datetime.now(timezone.utc).year
-          endpoints = ("races", "results", "qualifying", "driverstandings", "constructorstandings")
 
           def get_json(url):
               last = None
@@ -53,16 +52,68 @@ jobs:
                       time.sleep(1.5 * (attempt + 1))
               raise RuntimeError(f"Could not fetch {url}: {last}")
 
+          def merge_pages(year, endpoint):
+              first = get_json(f"{base}/{year}/{endpoint}/?limit=100")
+              table_name = "RaceTable"
+              rows_name = "Races"
+              if endpoint not in ("results", "qualifying"):
+                  return first
+              total = int(first.get("total", "0"))
+              limit = int(first.get("limit", "100"))
+              pages = [first]
+              offset = limit
+              while offset < total:
+                  pages.append(get_json(f"{base}/{year}/{endpoint}/?limit={limit}&offset={offset}"))
+                  offset += limit
+                  time.sleep(0.12)
+              merged = {}
+              for page in pages:
+                  for race in page.get(table_name, {}).get(rows_name, []):
+                      rnd = str(race.get("round", ""))
+                      if rnd not in merged:
+                          merged[rnd] = dict(race)
+                          continue
+                      target = merged[rnd]
+                      nested = "Results" if endpoint == "results" else "QualifyingResults"
+                      existing = target.setdefault(nested, [])
+                      seen = {x.get("Driver", {}).get("driverId") for x in existing}
+                      for item in race.get(nested, []):
+                          driver_id = item.get("Driver", {}).get("driverId")
+                          if driver_id not in seen:
+                              existing.append(item)
+                              seen.add(driver_id)
+              out = dict(first)
+              out[table_name] = dict(first.get(table_name, {}))
+              out[table_name][rows_name] = [merged[k] for k in sorted(merged, key=lambda x: int(x or 0))]
+              out["offset"] = "0"
+              out["limit"] = str(total)
+              return out
+
           for year in range(2023, current_year + 1):
               path = f"archive/{year}.json"
               responses = {}
-              for endpoint in endpoints:
+              for endpoint in ("races", "results", "qualifying", "driverstandings", "constructorstandings"):
                   key = f"/{year}/{endpoint}/"
                   try:
-                      responses[key] = get_json(f"{base}/{year}/{endpoint}/?limit=1000")
-                      time.sleep(0.3)
+                      responses[key] = merge_pages(year, endpoint)
+                      print(f"{year} {endpoint}: {responses[key].get('total', '?')} rows, {len(responses[key].get('RaceTable', {}).get('Races', []))} rounds")
+                      time.sleep(0.12)
                   except Exception as exc:
                       print(f"Warning: {year} {endpoint}: {exc}")
+
+              races = responses.get(f"/{year}/races/", {}).get("RaceTable", {}).get("Races", [])
+              for race in races:
+                  rnd = int(race.get("round", 0) or 0)
+                  if not rnd:
+                      continue
+                  for endpoint in ("driverstandings", "constructorstandings"):
+                      key = f"/{year}/{rnd}/{endpoint}/"
+                      try:
+                          responses[key] = get_json(f"{base}/{year}/{rnd}/{endpoint}/?limit=100")
+                          time.sleep(0.12)
+                      except Exception as exc:
+                          print(f"Warning: {year} round {rnd} {endpoint}: {exc}")
+
               if not responses:
                   print(f"No data fetched for {year}; leaving any existing archive unchanged.")
                   continue
