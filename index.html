@@ -375,7 +375,7 @@ const jolpicaCache=new Map();
 async function jget(path){if(jolpicaCache.has(path))return jolpicaCache.get(path);const task=(async()=>{let last;for(let i=0;i<2;i++){try{const url=JOLPICA+path+(path.includes("?")?"&":"?")+"limit=100";const res=await fetch(url,{headers:{Accept:"application/json"}});if(!res.ok)throw new Error("Jolpica-F1 returned "+res.status);const data=await res.json();if(!data?.MRData)throw new Error("Unexpected Jolpica-F1 response");return data.MRData}catch(e){last=e;if(i===0)await sleep(500)}}throw last||new Error("Jolpica-F1 is unavailable")})();jolpicaCache.set(path,task);task.catch(()=>jolpicaCache.delete(path));return task}
 const jdate=session=>session?.date?new Date(session.date+"T"+(session.time||"12:00:00Z")):null;
 function jolpicaSessionList(r){const defs=[["First Practice","FirstPractice"],["Second Practice","SecondPractice"],["Third Practice","ThirdPractice"],["Sprint Qualifying","SprintQualifying"],["Sprint Shootout","SprintShootout"],["Sprint","Sprint"],["Qualifying","Qualifying"],["Race",null]],out=[];defs.forEach(([name,key])=>{const v=key?r[key]:{date:r.date,time:r.time};if(v?.date){const d=jdate(v);if(d&&!Number.isNaN(+d))out.push({name,date:d})}});const seen=new Set();return out.filter(x=>{const k=x.name+"|"+x.date.toISOString();if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>a.date-b.date)}
-async function jolpicaRounds(y){const data=await jget(`/${y}/races/`),races=data.RaceTable?.Races||[];return races.map(r=>{const sessions=jolpicaSessionList(r),raceDate=jdate({date:r.date,time:r.time})||new Date(r.date+"T12:00:00Z"),start=sessions[0]?.date||raceDate,round=Number(r.round),key=`jolpica-${y}-${round}`;return {_source:"jolpica",jolpicaRound:round,meeting_key:key,session_key:key,date_start:start.toISOString(),date_end:new Date(raceDate.getTime()+7200000).toISOString(),location:r.Circuit?.Location?.locality||r.Circuit?.circuitName||"",country_name:r.Circuit?.Location?.country||"",circuit_short_name:r.Circuit?.circuitName||"",meeting_name:r.raceName||"Grand Prix",raceName:r.raceName||"Grand Prix",jolpicaRace:r}})}
+async function jolpicaRounds(y){const data=await jget(`/${y}/races/`),races=data.RaceTable?.Races||[];return races.map(r=>{const sessions=jolpicaSessionList(r),raceDate=jdate({date:r.date,time:r.time})||new Date(r.date+"T12:00:00Z"),start=sessions[0]?.date||raceDate,round=Number(r.round),key=`jolpica-${y}-${round}`;return {_source:"jolpica",season:y,jolpicaRound:round,meeting_key:key,session_key:key,date_start:start.toISOString(),date_end:new Date(raceDate.getTime()+7200000).toISOString(),location:r.Circuit?.Location?.locality||r.Circuit?.circuitName||"",country_name:r.Circuit?.Location?.country||"",circuit_short_name:r.Circuit?.circuitName||"",meeting_name:r.raceName||"Grand Prix",raceName:r.raceName||"Grand Prix",jolpicaRace:r}})}
 async function useJolpicaForCurrentRace(){
  if(!cur)throw new Error("No race selected");
  if(cur._source==="jolpica")return cur;
@@ -436,16 +436,27 @@ function normaliseCountdownSession(s,race){
  return {name:s.session_name||s.name||"Session",start:+start,end:Number.isFinite(+end)&&+end>+start?+end:(+start+2*3600000),race:s.meeting_name||s.raceName||race?.meeting_name||race?.raceName||race?.country_name||"Grand Prix",round:s.round||race?.round||race?.jolpicaRound||"",location:s.circuit_short_name||race?.circuit_short_name||"",source:s._source||race?._source||"openf1"};
 }
 async function loadCountdownSchedule(y){
+ const targetYear=Number.isFinite(Number(y))?Number(y):nowY,now=Date.now();
  let items=[];
- try{const all=await get(`/sessions?year=${y}`);items=all.map(x=>normaliseCountdownSession(x,rounds.find(r=>r.meeting_key===x.meeting_key))).filter(Boolean)}catch(e){}
- if(!items.length){
-  try{const races=rounds.some(r=>r._source==="jolpica")?rounds:await jolpicaRounds(y);
-   items=races.flatMap(r=>(r._source==="jolpica"&&r.jolpicaRace?jolpicaSessionList(r.jolpicaRace).map(q=>normaliseCountdownSession({name:q.name,date_start:q.date.toISOString(),date_end:new Date(+q.date+2*3600000).toISOString(),_source:"jolpica",meeting_name:r.meeting_name,circuit_short_name:r.circuit_short_name,round:r.jolpicaRound},r)):[]));
+ try{const all=await get(`/sessions?year=${targetYear}`);items=all.map(x=>normaliseCountdownSession(x,rounds.find(r=>r.meeting_key===x.meeting_key))).filter(Boolean)}catch(e){}
+ // A partial OpenF1 response is not enough to prove that the upcoming schedule is complete.
+ // Merge Jolpica sessions whenever OpenF1 has no upcoming/in-progress session, preserving OpenF1 entries on duplicates.
+ const hasUpcoming=items.some(x=>x.start>now||(x.start<=now&&x.end>now));
+ if(!hasUpcoming){
+  try{
+   const hasCurrentJolpica=rounds.some(r=>r._source==="jolpica"&&Number(r.season)===targetYear);
+   const races=hasCurrentJolpica?rounds.filter(r=>r._source==="jolpica"&&Number(r.season)===targetYear):await jolpicaRounds(targetYear);
+   let fallback=races.flatMap(r=>r.jolpicaRace?jolpicaSessionList(r.jolpicaRace).map(q=>normaliseCountdownSession({name:q.name,date_start:q.date.toISOString(),date_end:new Date(+q.date+7200000).toISOString(),_source:"jolpica",meeting_name:r.meeting_name,circuit_short_name:r.circuit_short_name,round:r.jolpicaRound},r)):[]);
+   if(!fallback.some(x=>x.start>now||(x.start<=now&&x.end>now))){
+    try{const nextYear=await jolpicaRounds(targetYear+1);const nextItems=nextYear.flatMap(r=>r.jolpicaRace?jolpicaSessionList(r.jolpicaRace).map(q=>normaliseCountdownSession({name:q.name,date_start:q.date.toISOString(),date_end:new Date(+q.date+7200000).toISOString(),_source:"jolpica",meeting_name:r.meeting_name,circuit_short_name:r.circuit_short_name,round:r.jolpicaRound},r)):[]);fallback.push(...nextItems)}catch(e){}
+   }
+   const keys=new Set(items.map(x=>`${x.name.toLowerCase()}|${Math.round(x.start/60000)}`));
+   items.push(...fallback.filter(x=>!keys.has(`${x.name.toLowerCase()}|${Math.round(x.start/60000)}`)));
   }catch(e){}
  }
  countdownSessions=items.filter(Boolean).sort((a,b)=>a.start-b.start);renderLast();
  if(countdownTimer)clearInterval(countdownTimer);countdownTimer=setInterval(renderCountdown,1000);
- if(countdownRefreshTimer)clearInterval(countdownRefreshTimer);countdownRefreshTimer=setInterval(()=>loadCountdownSchedule(year).catch(()=>{}),30*60*1000);
+ if(countdownRefreshTimer)clearInterval(countdownRefreshTimer);countdownRefreshTimer=setInterval(()=>loadCountdownSchedule(nowY).catch(()=>{}),30*60*1000);
 }
 function countdownHTML(){
  const now=Date.now(),active=countdownSessions.find(x=>x.start<=now&&now<x.end),next=countdownSessions.find(x=>x.start>now),chosen=active||next;
@@ -478,7 +489,7 @@ async function loadYear(y){
  const nxt=rounds.findIndex(r=>new Date(r.date_start)>Date.now());
  $("rounds").innerHTML=rounds.map((r,i)=>`<button class="gp" data-i="${i}" ${new Date(r.date_end)>Date.now()?"disabled":""} aria-pressed="false"><span class="n">${String(i+1).padStart(2,"0")}</span><span><b>${esc(r.location||r.country_name)}</b><small>${esc(r.country_name)} · ${new Date(r.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span>${i===nxt?'<span class="badge">Next</span>':""}</button>`).join("");
  document.querySelectorAll(".gp").forEach(b=>b.onclick=()=>{loadRound(+b.dataset.i);closeSheet()});
- await loadCountdownSchedule(y);
+ await loadCountdownSchedule(nowY);
  if(done.length)loadRound(rounds.indexOf(done[done.length-1]));
  else {cur=null;renderLast("<small>Season hasn't started yet.</small>");}
 }
@@ -906,8 +917,11 @@ let calFor=null,calMap={};
 const trackTime=(t,gmt)=>{const o=(gmt||"").match(/(-?)(\d+):(\d+)/);const ms=o?(o[1]?-1:1)*(+o[2]*60+ +o[3])*6e4:0;const d=new Date(new Date(t).getTime()+ms);return d.toUTCString().slice(5,11)+" "+d.toISOString().slice(11,16)};
 async function loadCal(){
  calFor=year;$("calList").innerHTML='<div class="state">Loading…</div>';
- try{const m=(await get(`/meetings?year=${year}`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));const now=Date.now(),nx=m.findIndex(x=>new Date(x.date_start)>now);calMap={};
- $("calList").innerHTML=m.map((x,i)=>{calMap[x.meeting_key]=x;const st=new Date(x.date_start)>now?(i===nx?"Next":"Upcoming"):"Done";return `<div class="mt" data-k="${x.meeting_key}"><button class="mth" aria-expanded="false"><span class="rn">${String(i+1).padStart(2,"0")}</span><span class="mi"><b>${esc(x.meeting_name)}</b><small>${esc(x.location)}, ${esc(x.country_name)} · ${new Date(x.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span><span class="badge${st==="Done"?" off":""}">${st}</span><span class="chev" aria-hidden="true">›</span></button><div class="mtd" hidden></div></div>`}).join("")||'<div class="state">No meetings found.</div>';
+ try{
+  const m=(await get(`/meetings?year=${year}`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
+  if(!m.length)throw new Error("OpenF1 returned no calendar meetings");
+  const now=Date.now(),nx=m.findIndex(x=>new Date(x.date_start)>now);calMap={};
+  $("calList").innerHTML=m.map((x,i)=>{calMap[x.meeting_key]=x;const st=new Date(x.date_start)>now?(i===nx?"Next":"Upcoming"):"Done";return `<div class="mt" data-k="${x.meeting_key}"><button class="mth" aria-expanded="false"><span class="rn">${String(i+1).padStart(2,"0")}</span><span class="mi"><b>${esc(x.meeting_name)}</b><small>${esc(x.location)}, ${esc(x.country_name)} · ${new Date(x.date_start).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</small></span><span class="badge${st==="Done"?" off":""}">${st}</span><span class="chev" aria-hidden="true">›</span></button><div class="mtd" hidden></div></div>`}).join("");
  }catch(e){try{await loadJolpicaCalendar()}catch(j){fail("calList",j)}}
 }
 async function loadJolpicaCalendar(){
