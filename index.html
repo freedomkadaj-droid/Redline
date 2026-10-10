@@ -1342,12 +1342,12 @@ $("calList").onclick=async e=>{
   if(x._source==="jolpica"){
    const ss=x._sessions||[];let html=circuitGuideHTML(x)+'<div class="schedule-intro"><b>'+esc(x.raceName)+'</b><span>·</span><span>'+esc(x.Circuit?.circuitName||"")+'</span></div><div class="schedule-table"><table><thead><tr><th>Session</th><th>Your local time</th></tr></thead><tbody>';
    ss.forEach(q=>{const date=q.date;html+='<tr><td><span class="session-name"><i class="session-dot"></i>'+esc(q.name)+'</span></td><td><span class="time-main">'+date.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"})+'</span><span class="time-date">'+date.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})+'</span></td></tr>'});
-   det.innerHTML=html+'</tbody></table></div>';det.dataset.done=1;return;
+   det.innerHTML=html+'</tbody></table></div>';renderRedlineCircuitMaps(det);det.dataset.done=1;return;
   }
   const ss=(await get(`/sessions?meeting_key=${x.meeting_key}`)).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
   let html=circuitGuideHTML(x)+'<div class="schedule-intro"><b>'+esc(x.meeting_official_name||"Grand Prix weekend")+'</b><span>·</span><span>'+esc(x.circuit_short_name||"")+'</span><span class="time-zone">TRACK TIME <b>UTC'+esc((x.gmt_offset||"").slice(0,6))+'</b></span></div><div class="schedule-table"><table><thead><tr><th>Session</th><th>Your time</th><th>Track time</th></tr></thead><tbody>';
   ss.forEach(q=>{const date=new Date(q.date_start);html+='<tr><td><span class="session-name"><i class="session-dot"></i>'+esc(q.session_name)+'</span></td><td><span class="time-main">'+date.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"})+'</span><span class="time-date">'+date.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})+'</span></td><td><span class="time-main">'+esc(trackTime(q.date_start,x.gmt_offset))+'</span><span class="time-date">Circuit local time</span></td></tr>'});
-  det.innerHTML=html+'</tbody></table></div>';det.dataset.done=1;
+  det.innerHTML=html+'</tbody></table></div>';renderRedlineCircuitMaps(det);det.dataset.done=1;
  }catch(err){det.textContent="Couldn't load sessions: "+err.message}
 };
 
