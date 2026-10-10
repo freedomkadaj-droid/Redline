@@ -93,6 +93,8 @@ select{background:var(--card2);color:var(--txt);border:1px solid var(--line);bor
 #sub button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:99px;padding:5px 14px;cursor:pointer;font:500 14px Inter}
 #sub button[aria-selected=true]{border-color:var(--red);color:var(--txt);background:rgba(255,30,0,.15)}
 :focus-visible{outline:2px solid var(--red);outline-offset:2px}
+/* Keep inactive tabs hidden even when layout classes set display:grid/flex. */
+[hidden]{display:none!important}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:18px;backdrop-filter:blur(10px)}
 .panel h2{font:600 13px 'Space Grotesk';letter-spacing:.14em;text-transform:uppercase;color:var(--mute);padding:14px 18px;border-bottom:1px solid var(--line)}
 .scroll{max-height:560px;overflow-y:auto}
