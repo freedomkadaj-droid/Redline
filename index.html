@@ -696,8 +696,8 @@ async function loadJolpicaSessionResult(kind){
   await useJolpicaForCurrentRace();if(!ok(t))return;
   const y=cur.season||year,r=cur.jolpicaRound;
   const path=kind==="fp1"?`/${y}/${r}/practice/1/`:`/${y}/${r}/sprint/qualifying/`;
-  const data=await jget(path);if(!ok(t))return;
-  const race=data.RaceTable?.Races?.[0]||data.PracticeTable?.Races?.[0]||data.QualifyingTable?.Races?.[0]||{};
+  let data=null;try{data=await jget(path)}catch(e){}if(!ok(t))return;
+  const race=data?.RaceTable?.Races?.[0]||data?.PracticeTable?.Races?.[0]||data?.QualifyingTable?.Races?.[0]||{};
   let res=kind==="fp1"?(race.Practice1Results||race.PracticeResults||[]):(race.SprintQualifyingResults||race.QualifyingResults||race.SprintResults||[]);
   // Jolpica's legacy-compatible API doesn't expose every FP/Sprint Qualifying classification.
   // Keep the confirmed 2026 Singapore weekend classifications available as a fallback.
