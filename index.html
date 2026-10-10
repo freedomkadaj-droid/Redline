@@ -1190,16 +1190,17 @@ async function renderRedlineCircuitMaps(root=document){
   const urls=[box.dataset.mapUrl,box.dataset.mapFallback];
   try{
    let response;
-   for(const url of urls){response=await fetch(url,{cache:"force-cache"});if(response.ok)break;}
+   for(const url of urls){try{response=await fetch(url,{cache:"force-cache"});if(response.ok)break;}catch(err){response=null;}}
    if(!response?.ok)throw new Error("map unavailable");
    const source=new DOMParser().parseFromString(await response.text(),"image/svg+xml");
    const original=source.documentElement;
    if(original.localName!=="svg"||source.querySelector("parsererror"))throw new Error("invalid SVG");
    const viewBox=original.getAttribute("viewBox")||"0 0 600 400";
    const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
-   svg.setAttribute("viewBox",viewBox);svg.setAttribute("width",String(w));svg.setAttribute("height",String(h));svg.setAttribute("role","img");svg.setAttribute("aria-label",box.getAttribute("aria-label")||"Circuit map");
+   svg.setAttribute("viewBox",viewBox);svg.setAttribute("role","img");svg.setAttribute("aria-label",box.getAttribute("aria-label")||"Circuit map");
    svg.setAttribute("preserveAspectRatio","xMidYMid meet");
    const vb=viewBox.trim().split(/[ ,]+/).map(Number),w=vb[2]||600,h=vb[3]||400;
+   svg.setAttribute("width",String(w));svg.setAttribute("height",String(h));
    const bg=document.createElementNS(svg.namespaceURI,"rect");bg.setAttribute("x",vb[0]||0);bg.setAttribute("y",vb[1]||0);bg.setAttribute("width",w);bg.setAttribute("height",h);bg.setAttribute("fill","#000");svg.appendChild(bg);
    const geometry=Array.from(original.querySelectorAll("path,polyline,polygon,line,circle,ellipse")).filter(el=>el!==bg);
    geometry.forEach(el=>{
