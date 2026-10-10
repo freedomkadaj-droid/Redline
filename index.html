@@ -921,15 +921,16 @@ const NEWS_SOURCES=[   // Show only short headlines with attribution and direct 
  {id:"f1",name:"Formula 1",label:"Formula 1 Official",color:"#E10600",type:"link",homepage:"https://www.formula1.com/en/latest",enabled:false},
  {id:"sky",name:"Sky Sports",label:"Sky Sports F1",color:"#17C3D6",type:"rss",url:"https://www.skysports.com/rss/12433",homepage:"https://www.skysports.com/f1",enabled:true},
  {id:"bbc",name:"BBC Sport",label:"BBC Sport",color:"#E0359A",type:"rss",url:"https://feeds.bbci.co.uk/sport/formula1/rss.xml",homepage:"https://www.bbc.com/sport/formula1",enabled:true},
- {id:"autosport",name:"Autosport",label:"Autosport",color:"#F58220",type:"rss",url:"https://www.autosport.com/rss/f1/news/",homepage:"https://www.autosport.com/f1/news/",enabled:true},
- {id:"motorsport",name:"Motorsport.com",label:"Motorsport.com",color:"#3B6CFF",type:"rss",url:"https://www.motorsport.com/rss/f1/news/",homepage:"https://www.motorsport.com/f1/news/",enabled:true},
+ {id:"autosport",name:"Autosport",label:"Autosport",color:"#F58220",type:"rss",url:"https://www.autosport.com/rss/f1/news/",homepage:"https://www.autosport.com/f1/news/",enabled:false},
+ {id:"motorsport",name:"Motorsport.com",label:"Motorsport.com",color:"#3B6CFF",type:"rss",url:"https://www.motorsport.com/rss/f1/news/",homepage:"https://www.motorsport.com/f1/news/",enabled:false},
  {id:"racefans",name:"RaceFans",label:"RaceFans",color:"#19B37A",type:"rss",url:"https://www.racefans.net/feed/",homepage:"https://www.racefans.net/",enabled:true},
- {id:"planetf1",name:"PlanetF1",label:"PlanetF1",color:"#9B5CFF",type:"rss",url:"https://www.planetf1.com/rss",homepage:"https://www.planetf1.com/",enabled:true},
- {id:"racingnews365",name:"RacingNews365",label:"RacingNews365",color:"#F2C230",type:"rss",url:"https://racingnews365.com/feed/news.xml",homepage:"https://racingnews365.com/",enabled:true},
- {id:"guardian",name:"The Guardian",label:"The Guardian",color:"#7C8CA3",type:"rss",url:"https://www.theguardian.com/sport/formulaone/rss",homepage:"https://www.theguardian.com/sport/formulaone",enabled:true},
- {id:"racer",name:"RACER",label:"RACER",color:"#E3B341",type:"rss",url:"https://racer.com/category/formula-1/feed/",homepage:"https://racer.com/category/formula-1/",enabled:true},
+ {id:"planetf1",name:"PlanetF1",label:"PlanetF1",color:"#9B5CFF",type:"rss",url:"https://www.planetf1.com/rss",homepage:"https://www.planetf1.com/",enabled:false},
+ {id:"racingnews365",name:"RacingNews365",label:"RacingNews365",color:"#F2C230",type:"rss",url:"https://racingnews365.com/feed/news.xml",homepage:"https://racingnews365.com/",enabled:false},
+ {id:"guardian",name:"The Guardian",label:"The Guardian",color:"#7C8CA3",type:"rss",url:"https://www.theguardian.com/sport/formulaone/rss",homepage:"https://www.theguardian.com/sport/formulaone",enabled:false},
+ {id:"racer",name:"RACER",label:"RACER",color:"#E3B341",type:"rss",url:"https://racer.com/category/formula-1/feed/",homepage:"https://racer.com/category/formula-1/",enabled:false},
  {id:"therace",name:"The Race",label:"The Race",color:"#C5A3FF",type:"rss",url:"https://www.the-race.com/category/formula-1/feed/",homepage:"https://www.the-race.com/category/formula-1/",enabled:true},
  {id:"motorsportweek",name:"Motorsport Week",label:"Motorsport Week",color:"#D71920",type:"rss",url:"https://www.motorsportweek.com/tag/formula-1/feed/",homepage:"https://www.motorsportweek.com/series/single-seater/formula-1/",enabled:true}
+ {id:"formula1news",name:"Formula1News.co.uk",label:"Formula1News.co.uk",color:"#E10600",type:"rss",url:"https://formula1news.co.uk/feed/",homepage:"https://formula1news.co.uk/",enabled:true},
 ];
 // readable text colour for a coloured tag
 function onColor(h){const n=parseInt(String(h).slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return(0.2126*r+0.7152*g+0.0722*b)/255>.5?"#15151E":"#fff"}
