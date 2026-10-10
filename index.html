@@ -1214,25 +1214,31 @@ async function renderRedlineCircuitMaps(root=document){
    if(!track)throw new Error("track outline missing");
    track.removeAttribute("style");track.removeAttribute("class");
    track.setAttribute("fill","none");track.setAttribute("stroke","#f5f5f7");
-   track.setAttribute("stroke-width",String(Math.max(w,h)*.006));
    track.setAttribute("stroke-linecap","round");track.setAttribute("stroke-linejoin","round");
    trackGroup.appendChild(track);svg.appendChild(trackGroup);
+   // Scale all styling from the real track dimensions, not the source SVG canvas.
+   // F1DB source files use different viewBox sizes, which previously made some
+   // corner markers oversized and crowded together.
+   const trackBounds=track.getBBox();
+   const trackSize=Math.max(trackBounds.width,trackBounds.height)||1;
+   track.setAttribute("stroke-width",String(trackSize*.0035));
    const count=Math.min(30,Math.max(0,Number(box.dataset.corners)||0));
    if(track&&count){
     const total=track.getTotalLength(),group=document.createElementNS(svg.namespaceURI,"g");group.setAttribute("class","redline-corner");
+    const radius=Math.max(trackSize*.009,2.5);
     for(let i=0;i<count;i++){
      const pt=track.getPointAtLength(total*(i+.5)/count),g=document.createElementNS(svg.namespaceURI,"g"),c=document.createElementNS(svg.namespaceURI,"circle"),t=document.createElementNS(svg.namespaceURI,"text");
-     const radius=Math.max(Math.min(w,h)*.014,4.5);c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",radius);
-     t.setAttribute("x",pt.x);t.setAttribute("y",pt.y+.3);t.setAttribute("font-size",String(radius*1.25));t.textContent=String(i+1);
+     c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",radius);
+     t.setAttribute("x",pt.x);t.setAttribute("y",pt.y+.15);t.setAttribute("font-size",String(radius*1.05));t.textContent=String(i+1);
      g.append(c,t);group.appendChild(g);
     }
     trackGroup.appendChild(group);
    }
-   // Rotate portrait-shaped circuits, then use a square viewBox based on the full artwork bounds.
+   // Rotate portrait-shaped circuits and keep only a modest, consistent safety margin.
    const bounds=trackGroup.getBBox(),cx=bounds.x+bounds.width/2,cy=bounds.y+bounds.height/2;
    const rotate=bounds.height>bounds.width*1.12;
    if(rotate)trackGroup.setAttribute("transform",`rotate(90 ${cx} ${cy})`);
-   const side=Math.max(bounds.width,bounds.height)*1.5||Math.max(w,h),half=side/2;
+   const side=Math.max(bounds.width,bounds.height)*1.24||Math.max(w,h),half=side/2;
    const bg=document.createElementNS(svg.namespaceURI,"rect");bg.setAttribute("x",cx-half);bg.setAttribute("y",cy-half);bg.setAttribute("width",side);bg.setAttribute("height",side);bg.setAttribute("fill","#000");
    svg.insertBefore(bg,trackGroup);
    svg.setAttribute("viewBox",`${cx-half} ${cy-half} ${side} ${side}`);
