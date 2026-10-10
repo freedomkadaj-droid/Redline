@@ -307,6 +307,25 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 .mth:focus-visible .mi b{color:var(--red);text-decoration-color:var(--red)}
 @media(hover:hover){.mth:hover{background:var(--hover)}.mth:hover .mi b{color:var(--red);text-decoration-color:var(--red)}.mth:hover .chev{color:var(--red)}}
 .radio{padding:18px;border-bottom:1px solid var(--line)}.radio:last-child{border-bottom:0}.radio-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}.radio-head .av{flex:0 0 40px}.radio-id{min-width:0;flex:1}.radio-id b{display:block;font:600 16px 'Space Grotesk';line-height:1.2}.radio-id small{display:block;color:var(--mute);font-size:12px;margin-top:4px}.radio-time{text-align:right;color:var(--mute);font:600 12px 'Space Grotesk';white-space:nowrap}.radio-kicker{font:700 10px 'Space Grotesk';letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:5px}.radio-audio{padding:10px 12px;background:var(--soft);border:1px solid var(--line);border-radius:12px}.radio-audio audio{display:block}.radio-wave{display:flex;align-items:center;gap:3px;height:22px;margin:0 0 7px;opacity:.8}.radio-wave i{display:block;width:3px;max-width:3px;flex:1;border-radius:4px;background:var(--red)}.radio-context{margin-top:14px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--soft)}.context-head{padding:12px 14px;border-bottom:1px solid var(--line)}.context-head b{display:block;font:700 12px 'Space Grotesk';letter-spacing:.1em}.context-head small{display:block;color:var(--mute);font-size:12px;margin-top:4px}.context-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line)}.context-card{min-width:0;padding:11px 13px;background:var(--card)}.context-card small{display:block;color:var(--mute);font:600 10px 'Space Grotesk';letter-spacing:.09em;text-transform:uppercase;margin-bottom:6px}.context-card b{display:block;font:600 15px 'Space Grotesk';overflow-wrap:anywhere}.context-card p{font-size:12px;color:var(--mute);line-height:1.45;margin:4px 0 0;overflow-wrap:anywhere}.context-summary{padding:12px 14px;border-top:1px solid var(--line)}.context-summary b{display:block;font:700 11px 'Space Grotesk';letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}.context-summary p{font-size:13px;line-height:1.5;margin:0;color:var(--txt)}.context-foot{display:block;padding:8px 14px;color:var(--mute);font-size:11px;border-top:1px solid var(--line)}@media(max-width:520px){.context-grid{grid-template-columns:1fr}.radio{padding:14px}.radio-time{font-size:11px}}
+/* Keep the desktop header card dimensions stable while its data loads */
+@media(min-width:821px){
+ header{align-items:center}
+ .last{box-sizing:border-box;width:570px;max-width:570px;min-height:136px;flex:0 1 570px;padding:9px 12px;gap:8px 12px}
+ .last .lr{flex:0 1 175px;gap:10px}
+ .last .lr .rnd{font-size:12px;padding:4px 7px}
+ .last .lt b{font-size:15px}
+ .last .lt small{font-size:11px}
+ .session-countdown{flex:1 1 250px;min-width:0;padding-left:12px;gap:4px}
+ .sc-top{gap:6px}
+ .sc-kicker{font-size:9px}
+ .sc-status{font-size:8px;padding:2px 6px}
+ .sc-session{font-size:14px}
+ .sc-gp,.sc-time{font-size:10px}
+ .sc-clock{max-width:225px;gap:4px}
+ .sc-unit{padding:4px 2px;border-radius:6px}
+ .sc-unit b{font-size:16px}
+ .sc-unit small{font-size:7px;margin-top:2px}
+}
 [hidden]{display:none!important}
 footer{color:var(--mute);font-size:14px}
 </style>
