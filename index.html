@@ -394,6 +394,12 @@ main,.layout>*{min-width:0}.panel{min-width:0;max-width:100%}
 /* source colour accents: top edge on cards, left edge in the list, tint on the logo tile */
 .nlist.cards li{border-top:3px solid var(--sc,var(--line))}
 .nlist.rows li{box-shadow:inset 3px 0 0 var(--sc,transparent)}
+/* Final override: the legacy image-list grid must not constrain headline-only articles. */
+.news-directory .nlist.rows .ncard.nheadline{display:block;grid-template-columns:minmax(0,1fr);gap:0;align-items:stretch;padding:0;width:100%;min-width:0}
+.news-directory .nlist.rows .ncard.nheadline .nbody{display:block;width:100%;min-width:0;padding:13px 14px}
+.news-directory .nlist.rows .ncard.nheadline .nt{display:block;width:100%;min-width:0;white-space:normal;overflow:visible;overflow-wrap:anywhere;-webkit-line-clamp:unset}
+@media(max-width:620px){.news-directory .nlist.rows .ncard.nheadline .nbody{padding:12px 11px}}
+
 .nimg.ph::before{background:repeating-linear-gradient(115deg,transparent 0 14px,rgba(255,30,0,.08) 14px 15px);background:repeating-linear-gradient(115deg,transparent 0 14px,color-mix(in srgb,var(--sc,#FF1E00) 18%,transparent) 14px 15px)}
 /* calendar rows: the title turns red and underlines on hover/focus, and the arrow shows it opens */
 .chev{font:600 22px/1 'Space Grotesk';color:var(--mute);transition:transform .15s ease,color .15s ease}
