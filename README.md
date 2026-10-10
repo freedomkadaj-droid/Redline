@@ -1,131 +1,118 @@
-🏎️ Redline — F1 Data Hub
+<div align="center">
 
-Redline is a personal Formula 1 data dashboard built to make F1 statistics, race information, driver data, and session data easier to explore in one place.
+# 🏁 REDLINE
 
-The project uses the OpenF1 API as its primary data source and presents the information through a clean, fan-friendly web interface.
+### Everything F1. All in One Place.
 
-🌐 Live-Demo: https://redlinef1.github.io
+Your ultimate Formula 1 companion — from the championship picture to the details behind every lap.
 
-✨ Features
-🏁 Formula 1 race and session data
-👨‍🚀 Driver information and statistics
-🏎️ Team information
-⏱️ Lap and timing data
-📊 F1 data visualization
-🗓️ Race weekend information
-🔎 Easy-to-navigate data exploration
-📱 Responsive web interface
-🔄 Data powered by OpenF1
+[**Open Redline →**](https://redlinef1.github.io/)
 
-The exact features of Redline may evolve over time as new ideas are added and the OpenF1 API continues to develop.
+*Explore the numbers. Follow the story. Feel the race.*
 
-🛠️ Tech Stack
+</div>
 
-Redline is built as a lightweight web application using:
+---
 
-HTML
-CSS
-JavaScript
-OpenF1 API
-GitHub Pages
+## 🏎️ Meet Redline
 
-The project is intentionally kept relatively lightweight so it can be hosted and maintained easily.
+Redline is an independent, fan-made Formula 1 dashboard built for people who love more than the final result. It brings race information, championship standings, driver statistics, live-session data and F1 news together in one responsive, easy-to-explore experience.
 
-📡 Data Source
+Whether you're checking the next Grand Prix, comparing drivers across a season, revisiting historic results or keeping up with the paddock, Redline puts the essentials in one place.
 
-Redline uses OpenF1 to retrieve Formula 1 data.
+## ✨ What You Can Explore
 
-OpenF1 provides detailed F1 telemetry, timing, session, driver, race control, lap, pit stop, and other racing data through a REST API.
+### 📰 News — The Paddock, at a Glance
+- Browse F1 stories from a collection of motorsport publishers in one feed.
+- Filter articles by source and open the original publisher's story.
+- Receive newly detected stories through a **New articles** control, so updates don't have to interrupt your reading.
+- Refresh the feed manually, with background checks while the page is open.
 
-Currently, OpenF1 provides historical data from the 2023 season onwards, with multiple endpoints available for different types of F1 data.
+*News availability depends on publisher feeds and third-party access relays. Some sources may occasionally be unavailable.*
 
-🔗 OpenF1:
-https://openf1.org/
+### 📊 Driver Stats — Go Beyond the Headlines
+- Explore season statistics with **Overview**, **Head-to-Head** and **Season Trends** views.
+- Compare drivers and look for patterns across a championship.
+- Select seasons, with historical coverage depending on the available data source.
 
-🔗 OpenF1 Documentation:
-https://openf1.org/docs/
+### 🗓️ Calendar — Know What's Next
+- Browse the season schedule and Grand Prix weekends.
+- Check session timing and the upcoming-session countdown in your local time.
+- See schedule information assembled from available F1 data sources.
 
-Note: OpenF1 is an unofficial Formula 1 data project and is not affiliated with Formula 1, the FIA, or Formula One Licensing B.V.
+### 🏆 Standings — Follow the Championship
+- View the Drivers' Championship and Constructors' Championship.
+- Switch between seasons to explore championship history.
+- Review positions and points as data becomes available.
 
-🚧 Project Status
+### 🏁 Race — Revisit the Results
+- Explore race weekends and available session results.
+- Browse historical seasons and rounds, including qualifying and race data where available.
+- Use the season and Grand Prix selectors to move through F1 history.
 
-Active personal project
+### 🔴 Live — Follow the Session
+- Check the current or most recent session information when data is available.
+- Follow session status and timing information without digging through raw API responses.
 
-Redline is developed and maintained as a personal project.
+### 📡 Telemetry — Dive Into the Data
+- Explore detailed session and timing data provided by the supported data services.
+- Availability and depth depend on the selected session and the data published by the APIs.
 
-Development is done primarily during my free time, so updates may not follow a fixed release schedule.
+## 🕰️ F1 History
 
-Future updates may include:
+Redline combines modern session data with historical results so you can move between current-season coverage and earlier championship seasons.
 
-New dashboards
-Additional F1 statistics
-Improved data visualization
-Driver and team comparisons
-More historical data exploration
-UI/UX improvements
-Additional OpenF1 API integrations
-New features based on future OpenF1 API capabilities
+- **OpenF1** provides modern Formula 1 session data, including timing, laps, drivers and other session information; its historical coverage generally starts in 2023.
+- **Jolpica-F1** provides the historical-results data used for older seasons, including race results, qualifying and championship standings where available.
+- Season selectors are designed to reach back to **1950**. The exact information available varies by season and endpoint.
 
-There are currently no plans for collaborative development or external contributors. This repository is mainly intended to document and showcase the project.
+Historical data is cached in the repository where supported, and a scheduled GitHub Actions workflow refreshes the archive. Live-session and news features still depend on their respective external services.
 
-🎯 Project Goals
+## 🎨 Made for the Race Weekend
 
-The main goal of Redline is simple:
+- Responsive layout for desktop and mobile.
+- Dark and light themes.
+- A streamlined, tab-based interface.
+- Persistent browser-side preferences and caching where supported.
+- Lightweight static hosting with no account required.
 
-Make Formula 1 data easier and more enjoyable to explore.
+## 🛠️ Built With
 
-Instead of interacting directly with API endpoints and raw JSON responses, Redline aims to turn that data into something that is easier for an F1 fan to understand and explore.
+| Technology | Role |
+| --- | --- |
+| HTML, CSS and JavaScript | Interface and application logic |
+| [OpenF1](https://openf1.org/) | Modern session, timing and telemetry data |
+| [Jolpica-F1](https://jolpi.ca/) | Historical Formula 1 results and standings |
+| RSS / Atom feeds | Aggregated motorsport news |
+| GitHub Pages | Static website hosting |
+| GitHub Actions | Scheduled historical archive refresh |
 
-This project is also an opportunity for me to experiment with:
+Redline is intentionally kept lightweight and is hosted as a static website. Some data services may apply rate limits, have outages or restrict browser access, so availability can vary.
 
-Front-end development
-API integration
-Data visualization
-UI/UX design
-JavaScript development
-Working with real-world datasets
-📈 Future Plans
+## 🚦 Project Status
 
-There is no strict roadmap for Redline.
+Redline is an active personal project. The core experience is built around seven areas: **News, Driver Stats, Calendar, Standings, Race, Live and Telemetry**. Improvements focus on reliability, historical coverage, data presentation and usability.
 
-New features will be added whenever I have time, inspiration, or find something interesting that can be built using F1 data.
+The project does not follow a fixed release schedule. Future ideas may include deeper statistics, additional comparisons and further data visualisations as time and data availability allow.
 
-The project may also evolve alongside new functionality and data becoming available through the OpenF1 API.
+## ⚠️ Disclaimer
 
-In other words:
+Redline is an independent, fan-made project. It is **not affiliated with, endorsed by, or sponsored by Formula 1, the FIA, or any Formula 1 team**.
 
-If I think of something cool, I'll probably build it. 🏎️💨
+Formula 1, F1, FORMULA ONE, GRAND PRIX and related marks are trademarks of their respective owners. Data and news are provided by or retrieved from third-party services and publishers; their availability and accuracy are subject to those providers.
 
-🏁 Update
+## 📜 License
 
-REDLINE v0.013 — UI & Design Improvements
+Please refer to the repository for the applicable license and usage terms.
 
-✨ What's New
+---
 
-📰 News Tab: Fixed the awkward expansion behaviour when opening news articles.
-🎨 Branding Refresh: Introduced a new logo and updated the title and subtitle typography.
-📊 Standings UI: Reduced the size of the standings section in the upper-right corner for a cleaner layout.
+<div align="center">
 
-⚠️ Disclaimer
+### Built for the fans who love the details.
 
-Redline is an independent fan-made project.
+**Lights out. Data on.** 🏎️
 
-It is not affiliated with, endorsed by, or sponsored by Formula 1, FIA, or any Formula 1 team.
+[Visit Redline](https://redlinef1.github.io/) · [View the source](https://github.com/redlinef1/redlinef1.github.io)
 
-Formula 1, F1, FORMULA ONE, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trademarks of their respective owners.
-
-F1 data is provided through the OpenF1 API.
-
-📜 License
-
-This project is primarily maintained as a personal project.
-
-Please check the repository for the applicable license and usage terms.
-
-🏁 Redline
-
-Built for Formula 1 fans who enjoy digging into the numbers.
-
-Lights out. Data on.
-
-🏎️💨
+</div>
