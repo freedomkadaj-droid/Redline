@@ -465,10 +465,34 @@ async function fetchRetry(p){for(let i=0;i<4;i++){await throttle();let r;try{r=a
   if(!Array.isArray(j))throw new Error("OpenF1 returned an unexpected data format");
   if(p.startsWith("/drivers"))j.forEach(d=>{if(d.full_name)nameBook[d.driver_number]=d});return j}
  throw new Error("OpenF1 is busy, try again soon")}
-function get(p){if(cache.has(p))return cache.get(p);const q=chain.then(()=>fetchRetry(p));
+// Durable browser archive: keeps successful API responses across reloads and API outages.
+const ARCHIVE_DB="redline-archive-v1";
+let archiveDbPromise;
+function archiveDb(){if(!("indexedDB" in window))return Promise.reject(new Error("IndexedDB unavailable"));if(!archiveDbPromise)archiveDbPromise=new Promise((resolve,reject)=>{const req=indexedDB.open(ARCHIVE_DB,1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains("responses"))req.result.createObjectStore("responses")};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});return archiveDbPromise}
+async function archiveRead(key){try{return await new Promise((resolve,reject)=>archiveDb().then(db=>{const tx=db.transaction("responses","readonly"),q=tx.objectStore("responses").get(key);q.onsuccess=()=>resolve(q.result?.data??null);q.onerror=()=>reject(q.error)}).catch(reject))}catch(e){return null}}
+async function archiveWrite(key,data){try{await new Promise((resolve,reject)=>archiveDb().then(db=>{const tx=db.transaction("responses","readwrite");tx.objectStore("responses").put({data,savedAt:Date.now()},key);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)}).catch(reject))}catch(e){}}
+const archiveStamp=()=>{try{return new Date().toLocaleString(undefined,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}catch(e){return "previously saved"}};
+function offlineArchiveNote(source){setNet("OFFLINE ARCHIVE · saved "+source+" data · "+archiveStamp())}
+function get(p){if(cache.has(p))return cache.get(p);const q=chain.then(async()=>{try{const v=await fetchRetry(p);if(Array.isArray(v)&&v.length)await archiveWrite("openf1:"+p,v);return v}catch(e){const saved=await archiveRead("openf1:"+p);if(Array.isArray(saved)&&saved.length){offlineArchiveNote("OpenF1");return saved}throw e}});
   chain=q.catch(()=>{}).then(()=>sleep(450));cache.set(p,q);q.then(v=>{if(Array.isArray(v)&&v.length===0&&cache.get(p)===q)cache.delete(p)}).catch(()=>{if(cache.get(p)===q)cache.delete(p)});return q}
-const jolpicaCache=new Map();
-async function jget(path){if(jolpicaCache.has(path))return jolpicaCache.get(path);const task=(async()=>{let last;for(let i=0;i<2;i++){try{const url=JOLPICA+path+(path.includes("?")?"&":"?")+"limit=100";const res=await fetch(url,{headers:{Accept:"application/json"}});if(!res.ok)throw new Error("Jolpica-F1 returned "+res.status);const data=await res.json();if(!data?.MRData)throw new Error("Unexpected Jolpica-F1 response");return data.MRData}catch(e){last=e;if(i===0)await sleep(500)}}throw last||new Error("Jolpica-F1 is unavailable")})();jolpicaCache.set(path,task);task.catch(()=>jolpicaCache.delete(path));return task}
+const jolpicaCache=new Map(),staticArchiveCache=new Map();
+async function readStaticSeasonArchive(y){if(staticArchiveCache.has(y))return staticArchiveCache.get(y);const task=(async()=>{const res=await fetch("./archive/"+y+".json",{cache:"no-store"});if(!res.ok)throw new Error("No permanent archive for "+y);const data=await res.json();if(!data?.responses)throw new Error("Invalid season archive");return data})();staticArchiveCache.set(y,task);task.catch(()=>staticArchiveCache.delete(y));return task}
+function deriveArchivedJolpica(path,responses){
+ if(responses[path])return responses[path];
+ const m=path.match(/^\/(\d{4})\/(\d+)\/(results|qualifying|driverstandings|constructorstandings)\/$/);if(!m)return null;
+ const [,year,round,kind]=m,base=kind==="driverstandings"?"driverStandings":kind==="constructorstandings"?"constructorStandings":kind;
+ const season=responses["/"+year+"/"+base+"/"];if(!season)return null;
+ const mr={...season};
+ if(kind==="results"||kind==="qualifying"){const rows=season.RaceTable?.Races||[];mr.RaceTable={...(season.RaceTable||{}),Races:rows.filter(r=>String(r.round)===round)};return mr}
+ const rows=season.StandingsTable?.StandingsLists||[];mr.StandingsTable={...(season.StandingsTable||{}),StandingsLists:rows.filter(r=>String(r.round)===round)};return mr
+}
+async function archiveJolpica(path){
+ const m=path.match(/^\/(\d{4})\//);if(!m)return null;
+ try{const season=await readStaticSeasonArchive(m[1]);const v=deriveArchivedJolpica(path,season.responses);if(v){offlineArchiveNote("permanent historical");return v}}catch(e){}
+ const saved=await archiveRead("jolpica:"+path);if(saved){offlineArchiveNote("Jolpica-F1");return saved}
+ return null
+}
+async function jget(path){if(jolpicaCache.has(path))return jolpicaCache.get(path);const task=(async()=>{let last;for(let i=0;i<2;i++){try{const url=JOLPICA+path+(path.includes("?")?"&":"?")+"limit=1000";const res=await fetch(url,{headers:{Accept:"application/json"}});if(!res.ok)throw new Error("Jolpica-F1 returned "+res.status);const data=await res.json();if(!data?.MRData)throw new Error("Unexpected Jolpica-F1 response");await archiveWrite("jolpica:"+path,data.MRData);return data.MRData}catch(e){last=e;if(i===0)await sleep(500)}}const archived=await archiveJolpica(path);if(archived)return archived;throw last||new Error("Jolpica-F1 is unavailable")})();jolpicaCache.set(path,task);task.catch(()=>jolpicaCache.delete(path));return task}
 const jdate=session=>session?.date?new Date(session.date+"T"+(session.time||"12:00:00Z")):null;
 function jolpicaSessionList(r){const defs=[["First Practice","FirstPractice"],["Second Practice","SecondPractice"],["Third Practice","ThirdPractice"],["Sprint Qualifying","SprintQualifying"],["Sprint Shootout","SprintShootout"],["Sprint","Sprint"],["Qualifying","Qualifying"],["Race",null]],out=[];defs.forEach(([name,key])=>{const v=key?r[key]:{date:r.date,time:r.time};if(v?.date){const d=jdate(v);if(d&&!Number.isNaN(+d))out.push({name,date:d})}});const seen=new Set();return out.filter(x=>{const k=x.name+"|"+x.date.toISOString();if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>a.date-b.date)}
 async function jolpicaRounds(y){const data=await jget(`/${y}/races/`),races=data.RaceTable?.Races||[];return races.map(r=>{const sessions=jolpicaSessionList(r),raceDate=jdate({date:r.date,time:r.time})||new Date(r.date+"T12:00:00Z"),start=sessions[0]?.date||raceDate,round=Number(r.round),key=`jolpica-${y}-${round}`;return {_source:"jolpica",season:y,jolpicaRound:round,meeting_key:key,session_key:key,date_start:start.toISOString(),date_end:new Date(raceDate.getTime()+7200000).toISOString(),location:r.Circuit?.Location?.locality||r.Circuit?.circuitName||"",country_name:r.Circuit?.Location?.country||"",circuit_short_name:r.Circuit?.circuitName||"",meeting_name:r.raceName||"Grand Prix",raceName:r.raceName||"Grand Prix",jolpicaRace:r}})}
@@ -1244,11 +1268,7 @@ function statsTeam(d){return d?.Constructors?.[0]?.name||d?.team||""}
 function statsColor(team,index){return teamIconColor(team)||(["FF1E00","3987E8","19A58C","E7B94D"][index%4])}
 function statsReadCache(y){try{const x=JSON.parse(localStorage.getItem(statsState.cacheKey(y))||"null");return x&&Array.isArray(x.drivers)?x:null}catch(e){return null}}
 function statsSaveCache(y,data){try{localStorage.setItem(statsState.cacheKey(y),JSON.stringify(data))}catch(e){}}
-async function statsEndpoint(path){
- const res=await fetch(JOLPICA+path+(path.includes("?")?"&":"?")+"limit=1000",{headers:{Accept:"application/json"}});
- if(!res.ok)throw new Error("Jolpica-F1 returned "+res.status);
- const data=await res.json();if(!data?.MRData)throw new Error("Unexpected Jolpica-F1 response");return data.MRData;
-}
+async function statsEndpoint(path){return jget(path)}
 function statsMerge(year,standingData,raceData,qualData,prior){
  const by={};(prior?.drivers||[]).forEach(d=>{by[d.id]={...d}});
  const standings=standingData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings||[];
@@ -1366,6 +1386,10 @@ const root=document.documentElement,tb=$("themebtn");
 function setTheme(t,save){root.dataset.theme=t;tb.textContent=t==="light"?"☾":"☀";tb.setAttribute("aria-label",t==="light"?"Switch to dark mode":"Switch to light mode");
  document.querySelector('meta[name=theme-color]')?.setAttribute("content",t==="light"?"#EEF0F3":"#0A0A0D");if(save)try{localStorage.setItem("redline-theme",t)}catch(e){}}
 setTheme(root.dataset.theme==="light"?"light":"dark");tb.onclick=()=>setTheme(root.dataset.theme==="light"?"dark":"light",true);
+// Install the offline app shell; API responses are archived separately in IndexedDB.
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+ window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}),{once:true});
+}
 hydrateNews();loadYear(nowY);loadNews();
 </script>
 </body>
